@@ -1,0 +1,47 @@
+{
+  "name": "statetrain",
+  "version": "0.0.1",
+  "description": "WIP",
+  "main": "index.js",
+  "scripts": {
+    "prepare": "lefthook install",
+    "dev": "vike dev",
+    "prod": "vike build && vike preview",
+    "build": "tsc && vike build",
+    "preview": "vike preview",
+    "lint": "biome lint --write .",
+    "format": "biome format --write .",
+    "check-types": "tsc --noEmit"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unterberg-dev/statetrain.git"
+  },
+  "author": "https://github.com/richard-unterberg",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/unterberg-dev/statetrain/issues"
+  },
+  "homepage": "https://github.com/unterberg-dev/statetrain#readme",
+  "dependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "lucide-react": "^0.473.0",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "react-classmate": "^1.0.22",
+    "tone": "^15.0.4",
+    "zustand": "^5.0.3"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^1.9.4",
+    "@types/node": "^22.10.7",
+    "@types/react": "^19.0.7",
+    "@types/react-dom": "^19.0.3",
+    "lefthook": "^1.10.10",
+    "typescript": "^5.7.3",
+    "unocss": "^65.4.3",
+    "vike": "^0.4.218",
+    "vike-react": "^0.5.11",
+    "vite": "^6.0.11"
+  }
+}
