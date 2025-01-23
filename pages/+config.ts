@@ -1,7 +1,7 @@
 import vikeReact from "vike-react/config"
 import type { Config } from "vike/types"
 
-import pkg from "#util/pkg"
+import pkg from "#lib/utils/pkg"
 
 export default {
   title: pkg.name,

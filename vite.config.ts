@@ -4,7 +4,7 @@ import UnoCSS from "unocss/vite"
 import vike from "vike/plugin"
 import { defineConfig } from "vite"
 
-import "dotenv/config"
+import tsConf from "./lib/utils/tsconf"
 
 export default defineConfig({
   base: "/statetrain/",
@@ -22,14 +22,9 @@ export default defineConfig({
   server: { port: 5247 },
   preview: { port: 4248 },
   resolve: {
-    alias: {
-      "#tone": path.resolve(__dirname, "./tone/"),
-      "#pages": path.resolve(__dirname, "./pages/"),
-      "#components": path.resolve(__dirname, "./components/"),
-      "#lib": path.resolve(__dirname, "./lib/"),
-      "#src": path.resolve(__dirname, "./src/"),
-      "#root": __dirname,
-      $public: path.resolve(__dirname, "./public"),
-    },
+    alias: Object.entries(tsConf.compilerOptions.paths).map(([key, [value]]) => ({
+      find: key.replace("/*", ""),
+      replacement: path.resolve(__dirname, value.replace("/*", "")),
+    })),
   },
 })

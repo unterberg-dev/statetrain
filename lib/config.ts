@@ -1,0 +1,32 @@
+import type { TransportConfigType } from "#types/tone"
+
+export const APP_CONFIG = {
+  viteUrl: `${import.meta.env.BASE_URL}`,
+  transition: {
+    tw: "duration-350 ease-out",
+    time: 350,
+    ease: "ease-out",
+  },
+}
+
+export const TRANSPORT_CONFIG: TransportConfigType = {
+  bpm: {
+    default: 130,
+    min: 60,
+    max: 240,
+  },
+  loop: {
+    default: true,
+  },
+  timeSignature: {
+    default: 4,
+    min: 2,
+    max: 8,
+  },
+  loopLength: {
+    default: 4,
+    min: 1,
+    max: 8,
+  },
+  isPlaying: false,
+}

@@ -3,6 +3,7 @@
   "version": "0.0.1",
   "description": "WIP",
   "main": "index.js",
+  "type": "module",
   "scripts": {
     "prepare": "lefthook install",
     "dev": "vike dev",
@@ -25,10 +26,11 @@
   "homepage": "https://github.com/unterberg-dev/statetrain#readme",
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.4",
+    "consola": "^3.4.0",
     "lucide-react": "^0.473.0",
     "react": "^19.0.0",
-    "react-dom": "^19.0.0",
     "react-classmate": "^1.0.22",
+    "react-dom": "^19.0.0",
     "tone": "^15.0.4",
     "zustand": "^5.0.3"
   },
