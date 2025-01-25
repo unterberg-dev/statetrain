@@ -4,36 +4,24 @@ import ToneManager from "./ToneManager"
 import { consola } from "consola/browser"
 
 class Metronome {
-  // IDs for scheduled repeating events
   private eighthNoteId: number | undefined = undefined
   private measureId: number | undefined = undefined
 
-  // Two Synths: one for 8th note ticks (C2), one for measure downbeats (C3)
   private eighthSynth: SynthType | undefined = undefined
   private measureSynth: SynthType | undefined = undefined
 
-  // Flag to prevent multiple starts
   private isStarted = false
 
-  /**
-   * Prepares the Metronome by creating two Synth instances (one for each pitch).
-   * We assume ToneManager is already initialized in the application flow.
-   */
   public initMetronome() {
     if (!ToneManager.isInitialized) {
       throw new Error("[Metronome] Tone.js is not initialized. Call ToneManager.init() first.")
     }
+    this.eighthSynth = ToneManager.createSynth()
+    this.measureSynth = ToneManager.createSynth()
   }
 
-  /**
-   * Schedules repeating events on the Transport:
-   * - C2 every 8th note
-   * - C3 every 1 measure
-   */
-  public start() {
+  public register() {
     this.stop() // Clear any existing events
-    this.eighthSynth = ToneManager.createSynth() // e.g., for 8th note "C2"
-    this.measureSynth = ToneManager.createSynth() // e.g., for measure "C3"
 
     consola.success("[Metronome] Initialized: Created two Synth instances for C2 & C3.")
 
@@ -51,9 +39,9 @@ class Metronome {
     }
 
     // Schedule a C2 note every 8th note
-    // this.eighthNoteId = ToneManager.Transport?.scheduleRepeat((time) => {
-    //   this.eighthSynth?.triggerAttackRelease('C3', '16n', time)
-    // }, '4n')
+    this.eighthNoteId = ToneManager.Transport?.scheduleRepeat((time) => {
+      this.eighthSynth?.triggerAttackRelease("C3", "16n", time)
+    }, "4n")
 
     // Schedule a C3 note every measure
     this.measureId = ToneManager.Transport?.scheduleRepeat((time) => {
@@ -68,9 +56,6 @@ class Metronome {
     this.isStarted = true
   }
 
-  /**
-   * Clears the scheduled events and disposes Synths.
-   */
   public stop() {
     if (!ToneManager.isInitialized) {
       consola.warn("[Metronome] ToneManager not initialized, cannot stop metronome.")
@@ -81,31 +66,32 @@ class Metronome {
       return
     }
 
-    // Clear repeating events
-    if (this.eighthNoteId) {
+    if (this.eighthNoteId !== undefined) {
       ToneManager.Transport?.clear(this.eighthNoteId)
       consola.info(`[Metronome] Cleared 8n repeat event ID: ${this.eighthNoteId}`)
       this.eighthNoteId = undefined
     }
 
-    if (this.measureId) {
+    if (this.measureId !== undefined) {
       ToneManager.Transport?.clear(this.measureId)
       consola.info(`[Metronome] Cleared measure repeat event ID: ${this.measureId}`)
       this.measureId = undefined
     }
 
-    // Dispose synths
+    this.isStarted = false
+    consola.success("[Metronome] Stopped and disposed synth resources.")
+  }
+
+  public dispose() {
+    this.stop()
     if (this.eighthSynth) {
       this.eighthSynth.dispose()
-      this.eighthSynth = undefined
+      consola.info("[Metronome] Disposed 8th Synth.")
     }
     if (this.measureSynth) {
       this.measureSynth.dispose()
-      this.measureSynth = undefined
+      consola.info("[Metronome] Disposed measure Synth.")
     }
-
-    this.isStarted = false
-    consola.success("[Metronome] Stopped and disposed synth resources.")
   }
 }
 

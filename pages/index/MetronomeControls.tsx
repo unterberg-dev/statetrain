@@ -1,5 +1,5 @@
 // src/components/MetronomeControls.jsx
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import ToneManager from "#tone/ToneManager"
 import Metronome from "#tone/Metronome"
 import Button from "#components/common/Button"
@@ -26,26 +26,13 @@ const MetronomeControls = () => {
     }
   }, [isToneReady])
 
-  const handleInitMetro = useCallback(() => {
-    if (!isToneReady) {
-      consola.warn("[MetronomeControls] Tone not ready, init first.")
-      return
-    }
-    if (!isMetroInit) {
-      metronome.initMetronome()
-      setIsMetroInit(true)
-    } else {
-      consola.warn("[MetronomeControls] Metronome already initialized.")
-    }
-  }, [isToneReady, isMetroInit])
-
   const handleStartMetro = useCallback(() => {
     if (!isToneReady || !isMetroInit) {
       consola.warn("[MetronomeControls] Metronome not ready to start.")
       return
     }
     if (!isMetroStarted) {
-      metronome.start()
+      metronome.register()
       setIsMetroStarted(true)
     }
   }, [isToneReady, isMetroInit, isMetroStarted])
@@ -53,7 +40,6 @@ const MetronomeControls = () => {
   const handleStopMetro = useCallback(() => {
     if (isMetroStarted) {
       metronome.stop()
-      setIsMetroInit(false)
       setIsMetroStarted(false)
     }
   }, [isMetroStarted])
@@ -70,13 +56,17 @@ const MetronomeControls = () => {
     }
   }, [isToneReady])
 
+  useEffect(() => {
+    if (isToneReady) {
+      metronome.initMetronome()
+      setIsMetroInit(true)
+    }
+  }, [isToneReady])
+
   return (
     <div className="flex gap-2">
       <Button onClick={handleInitTone} disabled={isToneReady}>
         {isToneReady ? "Tone Ready" : "Init Tone"}
-      </Button>
-      <Button onClick={handleInitMetro} disabled={!isToneReady || isMetroInit}>
-        {isMetroInit ? "Metronome Init" : "Init Metronome"}
       </Button>
       <Button onClick={handleStartMetro} disabled={!isToneReady || !isMetroInit || isMetroStarted}>
         Start Metronome

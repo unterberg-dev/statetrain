@@ -1,9 +1,9 @@
 import Button from "#components/common/Button"
-import { useToneContext } from "#tone/ToneContextProvider"
+import useTone from "#tone/useTone"
 import pkg from "#utils/pkg"
 
 const TonePortalContent = () => {
-  const { initTone } = useToneContext()
+  const { initTone } = useTone()
 
   return (
     <section className="flex justify-center">

@@ -1,12 +1,9 @@
 // src/tone/ToneManager.ts
+import { TRANSPORT_CONFIG } from "#lib/config"
 import type { TransportType } from "#types/tone"
 import { consola } from "consola/browser"
 import type { Synth as ToneSynth } from "tone"
 
-/**
- * We'll store the type references of Tone objects (like 'ToneTransport') and
- * only dynamically import them at runtime. So we don't import 'tone' at the top-level.
- */
 class ToneManager {
   private static instance: ToneManager
   public isInitialized = false
@@ -28,9 +25,16 @@ class ToneManager {
     return ToneManager.instance
   }
 
-  /**
-   * Initializes Tone.js dynamically. Ensures it's only initialized once and only after user gesture.
-   */
+  private setupTransport() {
+    if (!this.isInitialized || !this.Transport) {
+      consola.warn("Cannot setup Transport. Tone.js is not initialized.")
+      return
+    }
+    this.Transport.bpm.value = TRANSPORT_CONFIG.bpm.default
+    this.Transport.timeSignature = TRANSPORT_CONFIG.timeSignature.default
+    this.Transport.loopEnd = `${TRANSPORT_CONFIG.loopLength.default}m`
+  }
+
   public async init(): Promise<void> {
     if (this.isInitialized) {
       consola.warn("Tone.js is already initialized.")
@@ -44,46 +48,33 @@ class ToneManager {
 
     // Create a promise so if multiple calls come in while initialization is in progress,
     // they await the same promise rather than re-initializing.
-    // biome-ignore lint/suspicious/noAsyncPromiseExecutor: <explanation>
-    this.initPromise = new Promise<void>(async (resolve, reject) => {
-      try {
-        consola.start("Dynamically importing Tone.js...")
+    this.initPromise = new Promise<void>((resolve, reject) => {
+      const initialize = async () => {
+        try {
+          const ToneModule = await import("tone")
+          this.Tone = ToneModule
 
-        // Dynamically import Tone.js only now (after user gesture).
-        // This ensures no AudioContext is created until init is called.
-        const ToneModule = await import("tone")
+          // Now we can access all Tone objects through this.Tone
+          this.Transport = this.Tone?.getTransport()
+          this.setupTransport()
+          this.Synth = this.Tone.Synth
 
-        // 'default' might be undefined depending on how the bundler exports it,
-        // so we handle both possibilities.
-        this.Tone = ToneModule
-
-        // Now we can access all Tone objects through this.Tone
-        this.Transport = this.Tone?.getTransport()
-        this.Synth = this.Tone.Synth
-
-        // (Optional) Starting the AudioContext in some browsers
-        // requires a user gesture. If you want to do that explicitly,
-        // you can do: await this.Tone.start();
-
-        this.Transport.bpm.value = 120 // Set default BPM
-        this.isInitialized = true
-
-        consola.success("Tone.js initialized successfully (dynamic import).")
-        resolve()
-      } catch (error) {
-        consola.error("Error initializing Tone.js (dynamic import):", error)
-        reject(error)
-      } finally {
-        this.initPromise = undefined
+          this.isInitialized = true
+          consola.success("Tone.js initialized successfully (dynamic import).")
+          resolve()
+        } catch (error) {
+          consola.error("Error initializing Tone.js (dynamic import):", error)
+          reject(error)
+        } finally {
+          this.initPromise = undefined
+        }
       }
+      initialize()
     })
 
     return this.initPromise
   }
 
-  /**
-   * Starts the Tone.js Transport.
-   */
   public startTransport() {
     if (!this.isInitialized || !this.Transport) {
       consola.warn("Cannot start Transport. Tone.js is not initialized.")
@@ -93,9 +84,6 @@ class ToneManager {
     consola.info("Transport started.")
   }
 
-  /**
-   * Stops the Tone.js Transport.
-   */
   public stopTransport() {
     if (!this.isInitialized || !this.Transport) {
       consola.warn("Cannot stop Transport. Tone.js is not initialized.")
@@ -105,10 +93,6 @@ class ToneManager {
     consola.info("Transport stopped.")
   }
 
-  /**
-   * Retrieves the current state of the Transport.
-   * @returns {string} The current state ('started', 'stopped', 'paused').
-   */
   public getTransportState(): string {
     if (!this.isInitialized || !this.Transport) {
       return "stopped"
@@ -116,14 +100,29 @@ class ToneManager {
     return this.Transport.state
   }
 
-  /**
-   * Creates and returns a new Synth instance (e.g., Tone.Synth()).
-   */
   public createSynth() {
     if (!this.isInitialized || !this.Synth) {
       throw new Error("Cannot create Synth. Tone.js is not initialized.")
     }
     return new this.Synth().toDestination()
+  }
+
+  public setTimeSignature(value: number) {
+    if (!this.isInitialized || !this.Transport) {
+      consola.warn("Cannot set time signature. Tone.js is not initialized.")
+      return
+    }
+    this.Transport.timeSignature = value
+  }
+
+  public setBpm(value: number) {
+    if (!this.isInitialized || !this.Transport) {
+      consola.warn("Cannot set BPM. Tone.js is not initialized.")
+      return
+    }
+    if (value && value <= TRANSPORT_CONFIG.bpm.max && value >= TRANSPORT_CONFIG.bpm.min) {
+      this.Transport.bpm.value = value
+    }
   }
 }
 

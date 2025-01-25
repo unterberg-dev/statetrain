@@ -5,22 +5,9 @@ import { type ReactNode, useState, useCallback, createContext, useContext } from
 interface ToneContextType {
   isInitialized: boolean
   initTone: () => void
-  startTransport: () => void
-  stopTransport: () => void
-  getTransportState: () => string
-  createSynth: () => SynthType
 }
 
-const ToneContext = createContext<ToneContextType | undefined>(undefined)
-
-export const useToneContext = () => {
-  const context = useContext(ToneContext)
-
-  if (!context) {
-    throw new Error("useToneContext must be used within a ToneContextProvider")
-  }
-  return context
-}
+export const ToneContext = createContext<ToneContextType | undefined>(undefined)
 
 const ToneContextProvider = ({ children }: { children: ReactNode }) => {
   const [isInitialized, setIsInitialized] = useState(false)
@@ -48,31 +35,11 @@ const ToneContextProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [isInitialized, isInitializing])
 
-  const startTransport = useCallback(() => {
-    ToneManager.startTransport()
-  }, [])
-
-  const stopTransport = useCallback(() => {
-    ToneManager.stopTransport()
-  }, [])
-
-  const getTransportState = useCallback(() => {
-    return ToneManager.getTransportState()
-  }, [])
-
-  const createSynth = useCallback(() => {
-    return ToneManager.createSynth()
-  }, [])
-
   return (
     <ToneContext.Provider
       value={{
         isInitialized,
         initTone,
-        startTransport,
-        stopTransport,
-        getTransportState,
-        createSynth,
       }}
     >
       {children}

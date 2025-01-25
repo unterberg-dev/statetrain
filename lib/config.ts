@@ -11,7 +11,7 @@ export const APP_CONFIG = {
 
 export const TRANSPORT_CONFIG: TransportConfigType = {
   bpm: {
-    default: 130,
+    default: 200,
     min: 60,
     max: 240,
   },

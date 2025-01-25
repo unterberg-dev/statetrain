@@ -1,64 +1,37 @@
 // src/components/IndexPage.jsx
-import React, { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import Button from "#components/common/Button"
 import { consola } from "consola/browser"
 
-import type * as Tone from "tone"
-import { useToneContext } from "#tone/ToneContextProvider"
 import MetronomeControls from "#pages/index/MetronomeControls"
+import useTone from "#tone/useTone"
 
 const IndexPage = () => {
-  const { startTransport, stopTransport, getTransportState, createSynth } = useToneContext()
+  const { handlePlay, handleStop, isPlaying } = useTone()
   const [isTransportStarted, setIsTransportStarted] = useState(false)
-  const [synth, setSynth] = useState<Tone.Synth | null>(null)
-
-  const handleSetMetronome = useCallback(() => {
-    consola.info("Setting metronome...")
-    if (synth) {
-      // Example: Play a metronome tick
-      synth.triggerAttackRelease("C5", "64n")
-    }
-  }, [synth])
 
   const handleStartStop = useCallback(() => {
-    const currentState = getTransportState()
-
-    if (currentState === "started") {
-      stopTransport()
+    if (isPlaying) {
+      handleStop()
       setIsTransportStarted(false)
     } else {
-      startTransport()
+      handlePlay()
       setIsTransportStarted(true)
     }
-  }, [getTransportState, startTransport, stopTransport])
-
-  // Example: Create a Synth on component mount
-  useEffect(() => {
-    const newSynth = createSynth()
-    setSynth(newSynth)
-
-    // Cleanup on unmount
-    return () => {
-      newSynth.dispose()
-      consola.info("Synth disposed.")
-    }
-  }, [createSynth])
+  }, [isPlaying, handlePlay, handleStop])
 
   // Example: Cleanup Transport on component unmount
   useEffect(() => {
     return () => {
-      stopTransport()
+      handleStop()
       consola.info("Transport stopped on unmount.")
     }
-  }, [stopTransport])
+  }, [handleStop])
 
   return (
     <div className="p-4">
       <h1 className="text-2xl mb-4">Welcome to the Tone.js App</h1>
       <div className="space-x-4">
-        <Button type="button" onClick={handleSetMetronome}>
-          Play Metronome Tick
-        </Button>
         <Button type="button" onClick={handleStartStop}>
           {isTransportStarted ? "Stop Tone" : "Start Tone"}
         </Button>

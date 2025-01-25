@@ -4,10 +4,11 @@ import "@unocss/reset/tailwind.css"
 import "virtual:uno.css"
 
 import TonePortalContent from "#components/TonePortalContent"
-import ToneContextProvider, { useToneContext } from "#tone/ToneContextProvider"
+import ToneContextProvider from "#tone/ToneContextProvider"
+import useTone from "#tone/useTone"
 
 const App = ({ children }: { children: ReactNode }) => {
-  const { isInitialized } = useToneContext()
+  const { isInitialized } = useTone()
 
   return isInitialized ? children : <TonePortalContent />
 }
