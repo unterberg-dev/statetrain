@@ -1,7 +1,7 @@
-// src/tone/Metronome.ts
-import type { SynthType } from "#types/tone"
-import ToneManager from "./ToneManager"
 import { consola } from "consola/browser"
+
+import ToneManager from "#tone/ToneManager"
+import type { SynthType } from "#types/tone"
 
 class Metronome {
   private eighthNoteId: number | undefined = undefined

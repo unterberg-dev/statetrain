@@ -24,9 +24,9 @@ export const TRANSPORT_CONFIG: TransportConfigType = {
     max: 8,
   },
   loopLength: {
-    default: 4,
-    min: 1,
-    max: 8,
+    default: "4m",
+    min: "1m",
+    max: "8m",
   },
   isPlaying: false,
 }

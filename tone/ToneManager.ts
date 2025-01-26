@@ -4,6 +4,11 @@ import type { TransportType } from "#types/tone"
 import { consola } from "consola/browser"
 import type { Synth as ToneSynth } from "tone"
 
+interface SetupTransportOptions {
+  bpm?: number
+  timeSignature?: number
+  loopLength?: string
+}
 class ToneManager {
   private static instance: ToneManager
   public isInitialized = false
@@ -16,7 +21,10 @@ class ToneManager {
   public Transport: TransportType | undefined = undefined
   public Synth: typeof ToneSynth | undefined = undefined
 
-  private constructor() {}
+  // maintain internal transport state
+  public internalBpm = TRANSPORT_CONFIG.bpm.default
+  public internalTimeSignature = TRANSPORT_CONFIG.timeSignature.default
+  public internalLoopLength = TRANSPORT_CONFIG.loopLength.default
 
   public static getInstance(): ToneManager {
     if (!ToneManager.instance) {
@@ -25,14 +33,23 @@ class ToneManager {
     return ToneManager.instance
   }
 
-  private setupTransport() {
+  // premature
+  private getTransportState(): string {
+    if (!this.isInitialized || !this.Transport) {
+      return "stopped"
+    }
+    return this.Transport.state
+  }
+
+  private setTransport({ bpm, timeSignature, loopLength }: SetupTransportOptions = {}) {
     if (!this.isInitialized || !this.Transport) {
       consola.warn("Cannot setup Transport. Tone.js is not initialized.")
       return
     }
-    this.Transport.bpm.value = TRANSPORT_CONFIG.bpm.default
-    this.Transport.timeSignature = TRANSPORT_CONFIG.timeSignature.default
-    this.Transport.loopEnd = `${TRANSPORT_CONFIG.loopLength.default}m`
+    // setting all values is crucial if we wanna change signatures.
+    this.Transport.bpm.value = bpm || this.internalBpm
+    this.Transport.timeSignature = timeSignature || this.internalTimeSignature
+    this.Transport.loopEnd = loopLength || this.internalLoopLength
   }
 
   public async init(): Promise<void> {
@@ -56,7 +73,6 @@ class ToneManager {
 
           // Now we can access all Tone objects through this.Tone
           this.Transport = this.Tone?.getTransport()
-          this.setupTransport()
           this.Synth = this.Tone.Synth
 
           this.isInitialized = true
@@ -80,6 +96,7 @@ class ToneManager {
       consola.warn("Cannot start Transport. Tone.js is not initialized.")
       return
     }
+    this.setTransport()
     this.Transport.start()
     consola.info("Transport started.")
   }
@@ -89,15 +106,8 @@ class ToneManager {
       consola.warn("Cannot stop Transport. Tone.js is not initialized.")
       return
     }
-    this.Transport.stop()
+    this.Transport.pause()
     consola.info("Transport stopped.")
-  }
-
-  public getTransportState(): string {
-    if (!this.isInitialized || !this.Transport) {
-      return "stopped"
-    }
-    return this.Transport.state
   }
 
   public createSynth() {
@@ -112,7 +122,9 @@ class ToneManager {
       consola.warn("Cannot set time signature. Tone.js is not initialized.")
       return
     }
-    this.Transport.timeSignature = value
+    this.setTransport({
+      timeSignature: value,
+    })
   }
 
   public setBpm(value: number) {
@@ -121,7 +133,9 @@ class ToneManager {
       return
     }
     if (value && value <= TRANSPORT_CONFIG.bpm.max && value >= TRANSPORT_CONFIG.bpm.min) {
-      this.Transport.bpm.value = value
+      this.setTransport({
+        bpm: value,
+      })
     }
   }
 }

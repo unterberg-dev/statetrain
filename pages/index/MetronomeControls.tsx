@@ -4,6 +4,7 @@ import ToneManager from "#tone/ToneManager"
 import Metronome from "#tone/Metronome"
 import Button from "#components/common/Button"
 import { consola } from "consola/browser"
+import useTone from "#tone/useTone"
 
 const metronome = new Metronome()
 
@@ -11,7 +12,6 @@ const MetronomeControls = () => {
   const [isToneReady, setIsToneReady] = useState(ToneManager.isInitialized)
   const [isMetroInit, setIsMetroInit] = useState(false)
   const [isMetroStarted, setIsMetroStarted] = useState(false)
-  const [isTransportStarted, setIsTransportStarted] = useState(false)
 
   const handleInitTone = useCallback(async () => {
     if (!isToneReady) {
@@ -44,18 +44,6 @@ const MetronomeControls = () => {
     }
   }, [isMetroStarted])
 
-  const handleToggleTransport = useCallback(() => {
-    if (!isToneReady) return
-    const state = ToneManager.getTransportState()
-    if (state === "started") {
-      ToneManager.stopTransport()
-      setIsTransportStarted(false)
-    } else {
-      ToneManager.startTransport()
-      setIsTransportStarted(true)
-    }
-  }, [isToneReady])
-
   useEffect(() => {
     if (isToneReady) {
       metronome.initMetronome()
@@ -73,9 +61,6 @@ const MetronomeControls = () => {
       </Button>
       <Button onClick={handleStopMetro} disabled={!isMetroStarted}>
         Stop Metronome
-      </Button>
-      <Button onClick={handleToggleTransport} disabled={!isToneReady}>
-        {isTransportStarted ? "Stop Transport" : "Start Transport"}
       </Button>
     </div>
   )
