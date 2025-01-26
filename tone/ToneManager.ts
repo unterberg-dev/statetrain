@@ -1,7 +1,7 @@
 import { EventEmitter } from "eventemitter3"
 import { consola } from "consola/browser"
 import type { Synth as ToneSynth } from "tone"
-import type { TransportType } from "#types/tone"
+import type { ToneType, TransportType } from "#types/tone"
 import { TRANSPORT_CONFIG } from "#lib/config"
 
 interface SetupTransportOptions {
@@ -15,17 +15,20 @@ class ToneManager {
   public isInitialized = false
   private initPromise: Promise<void> | undefined
 
-  private Tone: typeof import("tone") | undefined
+  private Tone: ToneType | undefined
   public Transport: TransportType | undefined
   public Synth: typeof ToneSynth | undefined
 
   // Keep track of the scheduled repeat ID if we want to stop/clear it
-  private transportTickId?: number
+  private quarterTickId?: number
+  private sixteenthTickId?: number
 
   // Maintain internal transport state - setup defaults
   public internalBpm = TRANSPORT_CONFIG.bpm.default
   public internalTimeSignature = TRANSPORT_CONFIG.timeSignature.default
-  public internalLoopLength = TRANSPORT_CONFIG.loopLength.default
+  public internalLoopCount = TRANSPORT_CONFIG.loopLength.default // fixed to 4
+  public totalQuarterTicks = TRANSPORT_CONFIG.timeSignature.default * this.internalLoopCount
+  public totalSixteenthTicks = TRANSPORT_CONFIG.timeSignature.default * 4 * this.internalLoopCount
 
   // 1) Our global emitter
   public events = new EventEmitter()
@@ -39,6 +42,10 @@ class ToneManager {
       ToneManager.instance = new ToneManager()
     }
     return ToneManager.instance
+  }
+
+  public getTone() {
+    return ToneManager.getInstance().Tone as ToneType
   }
 
   public async init(): Promise<void> {
@@ -84,11 +91,15 @@ class ToneManager {
 
     this.Transport.bpm.value = Math.floor(bpm || this.internalBpm)
     this.Transport.timeSignature = Math.floor(timeSignature || this.internalTimeSignature)
-    this.Transport.loopEnd = `${Math.floor(loopLength || this.internalLoopLength)}m`
+    this.Transport.loopEnd = `${Math.floor(loopLength || this.internalLoopCount)}m`
 
     if (bpm) this.internalBpm = bpm
-    if (timeSignature) this.internalTimeSignature = timeSignature
-    if (loopLength) this.internalLoopLength = loopLength
+    if (timeSignature) {
+      this.internalTimeSignature = timeSignature
+    }
+    if (loopLength) this.internalLoopCount = loopLength
+    this.totalQuarterTicks = (timeSignature || this.internalTimeSignature) * 4
+    this.totalSixteenthTicks = (timeSignature || this.internalTimeSignature) * 4 * 4
 
     console.log("[ToneManager] Setting transport:", {
       bpm: this.Transport.bpm.value,
@@ -108,21 +119,33 @@ class ToneManager {
     this.setTransport()
 
     // For safety, clear old schedule
-    if (this.transportTickId !== undefined) {
-      this.Transport.clear(this.transportTickId)
+    if (this.quarterTickId !== undefined) {
+      this.Transport.clear(this.quarterTickId)
+    }
+    if (this.sixteenthTickId !== undefined) {
+      this.Transport.clear(this.sixteenthTickId)
     }
 
     // 2) Schedule repeating "tick" events every quarter note, for example
-    this.transportTickId = this.Transport.scheduleRepeat(
+    this.quarterTickId = this.Transport.scheduleRepeat(
       (time) => {
         // Use Tone.Draw so the callback fires at the right time for UI updates
         this.Tone?.getDraw().schedule(() => {
-          // Our “bus” emits a custom event “transportTick”
-          this.events.emit("transportTick", { time })
+          this.events.emit("quarterTick", { time })
         }, time)
       },
       "4n",
       "4n",
+    )
+
+    this.sixteenthTickId = this.Transport.scheduleRepeat(
+      (time) => {
+        this.Tone?.getDraw().schedule(() => {
+          this.events.emit("sixteenthTick", { time })
+        }, time)
+      },
+      "16n",
+      "0",
     )
 
     this.Transport.start()
@@ -140,10 +163,15 @@ class ToneManager {
     }
     this.Transport.stop()
 
-    if (this.transportTickId !== undefined) {
-      this.Transport.clear(this.transportTickId)
-      this.transportTickId = undefined
+    if (this.quarterTickId !== undefined) {
+      this.Transport.clear(this.quarterTickId)
+      this.quarterTickId = undefined
     }
+    if (this.sixteenthTickId !== undefined) {
+      this.Transport.clear(this.sixteenthTickId)
+      this.sixteenthTickId = undefined
+    }
+
     consola.info("Transport stopped.")
 
     this.events.emit("transportStop")

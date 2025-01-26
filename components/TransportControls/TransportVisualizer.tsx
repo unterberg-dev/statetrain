@@ -20,10 +20,10 @@ const TransportVisualizer = memo(() => {
     function handleTick() {
       setTickCount((prev) => prev + 1)
     }
-    ToneManager.events.on("transportTick", handleTick)
+    ToneManager.events.on("quarterTick", handleTick)
 
     return () => {
-      ToneManager.events.off("transportTick", handleTick)
+      ToneManager.events.off("quarterTick", handleTick)
     }
   }, [])
 

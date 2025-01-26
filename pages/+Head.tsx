@@ -1,7 +1,9 @@
+import { APP_CONFIG } from "#lib/config"
+
 const HeadDefault = () => (
   <>
-    <link rel="manifest" href="./site.webmanifest" />
-    <link rel="icon" href="./favicon/favicon.ico" />
+    <link rel="manifest" href={`${APP_CONFIG.viteUrl}/site.webmanifest`} />
+    <link rel="icon" href={`${APP_CONFIG.viteUrl}/favicon/favicon.ico`} />
   </>
 )
 

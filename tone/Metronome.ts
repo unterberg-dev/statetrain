@@ -20,7 +20,7 @@ class Metronome {
     return Metronome.instance
   }
 
-  public initMetronome() {
+  public init() {
     if (!ToneManager.isInitialized) {
       throw new Error("[Metronome] Tone.js is not initialized. Call ToneManager.init() first.")
     }
@@ -50,7 +50,7 @@ class Metronome {
     // Quarter-note beep
     this.eighthNoteId = ToneManager.Transport?.scheduleRepeat(
       (time) => {
-        this.eighthSynth?.triggerAttackRelease("C3", "16n", time)
+        this.eighthSynth?.triggerAttackRelease("C3", "16n", time, 0.5)
       },
       "4n",
       "0",
@@ -59,7 +59,7 @@ class Metronome {
     // Measure beep
     this.measureId = ToneManager.Transport?.scheduleRepeat(
       (time) => {
-        this.measureSynth?.triggerAttackRelease("C4", "16n", time)
+        this.measureSynth?.triggerAttackRelease("C4", "16n", time, 0.75)
       },
       "1m",
       "0",

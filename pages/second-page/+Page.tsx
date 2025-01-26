@@ -1,7 +1,7 @@
 import { H4Headline } from "#components/common/Headline"
 import LayoutComponent from "#components/common/LayoutComponent"
-import LinkComponent from "#components/common/LinkComponent"
 import InlinePlayButton from "#components/InlinePlayButton"
+import { StepSequencerUI } from "#components/StepSequencerUi"
 
 // todo: the current implementation must be oursourced to a separate file out of the page context
 const StartPage = () => (
@@ -9,9 +9,7 @@ const StartPage = () => (
     <H4Headline className="mb-5">💫 This is the alternative page layout :)</H4Headline>
     <p className="mb-3">We can now control tone.js from here</p>
     <InlinePlayButton className="mb-3" />
-    <p>
-      or after transitioning to the <LinkComponent href="/">start page</LinkComponent> of the app
-    </p>
+    <StepSequencerUI />
   </LayoutComponent>
 )
 export default StartPage

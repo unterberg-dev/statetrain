@@ -8,42 +8,40 @@ import Layout from "#components/common/LayoutComponent"
 import TransportSettings from "#components/TransportControls/TransportSettings"
 import TransportVisualizer from "#components/TransportControls/TransportVisualizer"
 import useTone from "#tone/useTone"
+import { APP_CONFIG } from "#lib/config"
 import Metronome from "#tone/Metronome"
 
 const TransportControls = () => {
   const { isPlaying, isInitialized, handlePlay, handleStop } = useTone()
-  const [isMetroStarted, setIsMetroStarted] = useState(false)
-  const [isMetroInit, setIsMetroInit] = useState(false)
+  const [isMetronomeStarted, setIsMetronomeStarted] = useState(false)
+  const [isMetronomeInit, setIsMetronomeInit] = useState(false)
 
-  const handleToggleMetro = useCallback(() => {
-    if (!isMetroInit) {
-      consola.warn("[TransportControls] Metronome not ready to start.")
+  const handleToggleMetronome = useCallback(() => {
+    if (!isMetronomeInit) {
+      consola.warn("[TransportControls] Metronomenome not ready to start.")
       return
     }
 
-    if (isMetroStarted) {
+    if (isMetronomeStarted) {
       Metronome.unregister()
-      setIsMetroStarted(false)
+      setIsMetronomeStarted(false)
     } else {
       Metronome.register()
-      setIsMetroStarted(true)
+      setIsMetronomeStarted(true)
     }
-  }, [isMetroStarted, isMetroInit])
+  }, [isMetronomeStarted, isMetronomeInit])
 
-  const handlePlayButtonClick = useCallback(() => {
-    if (isPlaying) {
-      handleStop()
-    } else {
-      handlePlay()
-    }
-  }, [handlePlay, handleStop, isPlaying])
+  const handlePlayButtonClick = useCallback(
+    () => (isPlaying ? handleStop() : handlePlay()),
+    [handlePlay, handleStop, isPlaying],
+  )
 
   useEffect(() => {
     if (isInitialized) {
-      Metronome.initMetronome()
+      Metronome.init()
       Metronome.register()
-      setIsMetroInit(true)
-      setIsMetroStarted(true)
+      setIsMetronomeInit(true)
+      setIsMetronomeStarted(true)
     }
   }, [isInitialized])
 
@@ -59,9 +57,15 @@ const TransportControls = () => {
         />
         <Button
           className="flex-1 w-14"
-          color={isMetroStarted ? "warning" : "success"}
-          icon={<img src="./icons/metronome-svgrepo-com.svg" alt="Stop" className="w-10 h-10" />}
-          onClick={handleToggleMetro}
+          color={isMetronomeStarted ? "warning" : "success"}
+          icon={
+            <img
+              src={`${APP_CONFIG.viteUrl}/icons/metronome-svgrepo-com.svg`}
+              alt="Stop"
+              className="w-10 h-10"
+            />
+          }
+          onClick={handleToggleMetronome}
         />
         <TransportVisualizer />
       </ElementContainer>
