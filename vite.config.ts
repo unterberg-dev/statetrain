@@ -7,7 +7,7 @@ import { defineConfig } from "vite"
 import tsConf from "./lib/utils/tsconf"
 
 export default defineConfig({
-  base: "/statetrain/",
+  base: "/statetrain",
   plugins: [
     UnoCSS(),
     react(),

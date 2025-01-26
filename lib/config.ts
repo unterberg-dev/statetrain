@@ -11,7 +11,7 @@ export const APP_CONFIG = {
 
 export const TRANSPORT_CONFIG: TransportConfigType = {
   bpm: {
-    default: 200,
+    default: 115,
     min: 60,
     max: 240,
   },
@@ -24,9 +24,9 @@ export const TRANSPORT_CONFIG: TransportConfigType = {
     max: 8,
   },
   loopLength: {
-    default: "4m",
-    min: "1m",
-    max: "8m",
+    default: 4,
+    min: 1,
+    max: 8,
   },
   isPlaying: false,
 }

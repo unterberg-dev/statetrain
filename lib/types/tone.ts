@@ -21,9 +21,9 @@ export type TransportConfigType = {
     max: number
   }
   loopLength: {
-    default: string
-    min: string
-    max: string
+    default: number
+    min: number
+    max: number
   }
   isPlaying: boolean
 }

@@ -1,9 +1,9 @@
 import rc from "react-classmate"
 
 const ElementContainer = rc.div`
-  p-2
-  bg-darkLight
-  border-darkLightBorder
+  p-3
+  bg-black
+  border-grayDark
   border-1
   rounded
 `

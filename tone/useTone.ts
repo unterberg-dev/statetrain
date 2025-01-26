@@ -2,6 +2,7 @@ import useInternalTransportStore from "#tone/useInternalTransportStore"
 import { ToneContext } from "#tone/ToneContextProvider"
 import ToneManager from "#tone/ToneManager"
 import { useCallback, useContext, useMemo } from "react"
+import { TRANSPORT_CONFIG } from "#lib/config"
 
 /** the tone controller */
 export const useTone = () => {
@@ -35,16 +36,20 @@ export const useTone = () => {
 
   const handleChangeBpm = useCallback(
     (value: number) => {
-      setBpm(value)
-      ToneManager.setBpm(value)
+      if (value <= TRANSPORT_CONFIG.bpm.max && value >= TRANSPORT_CONFIG.bpm.min) {
+        setBpm(value)
+        ToneManager.setBpm(value)
+      }
     },
     [setBpm],
   )
 
   const handleChangeTimeSignature = useCallback(
     (value: number) => {
-      setTimeSignature(value)
-      ToneManager.setTimeSignature(value)
+      if (value <= TRANSPORT_CONFIG.timeSignature.max && value >= TRANSPORT_CONFIG.timeSignature.min) {
+        setTimeSignature(value)
+        ToneManager.setTimeSignature(value)
+      }
     },
     [setTimeSignature],
   )
@@ -63,6 +68,7 @@ export const useTone = () => {
     handleChangeTimeSignature,
     initTone,
     isInitialized,
+    loopLength: TRANSPORT_CONFIG.loopLength.default,
   } as const
 }
 

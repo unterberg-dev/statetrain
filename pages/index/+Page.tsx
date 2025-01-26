@@ -1,44 +1,22 @@
-// src/components/IndexPage.jsx
-import { useCallback, useEffect, useState } from "react"
-import Button from "#components/common/Button"
-import { consola } from "consola/browser"
+import { H4Headline } from "#components/common/Headline"
+import LayoutComponent from "#components/common/LayoutComponent"
+import LinkComponent from "#components/common/LinkComponent"
+import InlinePlayButton from "#components/InlinePlayButton"
 
-import MetronomeControls from "#pages/index/MetronomeControls"
-import useTone from "#tone/useTone"
-
-const IndexPage = () => {
-  const { handlePlay, handleStop, isPlaying } = useTone()
-  const [isTransportStarted, setIsTransportStarted] = useState(false)
-
-  const handleStartStop = useCallback(() => {
-    if (isPlaying) {
-      handleStop()
-      setIsTransportStarted(false)
-    } else {
-      handlePlay()
-      setIsTransportStarted(true)
-    }
-  }, [isPlaying, handlePlay, handleStop])
-
-  // Example: Cleanup Transport on component unmount
-  useEffect(() => {
-    return () => {
-      handleStop()
-      consola.info("Transport stopped on unmount.")
-    }
-  }, [handleStop])
-
-  return (
-    <div className="p-4">
-      <h1 className="text-2xl mb-4">Welcome to the Tone.js App</h1>
-      <div className="space-x-4">
-        <Button type="button" onClick={handleStartStop}>
-          {isTransportStarted ? "Stop Tone" : "Start Tone"}
-        </Button>
-        <MetronomeControls />
-      </div>
-    </div>
-  )
-}
-
-export default IndexPage
+const StartPage = () => (
+  <LayoutComponent className="mt-10">
+    <H4Headline className="mb-5">🏡 This is the start page layout :)</H4Headline>
+    <p>
+      For a side project I needed a routable typescript react application with access to a shared tone.js
+      context. To test my code I build a small metronome implementation which needs kind of a communication
+      layer to and from tone.js
+    </p>
+    <p className="mb-3">We can control tone JS from here</p>
+    <InlinePlayButton className="mb-3" />
+    <p>
+      or after transitioning to a <LinkComponent href="/second-page/">alternative page</LinkComponent> of the
+      application
+    </p>
+  </LayoutComponent>
+)
+export default StartPage

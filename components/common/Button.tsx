@@ -34,7 +34,7 @@ const buttonVariants: VariantsConfig<ButtonBaseProps, ButtonBaseProps> = {
       lg: "py-3 px-4 rounded-lg shadow-md",
     },
     $color: {
-      hollow: "bg-transparent",
+      hollow: "",
       primary: ({ $disabled }) => `
         text-lightNeutral
         bg-primaryDarkNeutral
@@ -92,7 +92,7 @@ const button = createVariantMap({
   variantsConfig: buttonVariants,
 })
 
-interface ButtonProps extends HTMLAttributes<HTMLAnchorElement | HTMLButtonElement> {
+export interface ButtonProps extends HTMLAttributes<HTMLAnchorElement | HTMLButtonElement> {
   icon?: ReactNode
   link?: string
   type?: "button" | "submit" | "reset"

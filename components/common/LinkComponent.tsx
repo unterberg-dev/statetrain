@@ -16,9 +16,9 @@ const StyledLink = rc.a<StyledLinkProps>`
   transition-colors
   ${APP_CONFIG.transition.tw}
   inline-block
-  hover:text-primary
+  hover:text-primaryLight
   ${(p) => (p.$isActive ? "!text-primaryDark/70 underline isActive" : "")}
-  ${(p) => (p.$isMenu ? "!text-dark" : "text-primaryDark underline underline-0.5")}
+  ${(p) => (p.$isMenu ? "!text-dark" : "text-primaryLight/80 underline underline-0.5")}
 `
 
 const LinkComponent = ({
@@ -30,7 +30,7 @@ const LinkComponent = ({
   const { urlOriginal } = usePageContext()
 
   if (!href) {
-    return <div>Missing href</div>
+    return <span className="color-red">Missing href</span>
   }
 
   const isExternal = isExternalLink(href)
@@ -38,7 +38,7 @@ const LinkComponent = ({
 
   return (
     <StyledLink
-      href={href}
+      href={isExternal ? href : `${APP_CONFIG.viteUrl}${href}`}
       target={isExternal ? "_blank" : target}
       rel={isExternal ? "noreferrer" : ""}
       $isExternal={isExternal}

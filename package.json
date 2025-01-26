@@ -27,6 +27,7 @@
   "dependencies": {
     "@vitejs/plugin-react": "^4.3.4",
     "consola": "^3.4.0",
+    "eventemitter3": "^5.0.1",
     "lucide-react": "^0.473.0",
     "react": "^19.0.0",
     "react-classmate": "^1.0.22",
