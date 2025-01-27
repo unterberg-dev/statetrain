@@ -1,8 +1,11 @@
+// ToneManager.ts
 import { EventEmitter } from "eventemitter3"
 import { consola } from "consola/browser"
-import type { Synth as ToneSynthClass } from "tone"
+import type { Synth, AMSynth, MonoSynth } from "tone"
 import type { ToneType, TransportType } from "#types/tone"
 import { TRANSPORT_CONFIG } from "#lib/config"
+import { StepSequencer } from "#tone/StepSequencer"
+import type { SequencerMeasuresValue } from "#tone/useInternalSequencerStore"
 
 interface TransportSettings {
   bpm?: number
@@ -31,11 +34,17 @@ class ToneManager {
   // Tone.js library references
   private toneCore: ToneType | undefined
   public toneTransport: TransportType | undefined
-  public toneSynthClass: typeof ToneSynthClass | undefined
+
+  public toneSynthClass: typeof Synth | undefined
+  public toneAlternativeSynthClass: typeof MonoSynth | undefined
 
   // Scheduler IDs for repeated callbacks
   private quarterNoteRepeatId?: number
   private sixteenthNoteRepeatId?: number
+
+  private stepSequencer1: StepSequencer | null = null
+  private stepSequencer2: StepSequencer | null = null
+  private stepSequencer3: StepSequencer | null = null
 
   // Current transport state
   public currentBpm = TRANSPORT_CONFIG.bpm.default
@@ -69,12 +78,15 @@ class ToneManager {
           this.toneCore = ToneModule
 
           this.toneTransport = this.toneCore.getTransport()
+
           this.toneSynthClass = this.toneCore.Synth
+          this.toneAlternativeSynthClass = this.toneCore.MonoSynth
 
           this.isInitialized = true
           consola.success("Tone.js initialized successfully (dynamic import).")
 
           this.emitter.emit("initialized")
+
           resolve()
         } catch (error) {
           consola.error("Error initializing Tone.js (dynamic import):", error)
@@ -87,6 +99,37 @@ class ToneManager {
     })
 
     return this.initPromise
+  }
+
+  public initializeSequencer(measureCount: number) {
+    if (!this.isInitialized) {
+      throw new Error("Tone.js is not yet initialized.")
+    }
+
+    if (!this.stepSequencer1) {
+      consola.info("Initializing StepSequencer 1 with measureCount:", measureCount)
+      this.stepSequencer1 = new StepSequencer(measureCount, "G4")
+    }
+
+    if (!this.stepSequencer2) {
+      consola.info("Initializing StepSequencer 2 with measureCount:", measureCount)
+      this.stepSequencer2 = new StepSequencer(measureCount, "D#4")
+    }
+
+    if (!this.stepSequencer3) {
+      consola.info("Initializing StepSequencer 3 with measureCount:", measureCount)
+      this.stepSequencer3 = new StepSequencer(measureCount, "C5")
+    }
+  }
+
+  public getSequencer1() {
+    return this.stepSequencer1
+  }
+  public getSequencer2() {
+    return this.stepSequencer2
+  }
+  public getSequencer3() {
+    return this.stepSequencer3
   }
 
   /**
@@ -116,7 +159,7 @@ class ToneManager {
 
     this.currentBpm = newBpm
     this.currentTimeSignature = newTimeSig
-    this.currentLoopLength = newLoopLength
+    this.currentLoopLength = newLoopLength as SequencerMeasuresValue
 
     this.totalQuarterNotes = this.currentTimeSignature * this.currentLoopLength
     this.totalSixteenthNotes = this.currentTimeSignature * 4 * this.currentLoopLength
@@ -131,13 +174,13 @@ class ToneManager {
   /**
    * Start the transport and schedule repeated "tick" events.
    */
-  public start(): void {
+  public register(): void {
     if (!this.isInitialized || !this.toneTransport || !this.toneCore) {
       consola.warn("Cannot start playback. Tone.js is not initialized.")
       return
     }
 
-    // Set up the transport with current defaults
+    this.initializeSequencer(this.currentTimeSignature)
     this.configureTransport()
 
     // Clear any previous schedules
@@ -169,9 +212,16 @@ class ToneManager {
       "0",
     )
 
+    consola.info("Transport registered.")
+  }
+
+  public start(): void {
+    if (!this.isInitialized || !this.toneTransport) {
+      consola.warn("Cannot start playback. Tone.js is not initialized.")
+      return
+    }
     this.toneTransport.start()
     consola.info("Transport started.")
-    this.emitter.emit("playbackStarted")
   }
 
   /**
@@ -204,7 +254,43 @@ class ToneManager {
     if (!this.isInitialized || !this.toneSynthClass) {
       throw new Error("Cannot create Synth. Tone.js is not initialized.")
     }
-    return new this.toneSynthClass().toDestination()
+    return new this.toneSynthClass({
+      oscillator: {
+        type: "sine",
+      },
+    }).toDestination()
+  }
+
+  /**
+   * Create a new Synth instance (routed to destination by default).
+   */
+  public createAlternativeSynth() {
+    if (!this.isInitialized || !this.toneAlternativeSynthClass) {
+      throw new Error("Cannot create Synth 2. Tone.js is not initialized.")
+    }
+    return new this.toneAlternativeSynthClass({
+      oscillator: {
+        type: "sawtooth",
+      },
+      filter: {
+        frequency: 2000,
+      },
+      envelope: {
+        attack: 0,
+        decay: 0.5,
+        sustain: 0.5,
+        release: 0.1,
+      },
+      filterEnvelope: {
+        attack: 0.02,
+        decay: 0.2,
+        sustain: 0.5,
+        release: 2,
+        baseFrequency: 200,
+        octaves: 5,
+        exponent: 2,
+      },
+    }).toDestination()
   }
 
   /**
@@ -232,6 +318,16 @@ class ToneManager {
     if (value <= TRANSPORT_CONFIG.timeSignature.max && value >= TRANSPORT_CONFIG.timeSignature.min) {
       this.configureTransport({ timeSignature: value })
       this.emitter.emit("timeSignatureChanged", value)
+      consola.info("Time signature changed to:", value)
+
+      // Update sequencers
+      if (this.stepSequencer1) {
+        // this.stepSequencer1.setTimeSignature()
+        // this.stepSequencer1.setAllSteps(Array.from({ length: 5 }, () => false))
+      }
+      if (this.stepSequencer2) {
+        // this.stepSequencer2.setTimeSignature()
+      }
     }
   }
 }

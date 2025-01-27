@@ -77,6 +77,12 @@ export default defineConfig({
       sans: "Helvetica Neue, Arial, Tahoma, sans-serif",
     },
   },
+  content: {
+    pipeline: {
+      exclude: [/\.(css|postcss|node_modules|dist|sass|scss|less|stylus|stLyl)($|\?)/],
+      include: ["**/*.ts", "**/*.tsx"],
+    },
+  },
   preflights: [
     {
       // export theme to css variables

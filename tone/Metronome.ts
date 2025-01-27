@@ -1,5 +1,5 @@
 import ToneManager from "#tone/ToneManager"
-import type { SynthType } from "#types/tone"
+import type { AMSynthType, SynthType } from "#types/tone"
 
 class Metronome {
   private static instance: Metronome

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react"
+import { useEffect, type ReactNode } from "react"
 
 import "@unocss/reset/tailwind.css"
 import "virtual:uno.css"
@@ -14,17 +14,23 @@ const AppLayout = ({ children }: { children: ReactNode }) => (
   <>
     <Header />
     {children}
-    <Footer />
+    {/* <Footer /> */}
   </>
 )
 
 const App = ({ children }: { children: ReactNode }) => {
-  const { isInitialized } = useTone()
+  const { isInitialized, handlePlay, isPlaying } = useTone()
   const { ...context } = usePageContext()
 
   // if (context.abortReason) {
   //   return <AppLayout>{context.abortReason}</AppLayout>
   // }
+
+  useEffect(() => {
+    if (isInitialized) {
+      handlePlay()
+    }
+  }, [handlePlay, isInitialized])
 
   return isInitialized ? <AppLayout>{children}</AppLayout> : <TonePortalContent />
 }
