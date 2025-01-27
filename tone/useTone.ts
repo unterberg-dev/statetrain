@@ -25,12 +25,12 @@ export const useTone = () => {
   }, [context])
 
   const handlePlay = useCallback(() => {
-    ToneManager.startTransport()
+    ToneManager.start()
     setIsPlaying(true)
   }, [setIsPlaying])
 
   const handleStop = useCallback(() => {
-    ToneManager.stopTransport()
+    ToneManager.stop()
     setIsPlaying(false)
   }, [setIsPlaying])
 
@@ -38,7 +38,7 @@ export const useTone = () => {
     (value: number) => {
       if (value <= TRANSPORT_CONFIG.bpm.max && value >= TRANSPORT_CONFIG.bpm.min) {
         setBpm(value)
-        ToneManager.setBpm(value)
+        ToneManager.updateBpm(value)
       }
     },
     [setBpm],
@@ -47,8 +47,8 @@ export const useTone = () => {
   const handleChangeTimeSignature = useCallback(
     (value: number) => {
       if (value <= TRANSPORT_CONFIG.timeSignature.max && value >= TRANSPORT_CONFIG.timeSignature.min) {
+        ToneManager.updateTimeSignature(value)
         setTimeSignature(value)
-        ToneManager.setTimeSignature(value)
       }
     },
     [setTimeSignature],

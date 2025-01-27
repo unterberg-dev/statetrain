@@ -1,42 +1,23 @@
 import { EventEmitter } from "eventemitter3"
 import { consola } from "consola/browser"
-import type { Synth as ToneSynth } from "tone"
+import type { Synth as ToneSynthClass } from "tone"
 import type { ToneType, TransportType } from "#types/tone"
 import { TRANSPORT_CONFIG } from "#lib/config"
 
-interface SetupTransportOptions {
+interface TransportSettings {
   bpm?: number
   timeSignature?: number
   loopLength?: number
 }
 
+/**
+ * Manages loading Tone.js and exposes shared Tone resources.
+ */
 class ToneManager {
   private static instance: ToneManager
-  public isInitialized = false
-  private initPromise: Promise<void> | undefined
 
-  private Tone: ToneType | undefined
-  public Transport: TransportType | undefined
-  public Synth: typeof ToneSynth | undefined
-
-  // Keep track of the scheduled repeat ID if we want to stop/clear it
-  private quarterTickId?: number
-  private sixteenthTickId?: number
-
-  // Maintain internal transport state - setup defaults
-  public internalBpm = TRANSPORT_CONFIG.bpm.default
-  public internalTimeSignature = TRANSPORT_CONFIG.timeSignature.default
-  public internalLoopCount = TRANSPORT_CONFIG.loopLength.default // fixed to 4
-  public totalQuarterTicks = TRANSPORT_CONFIG.timeSignature.default * this.internalLoopCount
-  public totalSixteenthTicks = TRANSPORT_CONFIG.timeSignature.default * 4 * this.internalLoopCount
-
-  // 1) Our global emitter
-  public events = new EventEmitter()
-
-  private constructor() {
-    // Private to enforce singleton
-  }
-
+  // Singleton & initialization tracking
+  private constructor() {}
   public static getInstance(): ToneManager {
     if (!ToneManager.instance) {
       ToneManager.instance = new ToneManager()
@@ -44,10 +25,33 @@ class ToneManager {
     return ToneManager.instance
   }
 
-  public getTone() {
-    return ToneManager.getInstance().Tone as ToneType
-  }
+  private initPromise: Promise<void> | undefined
+  public isInitialized = false
 
+  // Tone.js library references
+  private toneCore: ToneType | undefined
+  public toneTransport: TransportType | undefined
+  public toneSynthClass: typeof ToneSynthClass | undefined
+
+  // Scheduler IDs for repeated callbacks
+  private quarterNoteRepeatId?: number
+  private sixteenthNoteRepeatId?: number
+
+  // Current transport state
+  public currentBpm = TRANSPORT_CONFIG.bpm.default
+  public currentTimeSignature = TRANSPORT_CONFIG.timeSignature.default
+  public currentLoopLength = TRANSPORT_CONFIG.loopLength.default // e.g. 4 bars
+
+  // Derived for reference (e.g. UI)
+  public totalQuarterNotes = this.currentTimeSignature * this.currentLoopLength
+  public totalSixteenthNotes = this.currentTimeSignature * 4 * this.currentLoopLength
+
+  // Global EventEmitter
+  public emitter = new EventEmitter()
+
+  /**
+   * Dynamic import and initialization of Tone.js
+   */
   public async init(): Promise<void> {
     if (this.isInitialized) {
       consola.warn("Tone.js is already initialized.")
@@ -57,21 +61,20 @@ class ToneManager {
       consola.info("Tone.js initialization is in progress.")
       return this.initPromise
     }
+
     this.initPromise = new Promise<void>((resolve, reject) => {
       const initialize = async () => {
         try {
           const ToneModule = await import("tone")
-          this.Tone = ToneModule
+          this.toneCore = ToneModule
 
-          this.Transport = this.Tone.getTransport()
-          this.Synth = this.Tone.Synth
+          this.toneTransport = this.toneCore.getTransport()
+          this.toneSynthClass = this.toneCore.Synth
 
           this.isInitialized = true
           consola.success("Tone.js initialized successfully (dynamic import).")
 
-          // Possibly emit an event so React knows
-          this.events.emit("initialized")
-
+          this.emitter.emit("initialized")
           resolve()
         } catch (error) {
           consola.error("Error initializing Tone.js (dynamic import):", error)
@@ -80,130 +83,155 @@ class ToneManager {
           this.initPromise = undefined
         }
       }
-      initialize()
+      void initialize()
     })
+
     return this.initPromise
   }
 
-  /** Helper to set transport parameters */
-  public setTransport({ bpm, timeSignature, loopLength }: SetupTransportOptions = {}) {
-    if (!this.Transport) return
-
-    this.Transport.bpm.value = Math.floor(bpm || this.internalBpm)
-    this.Transport.timeSignature = Math.floor(timeSignature || this.internalTimeSignature)
-    this.Transport.loopEnd = `${Math.floor(loopLength || this.internalLoopCount)}m`
-
-    if (bpm) this.internalBpm = bpm
-    if (timeSignature) {
-      this.internalTimeSignature = timeSignature
+  /**
+   * Returns the raw Tone module (Tone.js) for direct usage
+   */
+  public getTone(): ToneType {
+    if (!this.toneCore) {
+      throw new Error("Tone.js is not yet initialized.")
     }
-    if (loopLength) this.internalLoopCount = loopLength
-    this.totalQuarterTicks = (timeSignature || this.internalTimeSignature) * 4
-    this.totalSixteenthTicks = (timeSignature || this.internalTimeSignature) * 4 * 4
+    return this.toneCore
+  }
 
-    console.log("[ToneManager] Setting transport:", {
-      bpm: this.Transport.bpm.value,
-      timeSignature: this.Transport.timeSignature,
-      loopLength: this.Transport.loopEnd,
+  /**
+   * Configure the transport using provided settings,
+   * or fall back to current values.
+   */
+  public configureTransport({ bpm, timeSignature, loopLength }: TransportSettings = {}): void {
+    if (!this.toneTransport) return
+
+    const newBpm = bpm ?? this.currentBpm
+    const newTimeSig = timeSignature ?? this.currentTimeSignature
+    const newLoopLength = loopLength ?? this.currentLoopLength
+
+    this.toneTransport.bpm.value = Math.floor(newBpm)
+    this.toneTransport.timeSignature = Math.floor(newTimeSig)
+    this.toneTransport.loopEnd = `${Math.floor(newLoopLength)}m`
+
+    this.currentBpm = newBpm
+    this.currentTimeSignature = newTimeSig
+    this.currentLoopLength = newLoopLength
+
+    this.totalQuarterNotes = this.currentTimeSignature * this.currentLoopLength
+    this.totalSixteenthNotes = this.currentTimeSignature * 4 * this.currentLoopLength
+
+    consola.info("[ToneManager] configureTransport:", {
+      bpm: this.toneTransport.bpm.value,
+      timeSignature: this.toneTransport.timeSignature,
+      loopEnd: this.toneTransport.loopEnd,
     })
   }
 
-  /** Start the Transport and schedule repeated "tick" events */
-  public startTransport() {
-    if (!this.isInitialized || !this.Transport || !this.Tone) {
-      consola.warn("Cannot start Transport. Tone.js is not initialized.")
+  /**
+   * Start the transport and schedule repeated "tick" events.
+   */
+  public start(): void {
+    if (!this.isInitialized || !this.toneTransport || !this.toneCore) {
+      consola.warn("Cannot start playback. Tone.js is not initialized.")
       return
     }
 
-    // Set initial config
-    this.setTransport()
+    // Set up the transport with current defaults
+    this.configureTransport()
 
-    // For safety, clear old schedule
-    if (this.quarterTickId !== undefined) {
-      this.Transport.clear(this.quarterTickId)
+    // Clear any previous schedules
+    if (this.quarterNoteRepeatId !== undefined) {
+      this.toneTransport.clear(this.quarterNoteRepeatId)
     }
-    if (this.sixteenthTickId !== undefined) {
-      this.Transport.clear(this.sixteenthTickId)
+    if (this.sixteenthNoteRepeatId !== undefined) {
+      this.toneTransport.clear(this.sixteenthNoteRepeatId)
     }
 
-    // 2) Schedule repeating "tick" events every quarter note, for example
-    this.quarterTickId = this.Transport.scheduleRepeat(
+    // Schedule repeating "tick" events
+    this.quarterNoteRepeatId = this.toneTransport.scheduleRepeat(
       (time) => {
-        // Use Tone.Draw so the callback fires at the right time for UI updates
-        this.Tone?.getDraw().schedule(() => {
-          this.events.emit("quarterTick", { time })
+        this.toneCore?.getDraw().schedule(() => {
+          this.emitter.emit("quarterTick", { time })
         }, time)
       },
       "4n",
       "4n",
     )
 
-    this.sixteenthTickId = this.Transport.scheduleRepeat(
+    this.sixteenthNoteRepeatId = this.toneTransport.scheduleRepeat(
       (time) => {
-        this.Tone?.getDraw().schedule(() => {
-          this.events.emit("sixteenthTick", { time })
+        this.toneCore?.getDraw().schedule(() => {
+          this.emitter.emit("sixteenthTick", { time })
         }, time)
       },
       "16n",
       "0",
     )
 
-    this.Transport.start()
+    this.toneTransport.start()
     consola.info("Transport started.")
-
-    // Possibly emit an event to let React know we started
-    this.events.emit("transportStart")
+    this.emitter.emit("playbackStarted")
   }
 
-  /** Stop the Transport and clear the repeated "tick" event. */
-  public stopTransport() {
-    if (!this.isInitialized || !this.Transport) {
-      consola.warn("Cannot stop Transport. Tone.js is not initialized.")
+  /**
+   * Stop the transport and clear the repeated "tick" events.
+   */
+  public stop(): void {
+    if (!this.isInitialized || !this.toneTransport) {
+      consola.warn("Cannot stop playback. Tone.js is not initialized.")
       return
     }
-    this.Transport.stop()
+    this.toneTransport.stop()
 
-    if (this.quarterTickId !== undefined) {
-      this.Transport.clear(this.quarterTickId)
-      this.quarterTickId = undefined
+    if (this.quarterNoteRepeatId !== undefined) {
+      this.toneTransport.clear(this.quarterNoteRepeatId)
+      this.quarterNoteRepeatId = undefined
     }
-    if (this.sixteenthTickId !== undefined) {
-      this.Transport.clear(this.sixteenthTickId)
-      this.sixteenthTickId = undefined
+    if (this.sixteenthNoteRepeatId !== undefined) {
+      this.toneTransport.clear(this.sixteenthNoteRepeatId)
+      this.sixteenthNoteRepeatId = undefined
     }
 
     consola.info("Transport stopped.")
-
-    this.events.emit("transportStop")
+    this.emitter.emit("playbackStopped")
   }
 
+  /**
+   * Create a new Synth instance (routed to destination by default).
+   */
   public createSynth() {
-    if (!this.isInitialized || !this.Synth) {
+    if (!this.isInitialized || !this.toneSynthClass) {
       throw new Error("Cannot create Synth. Tone.js is not initialized.")
     }
-    return new this.Synth().toDestination()
+    return new this.toneSynthClass().toDestination()
   }
 
-  public setBpm(value: number) {
-    if (!this.isInitialized || !this.Transport) {
-      consola.warn("Cannot set BPM. Tone.js is not initialized.")
+  /**
+   * Convenience method to update BPM and fire event.
+   */
+  public updateBpm(value: number): void {
+    if (!this.isInitialized || !this.toneTransport) {
+      consola.warn("Cannot update BPM. Tone.js is not initialized.")
       return
     }
     if (value <= TRANSPORT_CONFIG.bpm.max && value >= TRANSPORT_CONFIG.bpm.min) {
-      this.setTransport({ bpm: value })
-      this.events.emit("bpmChanged", value)
+      this.configureTransport({ bpm: value })
+      this.emitter.emit("bpmChanged", value)
     }
   }
 
-  public setTimeSignature(value: number) {
-    if (!this.isInitialized || !this.Transport) {
-      consola.warn("Cannot set time signature. Tone.js is not initialized.")
+  /**
+   * Convenience method to update the time signature and fire event.
+   */
+  public updateTimeSignature(value: number): void {
+    if (!this.isInitialized || !this.toneTransport) {
+      consola.warn("Cannot update time signature. Tone.js is not initialized.")
       return
     }
-
     if (value <= TRANSPORT_CONFIG.timeSignature.max && value >= TRANSPORT_CONFIG.timeSignature.min) {
-      this.setTransport({ timeSignature: value })
-      this.events.emit("timeSignatureChanged", value)
+      this.configureTransport({ timeSignature: value })
+      this.emitter.emit("timeSignatureChanged", value)
     }
   }
 }

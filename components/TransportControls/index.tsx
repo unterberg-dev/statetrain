@@ -23,10 +23,10 @@ const TransportControls = () => {
     }
 
     if (isMetronomeStarted) {
-      Metronome.unregister()
+      Metronome.stop()
       setIsMetronomeStarted(false)
     } else {
-      Metronome.register()
+      Metronome.start()
       setIsMetronomeStarted(true)
     }
   }, [isMetronomeStarted, isMetronomeInit])
@@ -38,8 +38,8 @@ const TransportControls = () => {
 
   useEffect(() => {
     if (isInitialized) {
-      Metronome.init()
-      Metronome.register()
+      Metronome.initialize()
+      Metronome.start()
       setIsMetronomeInit(true)
       setIsMetronomeStarted(true)
     }

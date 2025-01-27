@@ -12,6 +12,7 @@ export const defaultColors = {
   darkNeutral: colors.neutral[900],
   grayDark: colors.neutral[800],
   grayDarkBorder: colors.neutral[700],
+  grayContrast: colors.neutral[600],
   darkBorder: "#111",
   gray: colors.neutral[500],
   grayNeutral: colors.neutral[500],
