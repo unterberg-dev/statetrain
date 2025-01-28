@@ -25,7 +25,7 @@ export interface SequencerStoreValues {
 }
 
 export const useInternalSequencer1Store = create<SequencerStoreValues>()((set) => ({
-  steps: sequencer1DefaultSteps,
+  steps: [], // sequencer1DefaultSteps,
   setSteps: (payload) => set(() => ({ steps: payload })),
   measures: sequencer1DefaultMeasures,
   setMeasures: (payload) => set(() => ({ measures: payload })),
@@ -34,7 +34,7 @@ export const useInternalSequencer1Store = create<SequencerStoreValues>()((set) =
 }))
 
 export const useInternalSequencer2Store = create<SequencerStoreValues>()((set) => ({
-  steps: sequencer2DefaultSteps,
+  steps: [], //sequencer2DefaultSteps,
   setSteps: (payload) => set(() => ({ steps: payload })),
   measures: sequencer2DefaultMeasures,
   setMeasures: (payload) => set(() => ({ measures: payload })),
@@ -43,7 +43,7 @@ export const useInternalSequencer2Store = create<SequencerStoreValues>()((set) =
 }))
 
 export const useInternalSequencer3Store = create<SequencerStoreValues>()((set) => ({
-  steps: sequencer3DefaultSteps,
+  steps: [], // sequencer3DefaultSteps,
   setSteps: (payload) => set(() => ({ steps: payload })),
   measures: sequencer3DefaultMeasures,
   setMeasures: (payload) => set(() => ({ measures: payload })),
@@ -52,7 +52,7 @@ export const useInternalSequencer3Store = create<SequencerStoreValues>()((set) =
 }))
 
 export const useInternalSequencer4Store = create<SequencerStoreValues>()((set) => ({
-  steps: sequencer4DefaultSteps,
+  steps: [], // sequencer4DefaultSteps,
   setSteps: (payload) => set(() => ({ steps: payload })),
   measures: sequencer4DefaultMeasures,
   setMeasures: (payload) => set(() => ({ measures: payload })),

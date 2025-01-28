@@ -9,6 +9,7 @@ import TransportVisualizer from "#components/TransportControls/TransportVisualiz
 import useTone from "#tone/useTone"
 import { APP_CONFIG } from "#lib/config"
 import useMetronome from "#tone/useMetronome"
+import LayoutComponent from "#components/common/LayoutComponent"
 
 const TransportControls = () => {
   const { isPlaying, handlePlay, handleStop } = useTone()
@@ -20,8 +21,9 @@ const TransportControls = () => {
   )
 
   return (
-    <Layout className="mt-10 flex">
-      <ElementContainer className="inline-flex gap-2 items-stretch h-20">
+    <LayoutComponent className="flex justify-end !sticky !top-0 z-20">
+      <ElementContainer className="inline-flex gap-3 items-stretch h-20">
+        <TransportVisualizer />
         <TransportSettings />
         <Button
           className={`"flex-1 w-14" ${isPlaying ? "" : "animate-pulse"}`}
@@ -41,9 +43,8 @@ const TransportControls = () => {
           }
           onClick={handleToggleMetronome}
         />
-        <TransportVisualizer />
       </ElementContainer>
-    </Layout>
+    </LayoutComponent>
   )
 }
 export default TransportControls

@@ -16,9 +16,9 @@ const StyledLink = rc.a<StyledLinkProps>`
   transition-colors
   ${APP_CONFIG.transition.tw}
   inline-block
-  hover:text-primaryLight
+  hover:text-light
   ${(p) => (p.$isActive ? "!text-primaryDark/70 underline isActive" : "")}
-  ${(p) => (p.$isMenu ? "!text-light" : "text-primaryLight/80 underline underline-0.5")}
+  ${(p) => (p.$isMenu ? "!text-light" : "text-primaryLight/90 underline underline-0.5")}
 `
 
 const LinkComponent = ({
