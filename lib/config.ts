@@ -30,3 +30,13 @@ export const TRANSPORT_CONFIG: TransportConfigType = {
   },
   isPlaying: false,
 }
+
+export const transportDefaultSixteenthsSteps = Array.from(
+  { length: TRANSPORT_CONFIG.timeSignature.default * TRANSPORT_CONFIG.loopLength.default * 4 },
+  () => false,
+)
+
+export const transportDefaultQuarterSteps = Array.from(
+  { length: TRANSPORT_CONFIG.timeSignature.default * TRANSPORT_CONFIG.loopLength.default },
+  () => false,
+)

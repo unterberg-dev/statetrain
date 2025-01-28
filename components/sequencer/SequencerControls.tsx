@@ -1,11 +1,12 @@
+import { Dice1, Shuffle, Trash } from "lucide-react"
+import { type Dispatch, type SetStateAction, useCallback, useEffect, useMemo } from "react"
+
 import Button from "#components/common/Button"
 import { parseTransportPosition } from "#components/sequencer/utils"
 import type { StepSequencer } from "#tone/StepSequencer"
 import ToneManager from "#tone/ToneManager"
-import type { SequencerMeasuresValue } from "#tone/useInternalSequencerStore"
+import type { SequencerMeasuresValue } from "#tone/useSequencer"
 import useTone from "#tone/useTone"
-import { Shuffle, Dice1, Trash } from "lucide-react"
-import { type Dispatch, type SetStateAction, useCallback, useEffect, useMemo } from "react"
 
 interface SequencerControlsProps {
   measures: SequencerMeasuresValue
@@ -14,6 +15,8 @@ interface SequencerControlsProps {
   setActiveStep: Dispatch<SetStateAction<number>>
   sequencer: StepSequencer | null
 }
+
+const measureOptions = [1, 2, 3, 4] as SequencerMeasuresValue[]
 
 const SequencerControls = ({
   measures,
@@ -60,12 +63,11 @@ const SequencerControls = ({
     [setSequencerSteps, setSequencerMeasures, setActiveStep, timeSignature, loopLength, sequencer],
   )
 
-  const measureOptions = [1, 2, 3, 4] as SequencerMeasuresValue[]
   const measureHandlers = useMemo(() => {
     return measureOptions.map((m) => {
       return () => handleMeasureSelect(m)
     })
-  }, [handleMeasureSelect, measureOptions])
+  }, [handleMeasureSelect])
 
   const handleRandomFillEmpty = useCallback(() => {
     if (!sequencer) return
@@ -110,15 +112,15 @@ const SequencerControls = ({
         ))}
       </div>
       <div className="flex items-center gap-2">
-        <Button onClick={handleRandomPattern}>
+        <Button color="success" onClick={handleRandomPattern}>
           <Shuffle className="inline-block w-4 h-4 mr-2" />
           Randomize
         </Button>
-        <Button onClick={handleRandomFillEmpty}>
+        <Button color="success" onClick={handleRandomFillEmpty}>
           <Dice1 className="inline-block w-4 h-4 mr-2" />
           Fill Empty
         </Button>
-        <Button onClick={handleClearAll}>
+        <Button color="error" onClick={handleClearAll}>
           <Trash className="inline-block w-4 h-4 mr-2" />
           Clear
         </Button>

@@ -1,4 +1,4 @@
-import { CircleDashed, CircleSlash2, CircleX, Smile } from "lucide-react"
+import { CircleDashed, CircleX, Smile } from "lucide-react"
 import { memo, useEffect, useMemo, useRef, useState } from "react"
 
 import useTone from "#tone/useTone"

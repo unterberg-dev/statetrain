@@ -37,12 +37,16 @@ const TransportControls = () => {
   )
 
   useEffect(() => {
-    if (isInitialized) {
-      Metronome.initialize()
-      Metronome.start()
-      setIsMetronomeInit(true)
-      setIsMetronomeStarted(true)
+    const initializeMetronome = async () => {
+      if (isInitialized) {
+        await Metronome.initialize()
+        Metronome.start()
+        setIsMetronomeInit(true)
+        setIsMetronomeStarted(true)
+      }
     }
+
+    initializeMetronome()
   }, [isInitialized])
 
   return (

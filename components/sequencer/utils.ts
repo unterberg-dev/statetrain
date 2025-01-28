@@ -22,3 +22,6 @@ export function chunkArray<T>(arr: T[], chunkSize: number): T[][] {
 export function getUniqueStepId(measureIndex: number, stepIndex: number) {
   return `m${measureIndex}-s${stepIndex}`
 }
+
+export const NOTES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+export const OCTAVES = Array.from({ length: 9 }, (_, i) => i) // Generates [0, 1, 2, ..., 8]

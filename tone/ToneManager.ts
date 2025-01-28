@@ -1,11 +1,10 @@
 // ToneManager.ts
 import { EventEmitter } from "eventemitter3"
 import { consola } from "consola/browser"
-import type { Synth, AMSynth, MonoSynth } from "tone"
 import type { ToneType, TransportType } from "#types/tone"
 import { TRANSPORT_CONFIG } from "#lib/config"
 import { StepSequencer } from "#tone/StepSequencer"
-import type { SequencerMeasuresValue } from "#tone/useInternalSequencerStore"
+import type { SequencerMeasuresValue } from "#tone/useSequencer"
 
 interface TransportSettings {
   bpm?: number
@@ -35,9 +34,6 @@ class ToneManager {
   private toneCore: ToneType | undefined
   public toneTransport: TransportType | undefined
 
-  public toneSynthClass: typeof Synth | undefined
-  public toneAlternativeSynthClass: typeof MonoSynth | undefined
-
   // Scheduler IDs for repeated callbacks
   private quarterNoteRepeatId?: number
   private sixteenthNoteRepeatId?: number
@@ -45,6 +41,7 @@ class ToneManager {
   private stepSequencer1: StepSequencer | null = null
   private stepSequencer2: StepSequencer | null = null
   private stepSequencer3: StepSequencer | null = null
+  private stepSequencer4: StepSequencer | null = null
 
   // Current transport state
   public currentBpm = TRANSPORT_CONFIG.bpm.default
@@ -79,9 +76,6 @@ class ToneManager {
 
           this.toneTransport = this.toneCore.getTransport()
 
-          this.toneSynthClass = this.toneCore.Synth
-          this.toneAlternativeSynthClass = this.toneCore.MonoSynth
-
           this.isInitialized = true
           consola.success("Tone.js initialized successfully (dynamic import).")
 
@@ -108,17 +102,26 @@ class ToneManager {
 
     if (!this.stepSequencer1) {
       consola.info("Initializing StepSequencer 1 with measureCount:", measureCount)
-      this.stepSequencer1 = new StepSequencer(measureCount, "G4")
+      this.stepSequencer1 = new StepSequencer(measureCount, "C2", "am")
+      this.stepSequencer1.init()
     }
 
     if (!this.stepSequencer2) {
       consola.info("Initializing StepSequencer 2 with measureCount:", measureCount)
-      this.stepSequencer2 = new StepSequencer(measureCount, "D#4")
+      this.stepSequencer2 = new StepSequencer(measureCount, "G4", "mono")
+      this.stepSequencer2.init()
     }
 
     if (!this.stepSequencer3) {
       consola.info("Initializing StepSequencer 3 with measureCount:", measureCount)
-      this.stepSequencer3 = new StepSequencer(measureCount, "C5")
+      this.stepSequencer3 = new StepSequencer(measureCount, "C3", "duo")
+      this.stepSequencer3.init()
+    }
+
+    if (!this.stepSequencer4) {
+      consola.info("Initializing StepSequencer 4 with measureCount:", measureCount)
+      this.stepSequencer4 = new StepSequencer(measureCount, "D#5", "default")
+      this.stepSequencer4.init()
     }
   }
 
@@ -130,6 +133,9 @@ class ToneManager {
   }
   public getSequencer3() {
     return this.stepSequencer3
+  }
+  public getSequencer4() {
+    return this.stepSequencer4
   }
 
   /**
@@ -248,52 +254,6 @@ class ToneManager {
   }
 
   /**
-   * Create a new Synth instance (routed to destination by default).
-   */
-  public createSynth() {
-    if (!this.isInitialized || !this.toneSynthClass) {
-      throw new Error("Cannot create Synth. Tone.js is not initialized.")
-    }
-    return new this.toneSynthClass({
-      oscillator: {
-        type: "sine",
-      },
-    }).toDestination()
-  }
-
-  /**
-   * Create a new Synth instance (routed to destination by default).
-   */
-  public createAlternativeSynth() {
-    if (!this.isInitialized || !this.toneAlternativeSynthClass) {
-      throw new Error("Cannot create Synth 2. Tone.js is not initialized.")
-    }
-    return new this.toneAlternativeSynthClass({
-      oscillator: {
-        type: "sawtooth",
-      },
-      filter: {
-        frequency: 2000,
-      },
-      envelope: {
-        attack: 0,
-        decay: 0.5,
-        sustain: 0.5,
-        release: 0.1,
-      },
-      filterEnvelope: {
-        attack: 0.02,
-        decay: 0.2,
-        sustain: 0.5,
-        release: 2,
-        baseFrequency: 200,
-        octaves: 5,
-        exponent: 2,
-      },
-    }).toDestination()
-  }
-
-  /**
    * Convenience method to update BPM and fire event.
    */
   public updateBpm(value: number): void {
@@ -319,15 +279,6 @@ class ToneManager {
       this.configureTransport({ timeSignature: value })
       this.emitter.emit("timeSignatureChanged", value)
       consola.info("Time signature changed to:", value)
-
-      // Update sequencers
-      if (this.stepSequencer1) {
-        // this.stepSequencer1.setTimeSignature()
-        // this.stepSequencer1.setAllSteps(Array.from({ length: 5 }, () => false))
-      }
-      if (this.stepSequencer2) {
-        // this.stepSequencer2.setTimeSignature()
-      }
     }
   }
 }

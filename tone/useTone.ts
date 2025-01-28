@@ -1,13 +1,31 @@
-import {
-  useInternalSequencer1Store,
-  useInternalSequencer2Store,
-  useInternalSequencer3Store,
-} from "./useInternalSequencerStore"
-import useInternalTransportStore from "#tone/useInternalTransportStore"
 import { ToneContext } from "#tone/ToneContextProvider"
 import ToneManager from "#tone/ToneManager"
-import { useCallback, useContext, useEffect, useMemo } from "react"
+import { useCallback, useContext, useMemo } from "react"
 import { TRANSPORT_CONFIG } from "#lib/config"
+import { create } from "zustand"
+
+interface TransportStoreGetter {
+  bpm: number
+  timeSignature: number
+  isPlaying: boolean
+}
+
+interface TransportStoreSetter {
+  setBpm: (payload: number | undefined) => void
+  setTimeSignature: (payload: number | undefined) => void
+  setIsPlaying: (payload: boolean | undefined) => void
+}
+
+export type TransportStoreValues = TransportStoreGetter & TransportStoreSetter
+
+const useInternalTransportStore = create<TransportStoreValues>()((set) => ({
+  bpm: TRANSPORT_CONFIG.bpm.default,
+  setBpm: (payload) => set(() => ({ bpm: payload })),
+  timeSignature: TRANSPORT_CONFIG.timeSignature.default,
+  setTimeSignature: (payload) => set(() => ({ timeSignature: payload })),
+  isPlaying: TRANSPORT_CONFIG.isPlaying,
+  setIsPlaying: (payload) => set(() => ({ isPlaying: payload })),
+}))
 
 /** the tone controller */
 const useTone = () => {
@@ -21,31 +39,15 @@ const useTone = () => {
   const timeSignature = useInternalTransportStore((state) => state.timeSignature)
   const setTimeSignature = useInternalTransportStore((state) => state.setTimeSignature)
 
-  // sequencer 1
-  const sequencer1Steps = useInternalSequencer1Store((state) => state.steps)
-  const setSequencer1Steps = useInternalSequencer1Store((state) => state.setSteps)
-  const sequencer1Measures = useInternalSequencer1Store((state) => state.measures)
-  const setSequencer1Measures = useInternalSequencer1Store((state) => state.setMeasures)
-
-  // sequencer 2
-  const sequencer2Steps = useInternalSequencer2Store((state) => state.steps)
-  const setSequencer2Steps = useInternalSequencer2Store((state) => state.setSteps)
-  const sequencer2Measures = useInternalSequencer2Store((state) => state.measures)
-  const setSequencer2Measures = useInternalSequencer2Store((state) => state.setMeasures)
-
-  // sequencer 3
-  const sequencer3Steps = useInternalSequencer3Store((state) => state.steps)
-  const setSequencer3Steps = useInternalSequencer3Store((state) => state.setSteps)
-  const sequencer3Measures = useInternalSequencer3Store((state) => state.measures)
-  const setSequencer3Measures = useInternalSequencer3Store((state) => state.setMeasures)
-
-  const isInitialized = useMemo(() => context?.isInitialized, [context])
-
   const initTone = useCallback(() => {
     if (context?.initTone) {
       context.initTone()
     }
   }, [context])
+
+  const isInitialized = useMemo(() => context?.isInitialized, [context])
+  const transport = useMemo(() => isInitialized && ToneManager.toneTransport, [isInitialized])
+  const tone = useMemo(() => isInitialized && ToneManager.getTone(), [isInitialized])
 
   const handlePlay = useCallback(() => {
     ToneManager.register()
@@ -78,12 +80,35 @@ const useTone = () => {
     [setTimeSignature],
   )
 
+  const registerQuarterTick = useCallback((event: () => void) => {
+    ToneManager.emitter.on("quarterTick", event)
+    return () => {
+      ToneManager.emitter.off("quarterTick", event)
+    }
+  }, [])
+
+  const unregisterQuarterTick = useCallback((event: () => void) => {
+    ToneManager.emitter.off("quarterTick", event)
+  }, [])
+
+  const registerSixteenthTick = useCallback((event: () => void) => {
+    ToneManager.emitter.on("sixteenthTick", event)
+    return () => {
+      ToneManager.emitter.off("sixteenthTick", event)
+    }
+  }, [])
+
+  const unregisterSixteenthTick = useCallback((event: () => void) => {
+    ToneManager.emitter.off("sixteenthTick", event)
+  }, [])
+
   if (!context) {
     throw new Error("useTone must be used within a ToneContextProvider")
   }
 
   return {
-    // transport
+    tone,
+    transport,
     isPlaying,
     handlePlay,
     handleStop,
@@ -94,24 +119,8 @@ const useTone = () => {
     initTone,
     isInitialized,
     loopLength: TRANSPORT_CONFIG.loopLength.default,
-
-    // sequencer 1
-    sequencer1Steps,
-    setSequencer1Steps,
-    sequencer1Measures,
-    setSequencer1Measures,
-
-    // sequencer 2
-    sequencer2Steps,
-    setSequencer2Steps,
-    sequencer2Measures,
-    setSequencer2Measures,
-
-    // sequencer 3
-    sequencer3Steps,
-    setSequencer3Steps,
-    sequencer3Measures,
-    setSequencer3Measures,
+    registerQuarterTick,
+    registerSixteenthTick,
   } as const
 }
 

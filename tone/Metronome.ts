@@ -1,5 +1,10 @@
+import { consola } from "consola/browser"
+import type { SynthOptions } from "tone"
+import type { RecursivePartial } from "tone/build/esm/core/util/Interface"
+
+import SynthManager from "#tone/SynthManager"
 import ToneManager from "#tone/ToneManager"
-import type { AMSynthType, SynthType } from "#types/tone"
+import type { SynthType } from "#types/tone"
 
 class Metronome {
   private static instance: Metronome
@@ -28,12 +33,22 @@ class Metronome {
   }
 
   /** Create synth instances; call after ToneManager is initialized. */
-  public initialize(): void {
+  public async initialize(): Promise<void> {
     if (!ToneManager.isInitialized) {
       throw new Error("[Metronome] Tone.js not initialized. Call ToneManager.init() first.")
     }
-    this.quarterSynth = ToneManager.createSynth()
-    this.measureSynth = ToneManager.createSynth()
+
+    const sharedOptions = {
+      envelope: {
+        sustain: 0.3,
+      },
+      oscillator: {
+        type: "sine3",
+      },
+    } as RecursivePartial<SynthOptions>
+
+    this.quarterSynth = await SynthManager.createSynth(sharedOptions)
+    this.measureSynth = await SynthManager.createSynth(sharedOptions)
   }
 
   /** If the time signature changes, re-register schedules if currently playing. */
@@ -52,15 +67,15 @@ class Metronome {
     this.stop()
 
     if (!ToneManager.isInitialized) {
-      console.warn("[Metronome] ToneManager is not initialized.")
+      consola.warn("[Metronome] ToneManager is not initialized.")
       return
     }
     if (!this.quarterSynth || !this.measureSynth) {
-      console.warn("[Metronome] Synths not created. Call initialize() first.")
+      consola.warn("[Metronome] Synths not created. Call initialize() first.")
       return
     }
     if (this.isPlaying) {
-      console.warn("[Metronome] Already running.")
+      consola.warn("[Metronome] Already running.")
       return
     }
 
@@ -82,11 +97,8 @@ class Metronome {
       "0",
     )
 
-    // Ensure transport is configured with the latest settings
-    ToneManager.configureTransport()
-
     this.isPlaying = true
-    console.info(
+    consola.info(
       "[Metronome] Started. quarterNoteScheduleId:",
       this.quarterNoteScheduleId,
       " measureScheduleId:",
@@ -99,11 +111,11 @@ class Metronome {
    */
   public stop(): void {
     if (!ToneManager.isInitialized) {
-      console.warn("[Metronome] ToneManager not initialized.")
+      consola.warn("[Metronome] ToneManager not initialized.")
       return
     }
     if (!this.isPlaying) {
-      console.warn("[Metronome] Not running or already stopped.")
+      consola.warn("[Metronome] Not running or already stopped.")
       return
     }
 
@@ -118,7 +130,7 @@ class Metronome {
     }
 
     this.isPlaying = false
-    console.info("[Metronome] Stopped scheduling.")
+    consola.info("[Metronome] Stopped scheduling.")
   }
 
   /**
@@ -138,7 +150,7 @@ class Metronome {
     this.quarterSynth = undefined
     this.measureSynth = undefined
 
-    console.info("[Metronome] Disposed completely.")
+    consola.info("[Metronome] Disposed completely.")
   }
 }
 
