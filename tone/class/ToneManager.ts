@@ -1,7 +1,7 @@
 import { EventEmitter } from "eventemitter3"
 import { consola } from "consola/browser"
 
-import type { ToneType, TransportType } from "#types/tone"
+import type { InternalToneType, InternalTransportType } from "#types/tone"
 import { TRANSPORT_CONFIG } from "#lib/config"
 import { StepSequencer } from "#tone/class/StepSequencer"
 import type { SequencerMeasuresValue } from "#tone/useSequencer"
@@ -31,17 +31,12 @@ class ToneManager {
   public isInitialized = false
 
   // Tone.js library references
-  private toneCore: ToneType | undefined
-  public toneTransport: TransportType | undefined
+  private toneCore: InternalToneType | undefined
+  public toneTransport: InternalTransportType | undefined
 
   // Scheduler IDs for repeated callbacks
   private quarterNoteRepeatId?: number
   private sixteenthNoteRepeatId?: number
-
-  private stepSequencer1: StepSequencer | null = null
-  private stepSequencer2: StepSequencer | null = null
-  private stepSequencer3: StepSequencer | null = null
-  private stepSequencer4: StepSequencer | null = null
 
   // Current transport state
   public currentBpm = TRANSPORT_CONFIG.bpm.default
@@ -51,6 +46,12 @@ class ToneManager {
   // Derived for reference (e.g. UI)
   public totalQuarterNotes = this.currentTimeSignature * this.currentLoopLength
   public totalSixteenthNotes = this.currentTimeSignature * 4 * this.currentLoopLength
+
+  // add sequencers
+  private stepSequencer1: StepSequencer | null = null
+  private stepSequencer2: StepSequencer | null = null
+  private stepSequencer3: StepSequencer | null = null
+  private stepSequencer4: StepSequencer | null = null
 
   // Global EventEmitter
   public emitter = new EventEmitter()
@@ -141,7 +142,7 @@ class ToneManager {
   /**
    * Returns the raw Tone module (Tone.js) for direct usage
    */
-  public getTone(): ToneType {
+  public getTone(): InternalToneType {
     if (!this.toneCore) {
       throw new Error("Tone.js is not yet initialized.")
     }

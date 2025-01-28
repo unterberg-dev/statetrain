@@ -7,14 +7,14 @@ import TonePortalContent from "#components/TonePortalContent"
 import ToneContextProvider from "#tone/ToneContextProvider"
 import useTone from "#tone/useTone"
 import Header from "#layout/Header"
-import { usePageContext } from "vike-react/usePageContext"
 import useMetronome from "#tone/useMetronome"
+import Footer from "#layout/Footer"
 
 const AppLayout = ({ children }: { children: ReactNode }) => (
   <>
     <Header />
     {children}
-    {/* <Footer /> */}
+    <Footer />
   </>
 )
 
@@ -22,11 +22,7 @@ const App = ({ children }: { children: ReactNode }) => {
   const { isInitialized, handlePlay, isPlaying } = useTone()
   const { handleMetronomeInit } = useMetronome()
 
-  const { ...context } = usePageContext()
-
-  // if (context.abortReason) {
-  //   return <AppLayout>{context.abortReason}</AppLayout>
-  // }
+  // @todo - add custom error handling here
 
   useEffect(() => {
     if (isInitialized) {

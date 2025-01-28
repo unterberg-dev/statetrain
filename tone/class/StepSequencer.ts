@@ -1,6 +1,7 @@
-import SynthManager, { type AvailableSynths } from "#tone/class/SynthManager"
+import SynthManager from "#tone/class/SynthManager"
 import ToneManager from "#tone/class/ToneManager"
 import type { SequencerMeasuresValue } from "#tone/useSequencer"
+import type { AvailableSynths } from "#types/tone"
 
 type SynthType = "default" | "mono" | "am" | "duo"
 

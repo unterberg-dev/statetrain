@@ -14,8 +14,6 @@ import type { RecursivePartial } from "tone/build/esm/core/util/Interface"
 
 import ToneManager from "#tone/class/ToneManager"
 
-export type AvailableSynths = Synth | MonoSynth | AMSynth | DuoSynth
-
 /**
  * Manages creation and management of Synth instances.
  */

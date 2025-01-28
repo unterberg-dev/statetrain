@@ -1,10 +1,9 @@
 import { consola } from "consola/browser"
-import type { SynthOptions } from "tone"
+import type { Synth, SynthOptions } from "tone"
 import type { RecursivePartial } from "tone/build/esm/core/util/Interface"
 
 import SynthManager from "#tone/class/SynthManager"
 import ToneManager from "#tone/class/ToneManager"
-import type { SynthType } from "#types/tone"
 
 class Metronome {
   private static instance: Metronome
@@ -14,8 +13,8 @@ class Metronome {
   private measureScheduleId?: number
 
   /** Synths used for quarter-note click and measure-downbeat click */
-  private quarterSynth?: SynthType
-  private measureSynth?: SynthType
+  private quarterSynth?: Synth
+  private measureSynth?: Synth
 
   /** Tracks if the metronome has started scheduling events */
   private isPlaying = false
