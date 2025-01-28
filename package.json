@@ -1,7 +1,7 @@
 {
   "name": "statetrain",
-  "version": "0.0.1",
-  "description": "Using Tone.js to create a simple sequencer, embedded in a react-framework",
+  "version": "0.0.2",
+  "description": "Using tone.js in a react-framework",
   "main": "index.js",
   "type": "module",
   "scripts": {
