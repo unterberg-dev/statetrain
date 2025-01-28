@@ -6,16 +6,19 @@ import { APP_CONFIG } from "#lib/config"
 import type { Colors } from "#types/ui"
 import isExternalLink from "#lib/utils/isExternalLink"
 
-interface ButtonBaseProps {
+interface ButtonVariantProps {
   $size?: "lg" | "md" | "sm" | "xs"
   $color?: Colors
+}
+
+interface ButtonBaseProps {
   $disabled?: boolean
   $loading?: boolean
   $noShadow?: boolean
   $noGutter?: boolean
 }
 
-const buttonVariants: VariantsConfig<ButtonBaseProps, ButtonBaseProps> = {
+const buttonVariants: VariantsConfig<ButtonVariantProps, ButtonBaseProps> = {
   base: ({ $noShadow, $noGutter, $disabled, $loading }) => `
     transition-colors
     inline-flex items-center justify-center gap-2
@@ -60,25 +63,6 @@ const buttonVariants: VariantsConfig<ButtonBaseProps, ButtonBaseProps> = {
         bg-errorDarkNeutral
         ${!$disabled ? "hover:bg-error" : ""}
       `,
-      neutral: ({ $disabled }) => `
-        text-dark
-        bg-light dark:bg-grayLight
-        ${!$disabled ? "hover:bg-graySuperLight dark:hover:bg-gray" : ""}
-      `,
-      copy: ({ $disabled }) => `
-        bg-white dark:bg-gray/30
-        text-dark
-        active:bg-successDarkNeutral active:text-lightNeutral
-        dark:active:bg-successDarkNeutral dark:active:text-lightNeutral
-        ${!$disabled ? "hover:text-dark hover:bg-grayLight/30 dark:hover:bg-gray/50" : ""}
-      `,
-      icon: `
-        rounded-full
-        w-7 lg:w-8
-        h-7 lg:h-8
-        bg-gray/20 dark:bg-grayLight
-        text-dark dark:text-grayDark
-      `,
     },
   },
   defaultVariants: {
@@ -97,8 +81,8 @@ export interface ButtonProps extends HTMLAttributes<HTMLAnchorElement | HTMLButt
   link?: string
   type?: "button" | "submit" | "reset"
   // we must redeclare these props here we don't want this $ on the outside
-  size?: ButtonBaseProps["$size"]
-  color?: ButtonBaseProps["$color"]
+  size?: ButtonVariantProps["$size"]
+  color?: ButtonVariantProps["$color"]
   disabled?: ButtonBaseProps["$disabled"]
   loading?: ButtonBaseProps["$loading"]
   noShadow?: ButtonBaseProps["$noShadow"]

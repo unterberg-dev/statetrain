@@ -1,4 +1,3 @@
-// ToneManager.ts
 import { EventEmitter } from "eventemitter3"
 import { consola } from "consola/browser"
 import type { ToneType, TransportType } from "#types/tone"

@@ -1,4 +1,3 @@
-// SynthManager.ts
 import { EventEmitter } from "eventemitter3"
 import { consola } from "consola/browser"
 import type {
