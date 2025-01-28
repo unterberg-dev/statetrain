@@ -1,5 +1,6 @@
 import { EventEmitter } from "eventemitter3"
 import { consola } from "consola/browser"
+
 import type { ToneType, TransportType } from "#types/tone"
 import { TRANSPORT_CONFIG } from "#lib/config"
 import { StepSequencer } from "#tone/class/StepSequencer"
