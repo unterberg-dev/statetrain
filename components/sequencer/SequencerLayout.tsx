@@ -3,7 +3,6 @@ import SequencerNoteSelect from "#components/sequencer/SequencerNoteSelect"
 import StepButtonMap from "#components/sequencer/StepButtonMap"
 import type { StepSequencer } from "#tone/class/StepSequencer"
 import { parseTransportPosition } from "#components/sequencer/utils"
-import ToneManager from "#tone/class/ToneManager"
 import useTone from "#tone/useTone"
 import { useState, useMemo, useEffect } from "react"
 import type { SequencerMeasuresValue } from "#tone/useSequencer"
@@ -19,7 +18,7 @@ interface SequencerLayoutProps {
 const SequencerLayout = ({ ...props }: SequencerLayoutProps) => {
   const { timeSignature, isPlaying, loopLength, transport, registerSixteenthTick, unregisterSixteenthTick } =
     useTone()
-  const [activeStep, setActiveStep] = useState(0)
+  const [activeStep, setActiveStep] = useState<number | undefined>()
 
   const measureSize = useMemo(() => timeSignature * loopLength, [timeSignature, loopLength])
   const totalSteps = useMemo(() => measureSize * props.measures, [measureSize, props.measures])
@@ -27,7 +26,7 @@ const SequencerLayout = ({ ...props }: SequencerLayoutProps) => {
   // track the current step for UI highlight
   useEffect(() => {
     function handleTick() {
-      setActiveStep((prev) => (prev + 1) % totalSteps)
+      setActiveStep((prev) => (typeof prev === "number" ? (prev + 1) % totalSteps : 0))
     }
     registerSixteenthTick(handleTick)
     return () => {

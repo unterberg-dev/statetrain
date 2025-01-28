@@ -12,7 +12,7 @@ interface SequencerControlsProps {
   measures: SequencerMeasuresValue
   setSequencerSteps: (steps: boolean[]) => void
   setSequencerMeasures: (payload: SequencerMeasuresValue) => void
-  setActiveStep: Dispatch<SetStateAction<number>>
+  setActiveStep: Dispatch<SetStateAction<number | undefined>>
   sequencer: StepSequencer | null
 }
 

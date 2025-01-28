@@ -5,7 +5,7 @@ import useTone from "#tone/useTone"
 import { useCallback, useEffect, useMemo } from "react"
 
 interface StepButtonMapProps {
-  activeStep: number
+  activeStep?: number
   steps: boolean[]
   sequencer: StepSequencer | null
   setSequencerSteps: (steps: boolean[]) => void

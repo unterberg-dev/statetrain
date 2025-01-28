@@ -1,7 +1,7 @@
 import rc from "react-classmate"
 
 const Skeleton = rc.div`
-  bg-graySuperLight
+  bg-grayDark
   animate-delay-300
   animate-pulse
   rounded
