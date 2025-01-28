@@ -1,7 +1,7 @@
 {
   "name": "statetrain",
   "version": "0.0.2",
-  "description": "Using tone.js in a react-framework",
+  "description": "Using tone.js in react-frameworks",
   "main": "index.js",
   "type": "module",
   "scripts": {
