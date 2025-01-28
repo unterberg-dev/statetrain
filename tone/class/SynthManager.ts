@@ -41,21 +41,13 @@ class SynthManager {
    * @param options Tone.SynthOptions to configure the Synth
    * @returns Synth instance
    */
-  public async createSynth(options?: RecursivePartial<SynthOptions>): Promise<Synth> {
-    try {
-      // Ensure Tone.js is initialized
-      await ToneManager.init()
+  public createSynth(options?: RecursivePartial<SynthOptions>): Synth {
+    const Tone = ToneManager.getTone()
+    const synth = new Tone.Synth(options).toDestination()
 
-      const Tone = ToneManager.getTone()
-      const synth = new Tone.Synth(options).toDestination()
-
-      this.emitter.emit("synthCreated", synth)
-      consola.info("Synth created successfully.")
-      return synth
-    } catch (error) {
-      consola.error("Error creating Synth:", error)
-      throw error
-    }
+    this.emitter.emit("synthCreated", synth)
+    consola.info("Synth created successfully.")
+    return synth
   }
 
   /**
@@ -63,21 +55,13 @@ class SynthManager {
    * @param options Tone.MonoSynthOptions to configure the MonoSynth
    * @returns MonoSynth instance
    */
-  public async createMonoSynth(options?: RecursivePartial<MonoSynthOptions>): Promise<MonoSynth> {
-    try {
-      // Ensure Tone.js is initialized
-      await ToneManager.init()
+  public createMonoSynth(options?: RecursivePartial<MonoSynthOptions>): MonoSynth {
+    const Tone = ToneManager.getTone()
+    const monoSynth = new Tone.MonoSynth(options).toDestination()
 
-      const Tone = ToneManager.getTone()
-      const monoSynth = new Tone.MonoSynth(options).toDestination()
-
-      this.emitter.emit("monoSynthCreated", monoSynth)
-      consola.info("MonoSynth created successfully.")
-      return monoSynth
-    } catch (error) {
-      consola.error("Error creating MonoSynth:", error)
-      throw error
-    }
+    this.emitter.emit("monoSynthCreated", monoSynth)
+    consola.info("MonoSynth created successfully.")
+    return monoSynth
   }
 
   /**
@@ -85,38 +69,22 @@ class SynthManager {
    * @param options Tone.AMSynthOptions to configure the AMSynth
    * @returns AMSynth instance
    */
-  public async createAMSynth(options?: RecursivePartial<AMSynthOptions>): Promise<AMSynth> {
-    try {
-      // Ensure Tone.js is initialized
-      await ToneManager.init()
+  public createAMSynth(options?: RecursivePartial<AMSynthOptions>): AMSynth {
+    const Tone = ToneManager.getTone()
+    const amSynth = new Tone.AMSynth(options).toDestination()
 
-      const Tone = ToneManager.getTone()
-      const amSynth = new Tone.AMSynth(options).toDestination()
-
-      this.emitter.emit("amSynthCreated", amSynth)
-      consola.info("AMSynth created successfully.")
-      return amSynth
-    } catch (error) {
-      consola.error("Error creating AMSynth:", error)
-      throw error
-    }
+    this.emitter.emit("amSynthCreated", amSynth)
+    consola.info("AMSynth created successfully.")
+    return amSynth
   }
 
-  public async createDuoSynth(options?: RecursivePartial<DuoSynthOptions>): Promise<DuoSynth> {
-    try {
-      // Ensure Tone.js is initialized
-      await ToneManager.init()
+  public createDuoSynth(options?: RecursivePartial<DuoSynthOptions>): DuoSynth {
+    const Tone = ToneManager.getTone()
+    const duoSynth = new Tone.DuoSynth(options).toDestination()
 
-      const Tone = ToneManager.getTone()
-      const duoSynth = new Tone.DuoSynth(options).toDestination()
-
-      this.emitter.emit("duoSynthCreated", duoSynth)
-      consola.info("DuoSynth created successfully.")
-      return duoSynth
-    } catch (error) {
-      consola.error("Error creating DuoSynth:", error)
-      throw error
-    }
+    this.emitter.emit("duoSynthCreated", duoSynth)
+    consola.info("DuoSynth created successfully.")
+    return duoSynth
   }
 }
 

@@ -7,10 +7,8 @@ import TonePortalContent from "#components/TonePortalContent"
 import ToneContextProvider from "#tone/ToneContextProvider"
 import useTone from "#tone/useTone"
 import Header from "#layout/Header"
-import Footer from "#layout/Footer"
 import { usePageContext } from "vike-react/usePageContext"
-import SynthManager from "#tone/class/SynthManager"
-import { StepSequencer } from "#tone/class/StepSequencer"
+import useMetronome from "#tone/useMetronome"
 
 const AppLayout = ({ children }: { children: ReactNode }) => (
   <>
@@ -22,6 +20,8 @@ const AppLayout = ({ children }: { children: ReactNode }) => (
 
 const App = ({ children }: { children: ReactNode }) => {
   const { isInitialized, handlePlay, isPlaying } = useTone()
+  const { handleMetronomeInit } = useMetronome()
+
   const { ...context } = usePageContext()
 
   // if (context.abortReason) {
@@ -30,9 +30,10 @@ const App = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (isInitialized) {
+      handleMetronomeInit()
       handlePlay()
     }
-  }, [handlePlay, isInitialized])
+  }, [handlePlay, handleMetronomeInit, isInitialized])
 
   return isInitialized ? <AppLayout>{children}</AppLayout> : <TonePortalContent />
 }

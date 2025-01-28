@@ -28,10 +28,10 @@ const buttonVariants: VariantsConfig<ButtonBaseProps, ButtonBaseProps> = {
   `,
   variants: {
     $size: {
-      xs: "py-1 px-2 rounded text-xs shadow-sm",
-      sm: "py-1.5 px-2.5 rounded text-sm shadow-sm",
-      md: "py-1.5 px-3 rounded shadow-sm",
-      lg: "py-3 px-4 rounded-lg shadow-md",
+      xs: "py-1 px-2 rounded-sm text-xs shadow-sm",
+      sm: "py-1.5 px-2.5 rounded-sm text-sm shadow-sm",
+      md: "py-1.5 px-3 rounded-sm shadow-sm",
+      lg: "py-3 px-4 rounded shadow-md",
     },
     $color: {
       hollow: "",

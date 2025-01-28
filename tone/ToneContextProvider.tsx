@@ -1,6 +1,6 @@
 import ToneManager from "#tone/class/ToneManager"
-import type { SynthType } from "#types/tone"
-import { type ReactNode, useState, useCallback, createContext, useContext } from "react"
+import { consola } from "consola/browser"
+import { type ReactNode, useState, useCallback, createContext } from "react"
 
 interface ToneContextType {
   isInitialized: boolean
@@ -15,12 +15,12 @@ const ToneContextProvider = ({ children }: { children: ReactNode }) => {
 
   const initTone = useCallback(async () => {
     if (isInitialized) {
-      console.warn("Tone.js is already initialized.")
+      consola.warn("Tone.js is already initialized.")
       return
     }
 
     if (isInitializing) {
-      console.warn("Tone.js initialization is already in progress.")
+      consola.warn("Tone.js initialization is already in progress.")
       return
     }
 
@@ -29,7 +29,7 @@ const ToneContextProvider = ({ children }: { children: ReactNode }) => {
       await ToneManager.init()
       setIsInitialized(true)
     } catch (error) {
-      console.error("Failed to initialize Tone.js:", error)
+      consola.error("Failed to initialize Tone.js:", error)
     } finally {
       setIsInitializing(false)
     }

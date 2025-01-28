@@ -1,6 +1,5 @@
 import { Play, Square } from "lucide-react"
-import { useCallback, useEffect, useState } from "react"
-import consola from "consola"
+import { useCallback } from "react"
 
 import Button from "#components/common/Button"
 import ElementContainer from "#components/common/ElementContainer"
@@ -9,45 +8,16 @@ import TransportSettings from "#components/TransportControls/TransportSettings"
 import TransportVisualizer from "#components/TransportControls/TransportVisualizer"
 import useTone from "#tone/useTone"
 import { APP_CONFIG } from "#lib/config"
-import Metronome from "#tone/class/Metronome"
+import useMetronome from "#tone/useMetronome"
 
 const TransportControls = () => {
-  const { isPlaying, isInitialized, handlePlay, handleStop } = useTone()
-  const [isMetronomeStarted, setIsMetronomeStarted] = useState(false)
-  const [isMetronomeInit, setIsMetronomeInit] = useState(false)
-
-  const handleToggleMetronome = useCallback(() => {
-    if (!isMetronomeInit) {
-      consola.warn("[TransportControls] Metronomenome not ready to start.")
-      return
-    }
-
-    if (isMetronomeStarted) {
-      Metronome.stop()
-      setIsMetronomeStarted(false)
-    } else {
-      Metronome.start()
-      setIsMetronomeStarted(true)
-    }
-  }, [isMetronomeStarted, isMetronomeInit])
+  const { isPlaying, handlePlay, handleStop } = useTone()
+  const { handleToggleMetronome, isMetronomeStarted } = useMetronome()
 
   const handlePlayButtonClick = useCallback(
     () => (isPlaying ? handleStop() : handlePlay()),
     [handlePlay, handleStop, isPlaying],
   )
-
-  useEffect(() => {
-    const initializeMetronome = async () => {
-      if (isInitialized) {
-        await Metronome.initialize()
-        Metronome.start()
-        setIsMetronomeInit(true)
-        setIsMetronomeStarted(true)
-      }
-    }
-
-    initializeMetronome()
-  }, [isInitialized])
 
   return (
     <Layout className="mt-10 flex">

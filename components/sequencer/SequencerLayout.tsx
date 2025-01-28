@@ -17,7 +17,8 @@ interface SequencerLayoutProps {
 }
 
 const SequencerLayout = ({ ...props }: SequencerLayoutProps) => {
-  const { timeSignature, isPlaying, loopLength, transport } = useTone()
+  const { timeSignature, isPlaying, loopLength, transport, registerSixteenthTick, unregisterSixteenthTick } =
+    useTone()
   const [activeStep, setActiveStep] = useState(0)
 
   const measureSize = useMemo(() => timeSignature * loopLength, [timeSignature, loopLength])
@@ -28,11 +29,11 @@ const SequencerLayout = ({ ...props }: SequencerLayoutProps) => {
     function handleTick() {
       setActiveStep((prev) => (prev + 1) % totalSteps)
     }
-    ToneManager.emitter.on("sixteenthTick", handleTick)
+    registerSixteenthTick(handleTick)
     return () => {
-      ToneManager.emitter.off("sixteenthTick", handleTick)
+      unregisterSixteenthTick(handleTick)
     }
-  }, [totalSteps])
+  }, [totalSteps, registerSixteenthTick, unregisterSixteenthTick])
 
   // reset highlight if user toggles global play
   useEffect(() => {

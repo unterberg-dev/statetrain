@@ -4,7 +4,9 @@ export const APP_CONFIG = {
   viteUrl: `${import.meta.env.BASE_URL}`,
   transition: {
     tw: "duration-350 ease-out",
+    twShort: "duration-125 ease-out",
     time: 350,
+    timeShort: 125,
     ease: "ease-out",
   },
 }

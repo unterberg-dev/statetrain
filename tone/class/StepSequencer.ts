@@ -29,14 +29,14 @@ export class StepSequencer {
   /**
    * Asynchronously initialize the StepSequencer by creating synths and scheduling repeats.
    */
-  public async init(): Promise<void> {
+  public init(): void {
     if (!ToneManager.isInitialized || !ToneManager.toneTransport) {
       throw new Error("ToneManager is not initialized.")
     }
 
     switch (this.synthType) {
       case "mono":
-        this.synth = await SynthManager.createMonoSynth({
+        this.synth = SynthManager.createMonoSynth({
           volume: 0,
           oscillator: {
             type: "sawtooth",
@@ -64,7 +64,7 @@ export class StepSequencer {
         })
         break
       case "am":
-        this.synth = await SynthManager.createAMSynth({
+        this.synth = SynthManager.createAMSynth({
           harmonicity: 2,
           volume: 10,
           oscillator: {
@@ -93,7 +93,7 @@ export class StepSequencer {
         })
         break
       case "duo":
-        this.synth = await SynthManager.createDuoSynth({
+        this.synth = SynthManager.createDuoSynth({
           detune: -10,
           harmonicity: 2,
           volume: -10,
@@ -133,7 +133,7 @@ export class StepSequencer {
         })
         break
       default:
-        this.synth = await SynthManager.createSynth({
+        this.synth = SynthManager.createSynth({
           detune: 5,
           oscillator: {
             type: "amtriangle22",

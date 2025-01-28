@@ -33,7 +33,7 @@ class Metronome {
   }
 
   /** Create synth instances; call after ToneManager is initialized. */
-  public async initialize(): Promise<void> {
+  public initialize() {
     if (!ToneManager.isInitialized) {
       throw new Error("[Metronome] Tone.js not initialized. Call ToneManager.init() first.")
     }
@@ -47,8 +47,8 @@ class Metronome {
       },
     } as RecursivePartial<SynthOptions>
 
-    this.quarterSynth = await SynthManager.createSynth(sharedOptions)
-    this.measureSynth = await SynthManager.createSynth(sharedOptions)
+    this.quarterSynth = SynthManager.createSynth(sharedOptions)
+    this.measureSynth = SynthManager.createSynth(sharedOptions)
   }
 
   /** If the time signature changes, re-register schedules if currently playing. */
@@ -63,9 +63,6 @@ class Metronome {
    * (Clears existing schedules first to avoid duplicates.)
    */
   public start(): void {
-    // Stop any active schedules
-    this.stop()
-
     if (!ToneManager.isInitialized) {
       consola.warn("[Metronome] ToneManager is not initialized.")
       return
@@ -112,10 +109,6 @@ class Metronome {
   public stop(): void {
     if (!ToneManager.isInitialized) {
       consola.warn("[Metronome] ToneManager not initialized.")
-      return
-    }
-    if (!this.isPlaying) {
-      consola.warn("[Metronome] Not running or already stopped.")
       return
     }
 
