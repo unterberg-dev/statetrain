@@ -17,10 +17,10 @@ export class StepSequencer {
   private note: string | number
   private synthType: SynthType
 
-  constructor(measureCount = 4, note = "G3", synthType: SynthType = "default") {
+  constructor(measureCount = 4, note = "G3", synthType: SynthType = "default", steps: boolean[] = []) {
     this.measureCount = measureCount as SequencerMeasuresValue
     this.note = note
-
+    this.steps = steps
     this.synthType = synthType
 
     // Build steps for initial measureCount
@@ -136,6 +136,7 @@ export class StepSequencer {
       default:
         this.synth = SynthManager.createSynth({
           detune: 5,
+          volume: -8,
           oscillator: {
             type: "amtriangle22",
             modulationType: "sine",
@@ -172,6 +173,28 @@ export class StepSequencer {
     ToneManager.toneTransport.on("start", () => {
       this.currentStep = 0
     })
+  }
+
+  public increaseVolume() {
+    if (this.synth?.volume) {
+      this.synth.volume.value += 5
+    }
+  }
+
+  public decreaseVolume() {
+    if (this.synth?.volume) {
+      this.synth.volume.value -= 5
+    }
+  }
+
+  public setVolume(value: number) {
+    if (this.synth?.volume) {
+      this.synth.volume.value = value
+    }
+  }
+
+  public getVolume() {
+    return this.synth?.volume.value || 0
   }
 
   /** Rebuilds the steps array based on measureCount & timeSig. */

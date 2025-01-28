@@ -1,4 +1,14 @@
-import { TRANSPORT_CONFIG, transportDefaultSixteenthsSteps } from "#lib/config"
+import { TRANSPORT_CONFIG } from "#lib/config"
+import {
+  sequencer1DefaultMeasures,
+  sequencer1DefaultSteps,
+  sequencer2DefaultMeasures,
+  sequencer2DefaultSteps,
+  sequencer3DefaultMeasures,
+  sequencer3DefaultSteps,
+  sequencer4DefaultMeasures,
+  sequencer4DefaultSteps,
+} from "#lib/defaultSteps"
 import ToneManager from "#tone/class/ToneManager"
 import useTone from "#tone/useTone"
 import { create } from "zustand"
@@ -10,34 +20,44 @@ export interface SequencerStoreValues {
   setSteps: (payload: boolean[]) => void
   measures: SequencerMeasuresValue
   setMeasures: (payload: SequencerMeasuresValue) => void
+  volume: number
+  setVolume: (payload: number) => void
 }
 
-const useInternalSequencer1Store = create<SequencerStoreValues>()((set) => ({
-  steps: transportDefaultSixteenthsSteps,
+export const useInternalSequencer1Store = create<SequencerStoreValues>()((set) => ({
+  steps: sequencer1DefaultSteps,
   setSteps: (payload) => set(() => ({ steps: payload })),
-  measures: TRANSPORT_CONFIG.loopLength.default,
+  measures: sequencer1DefaultMeasures,
   setMeasures: (payload) => set(() => ({ measures: payload })),
+  volume: 0,
+  setVolume: (payload) => set(() => ({ volume: payload })),
 }))
 
-const useInternalSequencer2Store = create<SequencerStoreValues>()((set) => ({
-  steps: transportDefaultSixteenthsSteps,
+export const useInternalSequencer2Store = create<SequencerStoreValues>()((set) => ({
+  steps: sequencer2DefaultSteps,
   setSteps: (payload) => set(() => ({ steps: payload })),
-  measures: TRANSPORT_CONFIG.loopLength.default,
+  measures: sequencer2DefaultMeasures,
   setMeasures: (payload) => set(() => ({ measures: payload })),
+  volume: 0,
+  setVolume: (payload) => set(() => ({ volume: payload })),
 }))
 
-const useInternalSequencer3Store = create<SequencerStoreValues>()((set) => ({
-  steps: transportDefaultSixteenthsSteps,
+export const useInternalSequencer3Store = create<SequencerStoreValues>()((set) => ({
+  steps: sequencer3DefaultSteps,
   setSteps: (payload) => set(() => ({ steps: payload })),
-  measures: TRANSPORT_CONFIG.loopLength.default,
+  measures: sequencer3DefaultMeasures,
   setMeasures: (payload) => set(() => ({ measures: payload })),
+  volume: 0,
+  setVolume: (payload) => set(() => ({ volume: payload })),
 }))
 
-const useInternalSequencer4Store = create<SequencerStoreValues>()((set) => ({
-  steps: transportDefaultSixteenthsSteps,
+export const useInternalSequencer4Store = create<SequencerStoreValues>()((set) => ({
+  steps: sequencer4DefaultSteps,
   setSteps: (payload) => set(() => ({ steps: payload })),
-  measures: TRANSPORT_CONFIG.loopLength.default,
+  measures: sequencer4DefaultMeasures,
   setMeasures: (payload) => set(() => ({ measures: payload })),
+  volume: 0,
+  setVolume: (payload) => set(() => ({ volume: payload })),
 }))
 
 const useSequencer = () => {
@@ -48,24 +68,32 @@ const useSequencer = () => {
   const setSequencer1Steps = useInternalSequencer1Store((state) => state.setSteps)
   const sequencer1Measures = useInternalSequencer1Store((state) => state.measures)
   const setSequencer1Measures = useInternalSequencer1Store((state) => state.setMeasures)
+  const sequencer1Volume = useInternalSequencer1Store((state) => state.volume)
+  const setSequencer1Volume = useInternalSequencer1Store((state) => state.setVolume)
 
   // sequencer 2
   const sequencer2Steps = useInternalSequencer2Store((state) => state.steps)
   const setSequencer2Steps = useInternalSequencer2Store((state) => state.setSteps)
   const sequencer2Measures = useInternalSequencer2Store((state) => state.measures)
   const setSequencer2Measures = useInternalSequencer2Store((state) => state.setMeasures)
+  const sequencer2Volume = useInternalSequencer2Store((state) => state.volume)
+  const setSequencer2Volume = useInternalSequencer2Store((state) => state.setVolume)
 
   // sequencer 3
   const sequencer3Steps = useInternalSequencer3Store((state) => state.steps)
   const setSequencer3Steps = useInternalSequencer3Store((state) => state.setSteps)
   const sequencer3Measures = useInternalSequencer3Store((state) => state.measures)
   const setSequencer3Measures = useInternalSequencer3Store((state) => state.setMeasures)
+  const sequencer3Volume = useInternalSequencer3Store((state) => state.volume)
+  const setSequencer3Volume = useInternalSequencer3Store((state) => state.setVolume)
 
   // sequencer 4
   const sequencer4Steps = useInternalSequencer4Store((state) => state.steps)
   const setSequencer4Steps = useInternalSequencer4Store((state) => state.setSteps)
   const sequencer4Measures = useInternalSequencer4Store((state) => state.measures)
   const setSequencer4Measures = useInternalSequencer4Store((state) => state.setMeasures)
+  const sequencer4Volume = useInternalSequencer4Store((state) => state.volume)
+  const setSequencer4Volume = useInternalSequencer4Store((state) => state.setVolume)
 
   const sequencer1 = isInitialized ? ToneManager.getSequencer1() : null
   const sequencer2 = isInitialized ? ToneManager.getSequencer2() : null
@@ -79,6 +107,8 @@ const useSequencer = () => {
     setSequencer1Steps,
     sequencer1Measures,
     setSequencer1Measures,
+    sequencer1Volume,
+    setSequencer1Volume,
 
     // sequencer 2
     sequencer2,
@@ -86,6 +116,8 @@ const useSequencer = () => {
     setSequencer2Steps,
     sequencer2Measures,
     setSequencer2Measures,
+    sequencer2Volume,
+    setSequencer2Volume,
 
     // sequencer 3
     sequencer3,
@@ -93,6 +125,8 @@ const useSequencer = () => {
     setSequencer3Steps,
     sequencer3Measures,
     setSequencer3Measures,
+    sequencer3Volume,
+    setSequencer3Volume,
 
     // sequencer 4
     sequencer4,
@@ -100,6 +134,8 @@ const useSequencer = () => {
     setSequencer4Steps,
     sequencer4Measures,
     setSequencer4Measures,
+    sequencer4Volume,
+    setSequencer4Volume,
   }
 }
 

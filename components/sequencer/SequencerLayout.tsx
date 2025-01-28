@@ -4,10 +4,30 @@ import StepButtonMap from "#components/sequencer/StepButtonMap"
 import type { StepSequencer } from "#tone/class/StepSequencer"
 import { parseTransportPosition } from "#components/sequencer/utils"
 import useTone from "#tone/useTone"
-import { useState, useMemo, useEffect } from "react"
+import { useState, useMemo, useEffect, useCallback } from "react"
 import type { SequencerMeasuresValue } from "#tone/useSequencer"
+import RangeSlider from "#components/form/RangeSlider"
+
+export const ruleOfThree = (value: number, min: number, max: number) => (value / 100) * (max - min) + min
+
+export const getPercent = (value: number, min: number, max: number) =>
+  Number((((value - min) / (max - min)) * 100).toFixed(2))
+
+export type PixiConfigMinMax = {
+  min: number
+  max: number
+}
+
+export type PixiConfigSingleValue = {
+  value: number
+} & PixiConfigMinMax
+
+export const getPercentSingleValue = (item: PixiConfigSingleValue) =>
+  getPercent(item.value, item.min, item.max)
 
 interface SequencerLayoutProps {
+  volume: number
+  setVolume: (value: number) => void
   measures: SequencerMeasuresValue
   setSequencerSteps: (steps: boolean[]) => void
   setSequencerMeasures: (payload: SequencerMeasuresValue) => void
@@ -15,7 +35,7 @@ interface SequencerLayoutProps {
   steps: boolean[]
 }
 
-const SequencerLayout = ({ ...props }: SequencerLayoutProps) => {
+const SequencerLayout = ({ sequencer, volume, setVolume, ...props }: SequencerLayoutProps) => {
   const { timeSignature, isPlaying, loopLength, transport, registerSixteenthTick, unregisterSixteenthTick } =
     useTone()
   const [activeStep, setActiveStep] = useState<number | undefined>()
@@ -53,18 +73,46 @@ const SequencerLayout = ({ ...props }: SequencerLayoutProps) => {
     setActiveStep(Math.floor(currentStep))
   }, [timeSignature, totalSteps, transport])
 
+  const onChangeVolume = useCallback(
+    (value: number) => {
+      if (sequencer) {
+        setVolume(value)
+        const interpolatedValue = ruleOfThree(value, -50, 20)
+        console.log("interpolatedValue", interpolatedValue)
+        sequencer.setVolume(interpolatedValue)
+      }
+    },
+    [sequencer, setVolume],
+  )
+
   return (
     <div className="p-4 border-grayDark bg-black border-1">
-      <SequencerNoteSelect sequencer={props.sequencer} />
+      <div className="flex justify-between items-center mb-4">
+        <SequencerNoteSelect sequencer={sequencer} />
+        <div className="flex gap-2 items-center">
+          <span className="text-sm pt-1 text-grayLight">Volume</span>
+          <RangeSlider
+            onChange={onChangeVolume}
+            initialValue={
+              volume ||
+              getPercentSingleValue({
+                min: -50,
+                max: 20,
+                value: 0,
+              })
+            }
+          />
+        </div>
+      </div>
       <SequencerControls
         measures={props.measures}
         setSequencerMeasures={props.setSequencerMeasures}
         setSequencerSteps={props.setSequencerSteps}
         setActiveStep={setActiveStep}
-        sequencer={props.sequencer}
+        sequencer={sequencer}
       />
       <StepButtonMap
-        sequencer={props.sequencer}
+        sequencer={sequencer}
         setSequencerSteps={props.setSequencerSteps}
         activeStep={activeStep}
         steps={props.steps}

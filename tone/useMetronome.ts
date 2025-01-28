@@ -42,6 +42,7 @@ const useMetronome = () => {
 
   const handleMetronomeInit = useCallback(() => {
     if (isInitialized) {
+      Metronome.stop()
       Metronome.initialize()
       Metronome.start()
       setIsMetronomeInit(true)

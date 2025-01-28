@@ -1,0 +1,57 @@
+
+/* Removing the default appearance for range thumbs */
+.thumb,
+.thumb::-webkit-slider-thumb {
+  -webkit-appearance: none;
+}
+.thumb {
+  pointer-events: none;
+  position: absolute;
+  height: 0;
+  width: 200px;
+  border: none;
+  box-shadow: none;
+  outline: none;
+  margin-top: 4px;
+}
+.thumb--left {
+  z-index: 3;
+}
+.thumb--right {
+  z-index: 4;
+}
+
+.thumb::-webkit-slider-thumb:hover {
+  background-color: var(--color-primaryLight);
+}
+
+.thumb::-moz-range-thumb:hover {
+  background-color: var(--color-primary);
+}
+
+/* For Chrome browsers */
+.thumb::-webkit-slider-thumb {
+  background-color: var(--color-primary);
+  border-radius: 50%;
+  cursor: pointer;
+  height: 18px;
+  width: 18px;
+  border: none;
+  outline: none;
+  pointer-events: all;
+  position: relative;
+}
+
+/* For Firefox browsers */
+.thumb::-moz-range-thumb {
+  background-color: var(--color-primary);
+  border: none;
+  outline: none;
+  border-radius: 50%;
+  cursor: pointer;
+  height: 18px;
+  width: 18px;
+  margin-top: 40px;
+  pointer-events: all;
+  position: relative;
+}

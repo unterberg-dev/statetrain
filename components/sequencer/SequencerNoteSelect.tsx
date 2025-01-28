@@ -64,7 +64,7 @@ const SequencerNoteSelect = ({ sequencer }: SequencerNoteSelectProps) => {
   }, [sequencer])
 
   return (
-    <div className="flex justify-start gap-4 mb-5">
+    <div className="flex justify-start gap-4">
       {/* Note Selection */}
       <div className="flex items-center justify-between w-34">
         <label htmlFor="note-select" className="text-sm whitespace-nowrap">

@@ -5,12 +5,21 @@ import type { InternalToneType, InternalTransportType } from "#types/tone"
 import { TRANSPORT_CONFIG } from "#lib/config"
 import { StepSequencer } from "#tone/class/StepSequencer"
 import type { SequencerMeasuresValue } from "#tone/useSequencer"
+import { useInternalSequencer1Store } from "#tone/useSequencer"
+import { useInternalSequencer2Store } from "#tone/useSequencer"
+import { useInternalSequencer3Store } from "#tone/useSequencer"
+import { useInternalSequencer4Store } from "#tone/useSequencer"
 
 interface TransportSettings {
   bpm?: number
   timeSignature?: number
   loopLength?: number
 }
+
+const sequencer1Store = useInternalSequencer1Store.getState().steps
+const sequencer2Store = useInternalSequencer2Store.getState().steps
+const sequencer3Store = useInternalSequencer3Store.getState().steps
+const sequencer4Store = useInternalSequencer4Store.getState().steps
 
 /**
  * Manages loading Tone.js and exposes shared Tone resources.
@@ -96,32 +105,32 @@ class ToneManager {
     return this.initPromise
   }
 
-  public initializeSequencer(measureCount: number) {
+  public initializeSequencer(measureCount?: number): void {
     if (!this.isInitialized) {
       throw new Error("Tone.js is not yet initialized.")
     }
 
     if (!this.stepSequencer1) {
       consola.info("Initializing StepSequencer 1 with measureCount:", measureCount)
-      this.stepSequencer1 = new StepSequencer(measureCount, "C2", "am")
+      this.stepSequencer1 = new StepSequencer(measureCount, "C2", "am", sequencer1Store)
       this.stepSequencer1.init()
     }
 
     if (!this.stepSequencer2) {
       consola.info("Initializing StepSequencer 2 with measureCount:", measureCount)
-      this.stepSequencer2 = new StepSequencer(measureCount, "G4", "mono")
+      this.stepSequencer2 = new StepSequencer(measureCount, "G4", "mono", sequencer2Store)
       this.stepSequencer2.init()
     }
 
     if (!this.stepSequencer3) {
       consola.info("Initializing StepSequencer 3 with measureCount:", measureCount)
-      this.stepSequencer3 = new StepSequencer(measureCount, "C3", "duo")
+      this.stepSequencer3 = new StepSequencer(measureCount, "C2", "duo", sequencer3Store)
       this.stepSequencer3.init()
     }
 
     if (!this.stepSequencer4) {
       consola.info("Initializing StepSequencer 4 with measureCount:", measureCount)
-      this.stepSequencer4 = new StepSequencer(measureCount, "D#5", "default")
+      this.stepSequencer4 = new StepSequencer(measureCount, "D#5", "default", sequencer4Store)
       this.stepSequencer4.init()
     }
   }
@@ -187,7 +196,7 @@ class ToneManager {
       return
     }
 
-    this.initializeSequencer(this.currentTimeSignature)
+    this.initializeSequencer(this.currentLoopLength)
     this.configureTransport()
 
     // Clear any previous schedules

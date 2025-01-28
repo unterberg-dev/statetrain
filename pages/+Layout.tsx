@@ -1,6 +1,7 @@
 import { useEffect, type ReactNode } from "react"
 
 import "@unocss/reset/tailwind.css"
+import "#components/style.css"
 import "virtual:uno.css"
 
 import TonePortalContent from "#components/TonePortalContent"
@@ -19,17 +20,22 @@ const AppLayout = ({ children }: { children: ReactNode }) => (
 )
 
 const App = ({ children }: { children: ReactNode }) => {
-  const { isInitialized, handlePlay, isPlaying } = useTone()
+  const { isInitialized, handlePlay, timeSignature } = useTone()
   const { handleMetronomeInit } = useMetronome()
 
   // @todo - add custom error handling here
 
   useEffect(() => {
     if (isInitialized) {
-      handleMetronomeInit()
       handlePlay()
     }
-  }, [handlePlay, handleMetronomeInit, isInitialized])
+  }, [handlePlay, isInitialized])
+
+  useEffect(() => {
+    if (timeSignature) {
+      handleMetronomeInit()
+    }
+  }, [timeSignature, handleMetronomeInit])
 
   return isInitialized ? <AppLayout>{children}</AppLayout> : <TonePortalContent />
 }
