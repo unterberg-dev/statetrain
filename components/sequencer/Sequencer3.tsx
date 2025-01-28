@@ -1,5 +1,5 @@
 // StepSequencerUi.tsx
-import ToneManager from "#tone/ToneManager"
+import ToneManager from "#tone/class/ToneManager"
 import SequencerLayout from "#components/sequencer/SequencerLayout"
 import useSequencer from "#tone/useSequencer"
 

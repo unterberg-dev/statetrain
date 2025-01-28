@@ -1,8 +1,8 @@
 import { CircleDashed, CircleX, Smile } from "lucide-react"
-import { memo, useEffect, useMemo, useRef, useState } from "react"
+import { memo, useEffect, useMemo, useState } from "react"
 
 import useTone from "#tone/useTone"
-import ToneManager from "#tone/ToneManager"
+import ToneManager from "#tone/class/ToneManager"
 
 const TransportVisualizer = memo(() => {
   const [tickCount, setTickCount] = useState(0)

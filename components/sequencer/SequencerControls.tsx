@@ -3,8 +3,8 @@ import { type Dispatch, type SetStateAction, useCallback, useEffect, useMemo } f
 
 import Button from "#components/common/Button"
 import { parseTransportPosition } from "#components/sequencer/utils"
-import type { StepSequencer } from "#tone/StepSequencer"
-import ToneManager from "#tone/ToneManager"
+import type { StepSequencer } from "#tone/class/StepSequencer"
+import ToneManager from "#tone/class/ToneManager"
 import type { SequencerMeasuresValue } from "#tone/useSequencer"
 import useTone from "#tone/useTone"
 

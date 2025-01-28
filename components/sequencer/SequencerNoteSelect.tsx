@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from "react"
 
 import { NOTES } from "#components/sequencer/utils"
-import type { StepSequencer } from "#tone/StepSequencer"
+import type { StepSequencer } from "#tone/class/StepSequencer"
 import NumberInput from "#components/form/NumberInput"
 import { StyledSelect } from "#components/form/styled"
 

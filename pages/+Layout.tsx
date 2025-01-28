@@ -9,8 +9,8 @@ import useTone from "#tone/useTone"
 import Header from "#layout/Header"
 import Footer from "#layout/Footer"
 import { usePageContext } from "vike-react/usePageContext"
-import SynthManager from "#tone/SynthManager"
-import { StepSequencer } from "#tone/StepSequencer"
+import SynthManager from "#tone/class/SynthManager"
+import { StepSequencer } from "#tone/class/StepSequencer"
 
 const AppLayout = ({ children }: { children: ReactNode }) => (
   <>

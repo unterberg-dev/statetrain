@@ -1,4 +1,4 @@
-import ToneManager from "#tone/ToneManager"
+import ToneManager from "#tone/class/ToneManager"
 import type { SynthType } from "#types/tone"
 import { type ReactNode, useState, useCallback, createContext, useContext } from "react"
 

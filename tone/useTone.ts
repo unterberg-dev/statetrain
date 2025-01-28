@@ -1,5 +1,5 @@
 import { ToneContext } from "#tone/ToneContextProvider"
-import ToneManager from "#tone/ToneManager"
+import ToneManager from "#tone/class/ToneManager"
 import { useCallback, useContext, useMemo } from "react"
 import { TRANSPORT_CONFIG } from "#lib/config"
 import { create } from "zustand"

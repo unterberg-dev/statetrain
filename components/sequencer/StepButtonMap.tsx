@@ -1,6 +1,6 @@
 import { SequencerButton } from "#components/sequencer/styled"
 import { chunkArray, getUniqueStepId } from "#components/sequencer/utils"
-import type { StepSequencer } from "#tone/StepSequencer"
+import type { StepSequencer } from "#tone/class/StepSequencer"
 import useTone from "#tone/useTone"
 import { useCallback, useEffect, useMemo } from "react"
 

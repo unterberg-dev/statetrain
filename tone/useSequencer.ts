@@ -1,5 +1,5 @@
 import { TRANSPORT_CONFIG, transportDefaultSixteenthsSteps } from "#lib/config"
-import ToneManager from "#tone/ToneManager"
+import ToneManager from "#tone/class/ToneManager"
 import useTone from "#tone/useTone"
 import { create } from "zustand"
 

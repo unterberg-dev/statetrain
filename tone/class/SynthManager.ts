@@ -13,7 +13,7 @@ import type {
 } from "tone"
 import type { RecursivePartial } from "tone/build/esm/core/util/Interface"
 
-import ToneManager from "#tone/ToneManager"
+import ToneManager from "#tone/class/ToneManager"
 
 export type AvailableSynths = Synth | MonoSynth | AMSynth | DuoSynth
 

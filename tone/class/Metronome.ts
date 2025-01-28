@@ -2,8 +2,8 @@ import { consola } from "consola/browser"
 import type { SynthOptions } from "tone"
 import type { RecursivePartial } from "tone/build/esm/core/util/Interface"
 
-import SynthManager from "#tone/SynthManager"
-import ToneManager from "#tone/ToneManager"
+import SynthManager from "#tone/class/SynthManager"
+import ToneManager from "#tone/class/ToneManager"
 import type { SynthType } from "#types/tone"
 
 class Metronome {

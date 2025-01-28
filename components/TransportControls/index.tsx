@@ -9,7 +9,7 @@ import TransportSettings from "#components/TransportControls/TransportSettings"
 import TransportVisualizer from "#components/TransportControls/TransportVisualizer"
 import useTone from "#tone/useTone"
 import { APP_CONFIG } from "#lib/config"
-import Metronome from "#tone/Metronome"
+import Metronome from "#tone/class/Metronome"
 
 const TransportControls = () => {
   const { isPlaying, isInitialized, handlePlay, handleStop } = useTone()
