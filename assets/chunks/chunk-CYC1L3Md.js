@@ -1,1 +1,0 @@
-import{u as o,j as q}from"./chunk-DzTJcogl.js";import{c as S}from"./chunk-DmvFjrY1.js";function p(){const{sequencer2:e,sequencer2Steps:s,sequencer2Measures:u,setSequencer2Steps:r,setSequencer2Measures:t,sequencer2Volume:n,setSequencer2Volume:c}=o();return q.jsx(S,{measures:u,sequencer:e,setSequencerMeasures:t,setSequencerSteps:r,steps:s,volume:n,setVolume:c})}export{p as S};
