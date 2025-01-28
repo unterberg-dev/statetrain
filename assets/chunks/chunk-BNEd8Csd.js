@@ -1,0 +1,1 @@
+import{j as n}from"./chunk-CdfIebs3.js";import{u as c,a as q}from"./chunk-DK_-gXDG.js";function o(){const{sequencer3:e,sequencer3Steps:s,sequencer3Measures:r,setSequencer3Steps:u,setSequencer3Measures:t}=c();return n.jsx(q,{measures:r,sequencer:e,setSequencerMeasures:t,setSequencerSteps:u,steps:s})}export{o as S};
