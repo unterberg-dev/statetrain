@@ -26,11 +26,12 @@ const SequencerControls = ({
   const measureSize = useMemo(() => timeSignature * loopLength, [timeSignature, loopLength])
   const totalSteps = useMemo(() => measureSize * measures, [measureSize, measures])
 
+  // @todo: potential bad side effect
+  // we need this to update the sequencer when the timeSignature change
   useEffect(() => {
-    console.log(totalSteps)
-    if (!sequencer || !totalSteps) return
+    if (!sequencer || !timeSignature) return
     handleMeasureSelect(measures)
-  }, [sequencer, totalSteps, measures])
+  }, [sequencer, timeSignature, measures])
 
   const handleMeasureSelect = useCallback(
     (newCount: SequencerMeasuresValue) => {
