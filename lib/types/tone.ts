@@ -30,3 +30,17 @@ export type TransportConfigType = {
   }
   isPlaying: boolean
 }
+
+export type StepNote = {
+  value: string
+  velocity: number
+}
+
+export type Step = {
+  index: number
+  active: boolean
+  notes: StepNote[]
+  double: boolean
+}
+
+export type Steps = Step[]

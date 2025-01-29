@@ -1,19 +1,22 @@
 import { SequencerButton } from "#components/sequencer/styled"
 import { chunkArray, getUniqueStepId } from "#components/sequencer/utils"
 import type { StepSequencer } from "#tone/class/StepSequencer"
+import useSequencer from "#tone/useSequencer"
 import useTone from "#tone/useTone"
+import type { Steps } from "#types/tone"
 import { useCallback, useEffect, useMemo } from "react"
 
 interface StepButtonMapProps {
   activeStep?: number
-  steps: boolean[]
+  steps: Steps
   sequencer: StepSequencer | null
-  setSequencerSteps: (steps: boolean[]) => void
+  setSequencerSteps: (steps: Steps) => void
 }
 
 const StepButtonMap = ({ activeStep, steps, sequencer, setSequencerSteps }: StepButtonMapProps) => {
   const { timeSignature, loopLength } = useTone()
   const measureSize = useMemo(() => timeSignature * loopLength, [timeSignature, loopLength])
+  const { editStepIndex, setEditStepIndex } = useSequencer()
 
   useEffect(() => {
     if (!sequencer) return
@@ -25,10 +28,9 @@ const StepButtonMap = ({ activeStep, steps, sequencer, setSequencerSteps }: Step
     (e: React.MouseEvent<HTMLButtonElement>) => {
       if (!sequencer) return
       const stepIndex = Number(e.currentTarget.dataset.stepIndex)
-      sequencer.toggleStep(stepIndex)
-      setSequencerSteps(sequencer.getSteps())
+      setEditStepIndex(stepIndex)
     },
-    [setSequencerSteps, sequencer],
+    [setEditStepIndex, sequencer],
   )
 
   // 2) Create an array [0..(totalSteps-1)]
@@ -53,7 +55,7 @@ const StepButtonMap = ({ activeStep, steps, sequencer, setSequencerSteps }: Step
           {measureSteps.map((stepObj, localIndex) => {
             const globalStepIdx = stepObj.originalIndex
             const isCurrent = activeStep === globalStepIdx
-            const isArmed = steps[globalStepIdx]
+            const isArmed = steps[globalStepIdx].notes.length > 0
             const uniqueKey = getUniqueStepId(measureIndex, localIndex)
 
             // Determine if it’s a quarter note step (4ths) or an eighth note step
@@ -61,7 +63,7 @@ const StepButtonMap = ({ activeStep, steps, sequencer, setSequencerSteps }: Step
             const isQuarter = globalStepIdx % 4 === 0
             const isEighth = globalStepIdx % 2 === 0
 
-            let computedState: "current" | "inactive" | "fourths" | "eigths" | "halfs"
+            let computedState: "current" | "inactive" | "halfs" | "eigths" | "fourths" | "edit"
             if (isCurrent) {
               // if it’s the active step, highlight with "current"
               computedState = "current"
@@ -77,6 +79,10 @@ const StepButtonMap = ({ activeStep, steps, sequencer, setSequencerSteps }: Step
             } else {
               // everything else
               computedState = "inactive"
+            }
+
+            if (editStepIndex === globalStepIdx) {
+              computedState = "edit"
             }
 
             return (

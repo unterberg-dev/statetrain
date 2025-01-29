@@ -1,5 +1,4 @@
 import SequencerControls from "#components/sequencer/SequencerControls"
-import SequencerNoteSelect from "#components/sequencer/SequencerNoteSelect"
 import StepButtonMap from "#components/sequencer/StepButtonMap"
 import type { StepSequencer } from "#tone/class/StepSequencer"
 import { parseTransportPosition } from "#components/sequencer/utils"
@@ -8,6 +7,8 @@ import { useState, useMemo, useEffect, useCallback } from "react"
 import type { SequencerMeasuresValue } from "#tone/useSequencer"
 import RangeSlider from "#components/form/RangeSlider"
 import PianoRoll from "#components/PianoRoll"
+import type { Steps } from "#types/tone"
+import useSequencer from "#tone/useSequencer"
 
 export const ruleOfThree = (value: number, min: number, max: number) => (value / 100) * (max - min) + min
 
@@ -31,10 +32,10 @@ interface SequencerLayoutProps {
   volume: number
   setVolume: (value: number) => void
   measures: SequencerMeasuresValue
-  setSequencerSteps: (steps: boolean[]) => void
   setSequencerMeasures: (payload: SequencerMeasuresValue) => void
   sequencer: StepSequencer | null
-  steps: boolean[]
+  steps: Steps
+  setSequencerSteps: (steps: Steps) => void
 }
 
 const SequencerLayout = ({
@@ -50,6 +51,7 @@ const SequencerLayout = ({
   const { timeSignature, isPlaying, loopLength, transport, registerSixteenthTick, unregisterSixteenthTick } =
     useTone()
   const [activeStep, setActiveStep] = useState<number | undefined>()
+  const { editStepIndex } = useSequencer()
 
   const measureSize = useMemo(() => timeSignature * loopLength, [timeSignature, loopLength])
   const totalSteps = useMemo(() => measureSize * measures, [measureSize, measures])
@@ -98,7 +100,6 @@ const SequencerLayout = ({
   return (
     <div className="p-4 border-grayDark bg-black border-1">
       <div className="flex justify-between items-center mb-4">
-        <SequencerNoteSelect sequencer={sequencer} />
         <div className="flex gap-2 items-center">
           <span className="text-sm pt-1 text-grayLight">Volume</span>
           <RangeSlider
@@ -127,7 +128,9 @@ const SequencerLayout = ({
         activeStep={activeStep}
         steps={steps}
       />
-      {!compact && <PianoRoll sequencer={sequencer} />}
+      {!compact && editStepIndex !== undefined && (
+        <PianoRoll steps={steps} activeStep={activeStep} sequencer={sequencer} />
+      )}
     </div>
   )
 }

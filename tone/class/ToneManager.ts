@@ -5,21 +5,23 @@ import type { InternalToneType, InternalTransportType } from "#types/tone"
 import { TRANSPORT_CONFIG } from "#lib/config"
 import { StepSequencer } from "#tone/class/StepSequencer"
 import type { SequencerMeasuresValue } from "#tone/useSequencer"
-import { useInternalSequencer1Store } from "#tone/useSequencer"
-import { useInternalSequencer2Store } from "#tone/useSequencer"
-import { useInternalSequencer3Store } from "#tone/useSequencer"
-import { useInternalSequencer4Store } from "#tone/useSequencer"
+import { useInternalSequencer1Store as useInternalSequencer1Steps } from "#tone/useSequencer"
+import { useInternalSequencer2Store as useInternalSequencer2Steps } from "#tone/useSequencer"
+import { useInternalSequencer3Store as useInternalSequencer3Steps } from "#tone/useSequencer"
+import { useInternalSequencer4Store as useInternalSequencer4Steps } from "#tone/useSequencer"
+import SynthManager from "#tone/class/SynthManager"
+import {
+  sequencer1DefaultMeasures,
+  sequencer2DefaultMeasures,
+  sequencer3DefaultMeasures,
+  sequencer4DefaultMeasures,
+} from "#lib/defaultSteps"
 
 interface TransportSettings {
   bpm?: number
   timeSignature?: number
   loopLength?: number
 }
-
-const sequencer1Store = useInternalSequencer1Store.getState().steps
-const sequencer2Store = useInternalSequencer2Store.getState().steps
-const sequencer3Store = useInternalSequencer3Store.getState().steps
-const sequencer4Store = useInternalSequencer4Store.getState().steps
 
 /**
  * Manages loading Tone.js and exposes shared Tone resources.
@@ -112,26 +114,140 @@ class ToneManager {
 
     if (!this.stepSequencer1) {
       consola.info("Initializing StepSequencer 1 with measureCount:", measureCount)
-      this.stepSequencer1 = new StepSequencer(measureCount, "C2", "am", sequencer1Store)
-      this.stepSequencer1.init()
+      this.stepSequencer1 = new StepSequencer(sequencer1DefaultMeasures, [])
+      this.stepSequencer1.initializeSynth(
+        SynthManager.createAMSynth({
+          harmonicity: 2,
+          volume: 10,
+          oscillator: {
+            type: "amsine2",
+            modulationType: "sine",
+            harmonicity: 1.01,
+          },
+          envelope: {
+            attack: 0.006,
+            decay: 4,
+            sustain: 0.04,
+            release: 1.2,
+          },
+          modulation: {
+            volume: 15,
+            type: "amsine2",
+            modulationType: "sine",
+            harmonicity: 12,
+          },
+          modulationEnvelope: {
+            attack: 0.006,
+            decay: 0.2,
+            sustain: 0.2,
+            release: 0.4,
+          },
+        }),
+      )
+      this.stepSequencer1.registerTransportCallback()
     }
 
     if (!this.stepSequencer2) {
       consola.info("Initializing StepSequencer 2 with measureCount:", measureCount)
-      this.stepSequencer2 = new StepSequencer(measureCount, "G4", "mono", sequencer2Store)
-      this.stepSequencer2.init()
+      this.stepSequencer2 = new StepSequencer(sequencer2DefaultMeasures, [])
+      this.stepSequencer2.initializeSynth(
+        SynthManager.createMonoSynth({
+          volume: 0,
+          oscillator: {
+            type: "sawtooth",
+          },
+          filter: {
+            Q: 2,
+            type: "bandpass",
+            rolloff: -24,
+          },
+          envelope: {
+            attack: 0.01,
+            decay: 0.1,
+            sustain: 0.2,
+            release: 0.6,
+          },
+          filterEnvelope: {
+            attack: 0.02,
+            decay: 0.4,
+            sustain: 1,
+            release: 0.7,
+            releaseCurve: "linear",
+            baseFrequency: 20,
+            octaves: 5,
+          },
+        }),
+      )
+      this.stepSequencer2.registerTransportCallback()
     }
 
     if (!this.stepSequencer3) {
       consola.info("Initializing StepSequencer 3 with measureCount:", measureCount)
-      this.stepSequencer3 = new StepSequencer(measureCount, "C2", "duo", sequencer3Store)
-      this.stepSequencer3.init()
+      this.stepSequencer3 = new StepSequencer(sequencer3DefaultMeasures, [])
+      this.stepSequencer3.initializeSynth(
+        SynthManager.createDuoSynth({
+          detune: -10,
+          harmonicity: 2,
+          volume: -10,
+          voice0: {
+            envelope: {
+              attack: 0.01,
+              decay: 0.2,
+              sustain: 0.1,
+              release: 0.1,
+            },
+            filter: {
+              frequency: 2000,
+              Q: 8,
+            },
+            filterEnvelope: {
+              attack: 0.25,
+              sustain: 0.05,
+              release: 0.1,
+            },
+          },
+          voice1: {
+            filter: {
+              frequency: 400,
+              Q: 12,
+            },
+            envelope: {
+              attack: 0.01,
+              decay: 0.2,
+              sustain: 0.1,
+              release: 0.2,
+            },
+            filterEnvelope: {
+              sustain: 0.05,
+              release: 0.1,
+            },
+          },
+        }),
+      )
+      this.stepSequencer3.registerTransportCallback()
     }
 
     if (!this.stepSequencer4) {
       consola.info("Initializing StepSequencer 4 with measureCount:", measureCount)
-      this.stepSequencer4 = new StepSequencer(measureCount, "D#5", "default", sequencer4Store)
-      this.stepSequencer4.init()
+      this.stepSequencer4 = new StepSequencer(sequencer4DefaultMeasures, [])
+      this.stepSequencer4.initializeSynth(
+        SynthManager.createSynth({
+          detune: 5,
+          volume: -8,
+          oscillator: {
+            type: "amtriangle22",
+            modulationType: "sine",
+          },
+          envelope: {
+            attack: 0.01,
+            decay: 0.14,
+            sustain: 0.2,
+            releaseCurve: "bounce",
+            release: 0.4,
+          },
+        }),
+      )
+      this.stepSequencer4.registerTransportCallback()
     }
   }
 

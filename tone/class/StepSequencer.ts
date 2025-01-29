@@ -1,167 +1,71 @@
-import SynthManager from "#tone/class/SynthManager"
 import ToneManager from "#tone/class/ToneManager"
 import type { SequencerMeasuresValue } from "#tone/useSequencer"
-import type { AvailableSynths } from "#types/tone"
-
-type SynthType = "default" | "mono" | "am" | "duo"
+import type { AvailableSynths, Steps } from "#types/tone"
+import consola from "consola"
 
 export class StepSequencer {
-  private steps: boolean[] = []
-  private measureCount = ToneManager.currentLoopLength
+  private steps: Steps = []
+  private measureCount: number
   private scheduledId: number | null = null
-
-  // Store the note here instead of passing it around
-  private note: string | number
-  private synthType: SynthType
   private synth: AvailableSynths | null = null
-
   public currentStep = 0
+  public monoVoice = true
 
-  constructor(measureCount = 4, note = "G3", synthType: SynthType = "default", steps: boolean[] = []) {
-    this.measureCount = measureCount as SequencerMeasuresValue
-    this.note = note
-    this.steps = steps
-    this.synthType = synthType
-
-    // Build steps for initial measureCount
-    this.initSteps()
+  constructor(measureCount = 4, steps: Steps = []) {
+    this.measureCount = measureCount
+    this.steps = steps.length ? steps : this.initSteps(measureCount)
   }
 
-  /**
-   * Asynchronously initialize the StepSequencer by creating synths and scheduling repeats.
-   */
-  public init(): void {
-    if (!ToneManager.isInitialized || !ToneManager.toneTransport) {
-      throw new Error("ToneManager is not initialized.")
+  private initSteps(measureCount: number): Steps {
+    const actualTimeSig = ToneManager.currentTimeSignature
+    const totalSteps = measureCount * actualTimeSig * 4
+
+    consola.info("Initializing steps with measure count", measureCount, "and total steps", totalSteps)
+
+    const steps = Array.from({ length: totalSteps }, (_, index) => ({
+      index,
+      active: false,
+      notes: [],
+      double: false,
+    }))
+    // consola.info("Initialized steps", steps)
+    return steps
+  }
+
+  public setSteps(newSteps: Steps) {
+    this.steps = newSteps
+  }
+
+  public getSteps() {
+    return [...this.steps]
+  }
+
+  public getSynth() {
+    return this.synth
+  }
+
+  public registerTransportCallback(): void {
+    if (!ToneManager.toneTransport) return
+
+    // Ensure we remove previous scheduling
+    if (this.scheduledId !== null) {
+      ToneManager.toneTransport.clear(this.scheduledId)
     }
 
-    switch (this.synthType) {
-      case "mono":
-        this.synth = SynthManager.createMonoSynth({
-          volume: 0,
-          oscillator: {
-            type: "sawtooth",
-          },
-          filter: {
-            Q: 2,
-            type: "bandpass",
-            rolloff: -24,
-          },
-          envelope: {
-            attack: 0.01,
-            decay: 0.1,
-            sustain: 0.2,
-            release: 0.6,
-          },
-          filterEnvelope: {
-            attack: 0.02,
-            decay: 0.4,
-            sustain: 1,
-            release: 0.7,
-            releaseCurve: "linear",
-            baseFrequency: 20,
-            octaves: 5,
-          },
-        })
-        break
-      case "am":
-        this.synth = SynthManager.createAMSynth({
-          harmonicity: 2,
-          volume: 10,
-          oscillator: {
-            type: "amsine2",
-            modulationType: "sine",
-            harmonicity: 1.01,
-          },
-          envelope: {
-            attack: 0.006,
-            decay: 4,
-            sustain: 0.04,
-            release: 1.2,
-          },
-          modulation: {
-            volume: 15,
-            type: "amsine2",
-            modulationType: "sine",
-            harmonicity: 12,
-          },
-          modulationEnvelope: {
-            attack: 0.006,
-            decay: 0.2,
-            sustain: 0.2,
-            release: 0.4,
-          },
-        })
-        break
-      case "duo":
-        this.synth = SynthManager.createDuoSynth({
-          detune: -10,
-          harmonicity: 2,
-          volume: -10,
-          voice0: {
-            envelope: {
-              attack: 0.01,
-              decay: 0.2,
-              sustain: 0.1,
-              release: 0.1,
-            },
-            filter: {
-              frequency: 2000,
-              Q: 8,
-            },
-            filterEnvelope: {
-              attack: 0.25,
-              sustain: 0.05,
-              release: 0.1,
-            },
-          },
-          voice1: {
-            filter: {
-              frequency: 400,
-              Q: 12,
-            },
-            envelope: {
-              attack: 0.01,
-              decay: 0.2,
-              sustain: 0.1,
-              release: 0.2,
-            },
-            filterEnvelope: {
-              sustain: 0.05,
-              release: 0.1,
-            },
-          },
-        })
-        break
-      default:
-        this.synth = SynthManager.createSynth({
-          detune: 5,
-          volume: -8,
-          oscillator: {
-            type: "amtriangle22",
-            modulationType: "sine",
-          },
-          envelope: {
-            attack: 0.01,
-            decay: 0.14,
-            sustain: 0.2,
-            releaseCurve: "bounce",
-            release: 0.4,
-          },
-        })
-    }
-
-    // Schedule the repeating callback ONCE
+    // Schedule repeating step trigger
     this.scheduledId = ToneManager.toneTransport.scheduleRepeat(
       (time) => {
-        const stepToPlay = this.currentStep % this.steps.length
-        if (this.steps[stepToPlay]) {
-          this.synth?.triggerAttackRelease(
-            this.note, // Use the class property
-            "16n",
-            time,
-            0.6,
-          )
+        const stepIndex = this.currentStep % this.steps.length
+        const step = this.steps[stepIndex]
+
+        if (step.active && this.synth) {
+          if (this.monoVoice) {
+            this.synth?.triggerAttackRelease(step.notes[0].value, "16n", time, step.notes[0].velocity)
+          } else {
+            for (const note of step.notes) {
+              this.synth?.triggerAttackRelease(note.value, "16n", time, note.velocity)
+            }
+          }
         }
         this.currentStep++
       },
@@ -169,14 +73,14 @@ export class StepSequencer {
       "0m",
     )
 
-    // Optionally reset current step on Transport start
+    // Reset step counter on transport start
     ToneManager.toneTransport.on("start", () => {
       this.currentStep = 0
     })
   }
 
-  public getSynth() {
-    return this.synth
+  public initializeSynth(synth: AvailableSynths) {
+    this.synth = synth
   }
 
   public increaseVolume() {
@@ -197,57 +101,56 @@ export class StepSequencer {
     }
   }
 
-  public getVolume() {
-    return this.synth?.volume.value || 0
+  public toggleStep(index: number, note: string, velocity: number) {
+    const step = this.steps[index]
+    if (!step) return
+
+    const existingNote = step.notes.find((n) => n.value === note)
+    if (existingNote) {
+      step.notes = step.notes.filter((n) => n.value !== note)
+    } else {
+      step.notes.push({ value: note, velocity })
+    }
+    step.active = step.notes.length > 0
   }
 
-  /** Rebuilds the steps array based on measureCount & timeSig. */
-  private initSteps() {
-    const actualTimeSig = ToneManager.currentTimeSignature
-    const totalSteps = this.measureCount * actualTimeSig * 4
+  public toggleDouble(index: number) {
+    const step = this.steps[index]
+    if (!step) return
+    step.double = !step.double
+  }
 
-    // Preserve old toggles if you want by copying them up to new length
-    const oldSteps = this.steps
-    this.steps = Array.from({ length: totalSteps }, (_, i) => oldSteps[i] ?? false)
+  public triggerStep(index: number, time: number) {
+    const step = this.steps[index]
+    if (step.active && this.synth) {
+      for (const note of step.notes) {
+        this.synth?.triggerAttackRelease(note.value, step.double ? "32n" : "16n", time, note.velocity)
+      }
+    }
+  }
+
+  public clearStep(index: number) {
+    if (this.steps[index]) {
+      this.steps[index].notes = []
+      this.steps[index].active = false
+    }
   }
 
   /** Let the UI set how many measures the sequencer should use (1..4). */
   public setMeasureCount(newCount: number) {
     this.measureCount = newCount as SequencerMeasuresValue
-    this.initSteps()
+    const newSteps = this.initSteps(newCount)
+    this.registerTransportCallback()
+    return newSteps
   }
 
-  public dispose() {
-    if (ToneManager.toneTransport && this.scheduledId !== null) {
-      ToneManager.toneTransport.clear(this.scheduledId)
+  public updateVelocity(index: number, note: string, velocity: number) {
+    const step = this.steps[index]
+    if (!step) return
+
+    const targetNote = step.notes.find((n) => n.value === note)
+    if (targetNote) {
+      targetNote.velocity = velocity
     }
-  }
-
-  public toggleStep(index: number) {
-    if (index < 0 || index >= this.steps.length) return
-    this.steps[index] = !this.steps[index]
-  }
-
-  public setAllSteps(newSteps: boolean[]) {
-    this.steps = newSteps.slice(0, this.steps.length)
-  }
-
-  public getSteps() {
-    return [...this.steps]
-  }
-
-  /**
-   * Change the note used by this sequencer on each triggered step.
-   * Can accept a string note ("C4", "G#3", etc.) or MIDI number (0-127).
-   */
-  public changeNote(newNote: string | number) {
-    this.note = newNote
-  }
-
-  /**
-   * Retrieve the current note.
-   */
-  public getNote(): string | number {
-    return this.note
   }
 }

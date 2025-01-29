@@ -6,27 +6,24 @@ import {
 } from "#lib/defaultSteps"
 import ToneManager from "#tone/class/ToneManager"
 import useTone from "#tone/useTone"
+import type { Steps } from "#types/tone"
 import { create } from "zustand"
 
 export type SequencerMeasuresValue = 1 | 2 | 3 | 4
 
-/** new steps protype */
-type NewStepNote = {
-  value: string
-  velocity: number
+export interface SequencerStoreConfig {
+  editStepIndex: number | undefined
+  setEditStepIndex: (payload: number | undefined) => void
 }
-type NewStep = {
-  index: number
-  active: boolean // is the step active - mostly for UI
-  notes: NewStepNote[] | NewStepNote // notes that are played
-  double: boolean // splits the 16thstep into two 32th notes
-}
-type NewSteps = NewStep[]
-/** end new steps protype */
+
+export const useInternalSequencerStoreConfigStore = create<SequencerStoreConfig>()((set) => ({
+  editStepIndex: undefined,
+  setEditStepIndex: (payload) => set(() => ({ editStepIndex: payload })),
+}))
 
 export interface SequencerStoreValues {
-  steps: boolean[]
-  setSteps: (payload: boolean[]) => void
+  steps: Steps
+  setSteps: (payload: Steps) => void
   measures: SequencerMeasuresValue
   setMeasures: (payload: SequencerMeasuresValue) => void
   volume: number
@@ -104,12 +101,18 @@ const useSequencer = () => {
   const sequencer4Volume = useInternalSequencer4Store((state) => state.volume)
   const setSequencer4Volume = useInternalSequencer4Store((state) => state.setVolume)
 
+  const editStepIndex = useInternalSequencerStoreConfigStore((state) => state.editStepIndex)
+  const setEditStepIndex = useInternalSequencerStoreConfigStore((state) => state.setEditStepIndex)
+
   const sequencer1 = isInitialized ? ToneManager.getSequencer1() : null
   const sequencer2 = isInitialized ? ToneManager.getSequencer2() : null
   const sequencer3 = isInitialized ? ToneManager.getSequencer3() : null
   const sequencer4 = isInitialized ? ToneManager.getSequencer4() : null
 
   return {
+    editStepIndex,
+    setEditStepIndex,
+
     // sequencer 1
     sequencer1,
     sequencer1Steps,
