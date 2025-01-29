@@ -1,19 +1,28 @@
-import { TRANSPORT_CONFIG } from "#lib/config"
 import {
   sequencer1DefaultMeasures,
-  sequencer1DefaultSteps,
   sequencer2DefaultMeasures,
-  sequencer2DefaultSteps,
   sequencer3DefaultMeasures,
-  sequencer3DefaultSteps,
   sequencer4DefaultMeasures,
-  sequencer4DefaultSteps,
 } from "#lib/defaultSteps"
 import ToneManager from "#tone/class/ToneManager"
 import useTone from "#tone/useTone"
 import { create } from "zustand"
 
 export type SequencerMeasuresValue = 1 | 2 | 3 | 4
+
+/** new steps protype */
+type NewStepNote = {
+  value: string
+  velocity: number
+}
+type NewStep = {
+  index: number
+  active: boolean // is the step active - mostly for UI
+  notes: NewStepNote[] | NewStepNote // notes that are played
+  double: boolean // splits the 16thstep into two 32th notes
+}
+type NewSteps = NewStep[]
+/** end new steps protype */
 
 export interface SequencerStoreValues {
   steps: boolean[]

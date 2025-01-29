@@ -1,7 +1,7 @@
 import SequencerLayout from "#components/sequencer/SequencerLayout"
 import useSequencer from "#tone/useSequencer"
 
-function Sequencer1() {
+const Sequencer1 = ({ compact = false }: { compact?: boolean }) => {
   const {
     sequencer1,
     sequencer1Steps,
@@ -14,6 +14,7 @@ function Sequencer1() {
 
   return (
     <SequencerLayout
+      compact={compact}
       measures={sequencer1Measures}
       sequencer={sequencer1}
       setSequencerMeasures={setSequencer1Measures}

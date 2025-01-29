@@ -7,6 +7,7 @@ import useTone from "#tone/useTone"
 import { useState, useMemo, useEffect, useCallback } from "react"
 import type { SequencerMeasuresValue } from "#tone/useSequencer"
 import RangeSlider from "#components/form/RangeSlider"
+import PianoRoll from "#components/PianoRoll"
 
 export const ruleOfThree = (value: number, min: number, max: number) => (value / 100) * (max - min) + min
 
@@ -26,6 +27,7 @@ export const getPercentSingleValue = (item: PixiConfigSingleValue) =>
   getPercent(item.value, item.min, item.max)
 
 interface SequencerLayoutProps {
+  compact?: boolean
   volume: number
   setVolume: (value: number) => void
   measures: SequencerMeasuresValue
@@ -35,13 +37,22 @@ interface SequencerLayoutProps {
   steps: boolean[]
 }
 
-const SequencerLayout = ({ sequencer, volume, setVolume, ...props }: SequencerLayoutProps) => {
+const SequencerLayout = ({
+  sequencer,
+  compact = false,
+  volume,
+  setVolume,
+  measures,
+  setSequencerMeasures,
+  setSequencerSteps,
+  steps,
+}: SequencerLayoutProps) => {
   const { timeSignature, isPlaying, loopLength, transport, registerSixteenthTick, unregisterSixteenthTick } =
     useTone()
   const [activeStep, setActiveStep] = useState<number | undefined>()
 
   const measureSize = useMemo(() => timeSignature * loopLength, [timeSignature, loopLength])
-  const totalSteps = useMemo(() => measureSize * props.measures, [measureSize, props.measures])
+  const totalSteps = useMemo(() => measureSize * measures, [measureSize, measures])
 
   // track the current step for UI highlight
   useEffect(() => {
@@ -78,7 +89,6 @@ const SequencerLayout = ({ sequencer, volume, setVolume, ...props }: SequencerLa
       if (sequencer) {
         setVolume(value)
         const interpolatedValue = ruleOfThree(value, -50, 20)
-        console.log("interpolatedValue", interpolatedValue)
         sequencer.setVolume(interpolatedValue)
       }
     },
@@ -105,18 +115,19 @@ const SequencerLayout = ({ sequencer, volume, setVolume, ...props }: SequencerLa
         </div>
       </div>
       <SequencerControls
-        measures={props.measures}
-        setSequencerMeasures={props.setSequencerMeasures}
-        setSequencerSteps={props.setSequencerSteps}
+        measures={measures}
+        setSequencerMeasures={setSequencerMeasures}
+        setSequencerSteps={setSequencerSteps}
         setActiveStep={setActiveStep}
         sequencer={sequencer}
       />
       <StepButtonMap
         sequencer={sequencer}
-        setSequencerSteps={props.setSequencerSteps}
+        setSequencerSteps={setSequencerSteps}
         activeStep={activeStep}
-        steps={props.steps}
+        steps={steps}
       />
+      {!compact && <PianoRoll sequencer={sequencer} />}
     </div>
   )
 }

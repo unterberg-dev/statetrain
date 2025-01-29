@@ -8,14 +8,14 @@ type SynthType = "default" | "mono" | "am" | "duo"
 export class StepSequencer {
   private steps: boolean[] = []
   private measureCount = ToneManager.currentLoopLength
-
-  private synth: AvailableSynths | null = null
-  public currentStep = 0
   private scheduledId: number | null = null
 
   // Store the note here instead of passing it around
   private note: string | number
   private synthType: SynthType
+  private synth: AvailableSynths | null = null
+
+  public currentStep = 0
 
   constructor(measureCount = 4, note = "G3", synthType: SynthType = "default", steps: boolean[] = []) {
     this.measureCount = measureCount as SequencerMeasuresValue
@@ -173,6 +173,10 @@ export class StepSequencer {
     ToneManager.toneTransport.on("start", () => {
       this.currentStep = 0
     })
+  }
+
+  public getSynth() {
+    return this.synth
   }
 
   public increaseVolume() {

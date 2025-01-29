@@ -23,25 +23,25 @@ const Sequencer1Page = () => {
           <Headline as="h2">
             <LinkComponent href={internalLinks.sequencer1}>Sequencer / Synth 1</LinkComponent>
           </Headline>
-          <Sequencer1 />
+          <Sequencer1 compact />
         </div>
         <div>
           <Headline as="h2">
             <LinkComponent href={internalLinks.sequencer2}>Sequencer / Synth 2</LinkComponent>
           </Headline>
-          <Sequencer2 />
+          <Sequencer2 compact />
         </div>
         <div>
           <Headline as="h2">
             <LinkComponent href={internalLinks.sequencer3}>Sequencer / Synth 3</LinkComponent>
           </Headline>
-          <Sequencer3 />
+          <Sequencer3 compact />
         </div>
         <div>
           <Headline as="h2">
             <LinkComponent href={internalLinks.sequencer4}>Sequencer / Synth 4</LinkComponent>
           </Headline>
-          <Sequencer4 />
+          <Sequencer4 compact />
         </div>
       </div>
     </LayoutComponent>

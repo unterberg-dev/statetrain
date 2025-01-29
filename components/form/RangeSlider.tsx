@@ -67,8 +67,6 @@ const RangeSlider = ({ multi, step = 1, onChange, initialValue }: RangeSliderPro
   const rangeRef = useRef<HTMLDivElement>(null)
   const sliderRef = useRef<HTMLDivElement>(null)
 
-  console.log(initialValue)
-
   const changeSingleStyle = useCallback(
     (singleVal: number) => {
       const percent = getPercent(singleVal, min, max)
