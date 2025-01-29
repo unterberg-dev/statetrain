@@ -85,6 +85,7 @@ const PianoRoll = ({ sequencer }: PianoRollProps) => {
   )
 
   const handleSetCurrentOctave = useCallback((octave: number) => {
+    if (octave < 0 || octave > 10) return
     setCurrentOctave(octave)
   }, [])
 
