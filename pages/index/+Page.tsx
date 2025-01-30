@@ -1,15 +1,15 @@
 import { H2Headline, H3Headline } from "#components/common/Headline"
 import LayoutComponent from "#components/common/LayoutComponent"
 import LinkComponent from "#components/common/LinkComponent"
-import AMSynthSequencer from "#components/sequencer/AMSynth"
-import MonoSynthSequencer from "#components/sequencer/MonoSynth"
-import DuoSynthSequencer from "#components/sequencer/DuoSynth"
-import MetalSynthSequencer from "#components/sequencer/MetalSynth"
+import AMSynthSequencer from "#components/sequencer/templates/AMSynth"
+import MonoSynthSequencer from "#components/sequencer/templates/MonoSynth"
+import DuoSynthSequencer from "#components/sequencer/templates/DuoSynth"
+import MetalSynthSequencer from "#components/sequencer/templates/MetalSynth"
 import { internalLinks } from "#lib/links"
 import { List } from "lucide-react"
 import rc from "react-classmate"
-import MembraneSynthSequencer from "#components/sequencer/MembraneSynth"
-import FMSynthSequencer from "#components/sequencer/FmSynth"
+import MembraneSynthSequencer from "#components/sequencer/templates/MembraneSynth"
+import FMSynthSequencer from "#components/sequencer/templates/FmSynth"
 
 const Headline = rc.extend(H3Headline)`mb-4`
 

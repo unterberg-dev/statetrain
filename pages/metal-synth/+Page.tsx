@@ -1,6 +1,6 @@
 import { H1Headline } from "#components/common/Headline"
 import LayoutComponent from "#components/common/LayoutComponent"
-import MetalSynthSequencer from "#components/sequencer/MetalSynth"
+import MetalSynthSequencer from "#components/sequencer/templates/MetalSynth"
 
 // todo: the current implementation must be oursourced to a separate file out of the page context
 const MetalSynthPage = () => (

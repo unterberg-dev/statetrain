@@ -1,6 +1,6 @@
 import { H1Headline } from "#components/common/Headline"
 import LayoutComponent from "#components/common/LayoutComponent"
-import DuoSynthSequencer from "#components/sequencer/DuoSynth"
+import DuoSynthSequencer from "#components/sequencer/templates/DuoSynth"
 
 // todo: the current implementation must be oursourced to a separate file out of the page context
 const DuoSynthPage = () => (
