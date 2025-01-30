@@ -271,17 +271,22 @@ class ToneManager {
       this.fmSynthSequencer = new StepSequencer(sequencer4DefaultMeasures, [], false)
       this.fmSynthSequencer.initializeSynth(
         SynthManager.createFMSynth({
-          harmonicity: 3,
+          harmonicity: 4,
+          oscillator: {
+            type: "sine",
+          },
           modulationIndex: 10,
-          volume: -10,
+          volume: 0,
           envelope: {
             attack: 0.01,
-            decay: 0.2,
+            decay: 0.5,
             sustain: 0.3,
             release: 1.2,
+            attackCurve: "exponential",
           },
           modulation: {
-            type: "sine",
+            type: "sawtooth",
+            phase: 30,
           },
           modulationEnvelope: {
             attack: 0.01,

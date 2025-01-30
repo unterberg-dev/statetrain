@@ -223,6 +223,7 @@ const useSequencer = () => {
     sequencer6Measures,
     setSequencer6Measures,
     sequencer6Volume,
+    setSequencer6Volume,
 
     // sequencer 7
     sequencer7,

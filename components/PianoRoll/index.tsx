@@ -74,7 +74,7 @@ const PianoRoll = ({ sequencer, steps, activeStep }: PianoRollProps) => {
   useEffect(() => {
     if (editStepIndex === undefined || !steps?.length || !tone) return
 
-    const stepNotes = steps[editStepIndex].notes.map((note) => tone.Frequency(note.value).toMidi())
+    const stepNotes = steps[editStepIndex]?.notes.map((note) => tone.Frequency(note.value).toMidi())
     setEditStepNotesMap({ [editStepIndex]: stepNotes })
   }, [editStepIndex, steps, tone])
 
