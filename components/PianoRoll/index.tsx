@@ -57,8 +57,6 @@ interface PianoRollProps {
 }
 
 /** Piano Roll protype */
-// @todo: we need the activeStep + information which note was played.
-// means we need a real object containing the current step, note, velocity, etc.
 const PianoRoll = ({ sequencer, steps, activeStep }: PianoRollProps) => {
   const { tone } = useTone()
   const { editStepIndex } = useSequencer()
@@ -67,13 +65,7 @@ const PianoRoll = ({ sequencer, steps, activeStep }: PianoRollProps) => {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null) // To store the timeout reference
 
   // we only need this for diplaying what user choosen to edit on this step
-  const [editStepNotes, setEditStepNotes] = useState<number[]>([])
-
-  useEffect(() => {
-    if (editStepIndex) {
-      setEditStepNotes([])
-    }
-  }, [editStepIndex])
+  const [editStepNotesMap, setEditStepNotesMap] = useState<Record<number, number[]>>({})
 
   // currently buggin if key was 0
   const notesInCurrentOctave = keyMap.filter(
@@ -85,18 +77,22 @@ const PianoRoll = ({ sequencer, steps, activeStep }: PianoRollProps) => {
     [steps, activeStep],
   )
 
-  // we wanna check if the step we edit (editStepIndex) had notes in it and wanna display them on the roll
-  const currentEditStepNotes = useMemo(
-    () => steps?.find((step) => step.index === editStepIndex)?.notes,
-    [steps, editStepIndex],
-  )
+  const handleNotePress = useCallback((notes: number[]) => {
+    setNotesPressed(notes)
+
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current)
+    }
+    timeoutRef.current = setTimeout(() => {
+      setNotesPressed(null)
+    }, APP_CONFIG.transition.timeShort)
+  }, [])
 
   const currentEditStepNotesValuesToMidi: number[] = useMemo(() => {
-    if (!tone || !currentEditStepNotes) return []
-    const steps = currentEditStepNotes.map((note) => tone.Frequency(note.value).toMidi())
-
-    return [...steps, ...editStepNotes]
-  }, [currentEditStepNotes, editStepNotes, tone])
+    if (!tone || !editStepIndex) return []
+    const stepNotes = editStepNotesMap[editStepIndex] || []
+    return stepNotes.map((note) => tone.Frequency(note, "midi").toMidi())
+  }, [editStepNotesMap, editStepIndex, tone])
 
   useEffect(() => {
     if (sequencer && currentActiveStep?.active && tone) {
@@ -104,46 +100,36 @@ const PianoRoll = ({ sequencer, steps, activeStep }: PianoRollProps) => {
       for (const note of currentActiveStep.notes) {
         notes.push(tone.Frequency(note.value).toMidi())
       }
-
-      setNotesPressed(notes)
-
-      // Clear any existing timeout to prevent conflicting resets
-      if (timeoutRef.current) {
-        clearTimeout(timeoutRef.current)
-      }
-
-      // Set a new timeout to clear the pressed note after 300ms
-      timeoutRef.current = setTimeout(() => {
-        setNotesPressed(null)
-      }, APP_CONFIG.transition.timeShort)
+      handleNotePress(notes)
     }
-  }, [sequencer, currentActiveStep, tone])
+  }, [sequencer, currentActiveStep, tone, handleNotePress])
 
   const handlePlayNote = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       const synth = sequencer?.getSynth()
       const value = Number(event.currentTarget.dataset.keyIndex)
 
-      setNotesPressed([value])
-      setEditStepNotes((prev) => {
-        if (prev.includes(value)) {
-          return prev.filter((note) => note !== value)
-        }
-        return [...prev, value]
+      console.log("handlePlayNote", editStepIndex)
+      if (editStepIndex === undefined) return
+
+      setEditStepNotesMap((prev) => {
+        const prevNotes = prev[editStepIndex] || []
+        const newNotes = prevNotes.includes(value)
+          ? prevNotes.filter((n) => n !== value)
+          : [...prevNotes, value]
+        return { ...prev, [editStepIndex]: newNotes }
       })
 
-      if (synth && editStepIndex !== undefined && value !== undefined && tone && sequencer) {
+      if (synth && tone && sequencer) {
         const note = tone.Frequency(value, "midi").toNote()
         sequencer.toggleStep(editStepIndex, note, 0.5)
-        synth.triggerAttackRelease(tone.Frequency(value, "midi").toNote(), "16n", tone.now(), 0.5)
+        synth.triggerAttackRelease(note, "16n", tone.now(), 0.5)
       }
 
-      // Clear any existing timeout to prevent conflicting resets
+      // Clear pressed state after timeout
       if (timeoutRef.current) {
         clearTimeout(timeoutRef.current)
       }
-
-      // Set a new timeout to clear the pressed note after 300ms
       timeoutRef.current = setTimeout(() => {
         setNotesPressed(null)
       }, APP_CONFIG.transition.timeShort)

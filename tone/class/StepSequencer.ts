@@ -28,7 +28,7 @@ export class StepSequencer {
       notes: [],
       double: false,
     }))
-    // consola.info("Initialized steps", steps)
+    this.steps = steps
     return steps
   }
 
@@ -136,11 +136,22 @@ export class StepSequencer {
     }
   }
 
-  /** Let the UI set how many measures the sequencer should use (1..4). */
   public setMeasureCount(newCount: number) {
     this.measureCount = newCount as SequencerMeasuresValue
-    const newSteps = this.initSteps(newCount)
-    this.registerTransportCallback()
+
+    const actualTimeSig = ToneManager.currentTimeSignature
+    const newTotalSteps = newCount * actualTimeSig * 4
+    const oldSteps = this.steps
+
+    // Create new steps while retaining existing step data where possible
+    const newSteps = Array.from({ length: newTotalSteps }, (_, index) => {
+      if (index < oldSteps.length) {
+        return oldSteps[index]
+      }
+      return { index, active: false, notes: [], double: false }
+    })
+
+    this.steps = newSteps
     return newSteps
   }
 

@@ -18,10 +18,11 @@ const StepButtonMap = ({ activeStep, steps, sequencer, setSequencerSteps }: Step
   const measureSize = useMemo(() => timeSignature * loopLength, [timeSignature, loopLength])
   const { editStepIndex, setEditStepIndex } = useSequencer()
 
+  // Ensure the UI updates when step count changes
   useEffect(() => {
-    if (!sequencer) return
+    if (!sequencer || !steps.length) return
     setSequencerSteps(sequencer.getSteps())
-  }, [sequencer, setSequencerSteps])
+  }, [sequencer, steps.length, setSequencerSteps])
 
   /** Toggles a step in the sequencer + updates local state copy of steps */
   const handleToggleStepEvent = useCallback(
