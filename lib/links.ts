@@ -11,6 +11,7 @@ export const internalLinks = {
     duoSynth: `${base}/duo-synth/`,
     membraneSynth: `${base}/membrane-synth/`,
     fmSynth: `${base}/fm-synth/`,
+    pluckSynth: `${base}/pluck-synth/`,
   },
 }
 
