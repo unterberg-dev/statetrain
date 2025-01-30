@@ -5,9 +5,8 @@ import type { StepSequencer } from "#tone/class/StepSequencer"
 import useSequencer from "#tone/useSequencer"
 import useTone from "#tone/useTone"
 import type { Steps } from "#types/tone"
-import { use, useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import rc from "react-classmate"
-import { usePageContext } from "vike-react/usePageContext"
 
 interface StyledKeyProps {
   $pressed: boolean

@@ -1,4 +1,5 @@
-import { SequencerButton } from "#components/sequencer/styled"
+import MissingStepButtonMap from "#components/sequencer/MissingStepsMap"
+import { SequencerButton, StepRow, StepsOuter } from "#components/sequencer/styled"
 import { chunkArray, getUniqueStepId } from "#components/sequencer/utils"
 import type { StepSequencer } from "#tone/class/StepSequencer"
 import useSequencer from "#tone/useSequencer"
@@ -38,12 +39,6 @@ const StepButtonMap = ({
   const handleToggleStepEvent = useCallback(
     async (e: React.MouseEvent<HTMLButtonElement>) => {
       if (!sequencer) return
-
-      // if (editStepIndex === Number(e.currentTarget.dataset.stepIndex)) {
-      //   setEditStepIndex(undefined)
-      //   return
-      // }
-
       const stepIndex = Number(e.currentTarget.dataset.stepIndex)
 
       if (navTo) {
@@ -73,12 +68,12 @@ const StepButtonMap = ({
   }, [stepObjects, measureSize])
 
   return (
-    <div className="flex flex-col gap-1">
+    <StepsOuter $compact={compact}>
       {/* map over each measure */}
       {measureChunks.map((measureSteps, measureIndex) => (
-        <div
+        <StepRow
           key={getUniqueStepId(measureIndex, 0)} // measure-level key
-          className="lg:flex lg:mb-0 mb-3 gap-1 min-h-20 grid grid-cols-8"
+          $compact={compact}
         >
           {measureSteps.map((stepObj, localIndex) => {
             const globalStepIdx = stepObj.originalIndex
@@ -125,9 +120,15 @@ const StepButtonMap = ({
               </div>
             )
           })}
-        </div>
+        </StepRow>
       ))}
-    </div>
+      <MissingStepButtonMap
+        steps={steps}
+        measureSize={measureSize}
+        totalLength={steps.length}
+        compact={compact}
+      />
+    </StepsOuter>
   )
 }
 

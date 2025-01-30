@@ -11,6 +11,8 @@ import type { Steps } from "#types/tone"
 import useSequencer from "#tone/useSequencer"
 import { getPercentSingleValue, ruleOfThree } from "#utils/index"
 import ToneManager from "#tone/class/ToneManager"
+import Knob from "#components/Knob"
+import useDebouncedCallback from "#lib/hooks/useDebouncedCallback"
 
 interface SequencerLayoutProps {
   compact?: boolean
@@ -108,35 +110,41 @@ const SequencerLayout = ({
     setActiveStep(Math.floor(currentStep))
   }, [timeSignature, totalSteps, transport])
 
-  const onChangeVolume = useCallback(
-    (value: number) => {
-      if (sequencer) {
-        setVolume(value)
-        const interpolatedValue = ruleOfThree(value, -50, 20)
-        sequencer.setVolume(interpolatedValue)
-      }
-    },
-    [sequencer, setVolume],
-  )
+  const [realTimeVolume, setRealTimeVolume] = useState<number>(volume)
+
+  const onChangeVolume = useCallback((value: number) => {
+    setRealTimeVolume(Math.floor(value)) // Update UI instantly
+    debouncedOnChangeVolume(Math.floor(value)) // Delay actual volume update
+  }, [])
+
+  const debouncedOnChangeVolume = useDebouncedCallback((value: number) => {
+    if (sequencer) {
+      console.log("debouncedOnChangeVolume", value)
+      setVolume(value)
+      const interpolatedValue = ruleOfThree(value, -50, 20)
+      sequencer.setVolume(interpolatedValue)
+    }
+  }, 50) // Adjust the debounce delay as needed (e.g., 300ms)
+
+  useEffect(() => {
+    console.log(setVolume)
+  }, [setVolume])
 
   return (
     <div className="p-4 border-grayDark bg-black border-1">
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex gap-2 items-center">
-          <span className="text-sm pt-1 text-grayLight">Volume</span>
-          <RangeSlider
-            onChange={onChangeVolume}
-            initialValue={
-              volume ||
-              getPercentSingleValue({
-                min: -50,
-                max: 20,
-                value: 0,
-              })
-            }
-          />
-        </div>
-      </div>
+      <Knob
+        label="Volume"
+        onChange={onChangeVolume}
+        rotateDegrees={-180}
+        value={
+          realTimeVolume ||
+          getPercentSingleValue({
+            min: -50,
+            max: 20,
+            value: 0,
+          })
+        }
+      />
       {!compact && <SequencerControls measures={measures} handleMeasureSelect={handleMeasureSelect} />}
       <StepButtonMap
         navTo={compact && navTo ? navTo : undefined}

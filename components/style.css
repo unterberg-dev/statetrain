@@ -54,3 +54,44 @@
   pointer-events: all;
   position: relative;
 }
+
+
+.knob g#container g#Oval-2:nth-child(1) {
+  /* display: none !important; */
+  border: none;
+  position: relative;
+  fill: none;
+  stroke: none;
+}
+
+.knob g#container g#Oval-2:nth-child(1) use:nth-child(1) {
+  display: none !important;
+}
+
+.knob g#container g#Oval-2:nth-child(1) use:nth-child(2) {
+  /* fill: red; */
+  fill: var(--color-dark);
+  stroke: var(--color-primary);
+  stroke-width: 4px;
+}
+
+.knob g#container g#Oval-2:nth-child(1)::after {
+  content: "";
+  background-color: red;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  z-index: 100;
+}
+
+.knob g#container g#Oval-2:nth-child(2) {
+  display: none !important;
+}
+
+.knob #knob path {
+  fill: var(--color-primaryLight);
+}
+
+.knob #Oval-5 {
+  display: none;
+}

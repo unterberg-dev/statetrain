@@ -12,7 +12,7 @@ export interface MetronomeStoreValues {
 }
 
 const useInternalMetronomeStore = create<MetronomeStoreValues>()((set) => ({
-  isMetronomeStarted: true,
+  isMetronomeStarted: false,
   setIsMetronomeStarted: (payload) => set(() => ({ isMetronomeStarted: payload })),
   isMetronomeInit: false,
   setIsMetronomeInit: (payload) => set(() => ({ isMetronomeInit: payload })),
@@ -44,11 +44,14 @@ const useMetronome = () => {
     if (isInitialized) {
       Metronome.stop()
       Metronome.initialize()
-      Metronome.start()
+
+      if (isMetronomeStarted) {
+        Metronome.start()
+      }
+
       setIsMetronomeInit(true)
-      setIsMetronomeStarted(true)
     }
-  }, [setIsMetronomeInit, setIsMetronomeStarted, isInitialized])
+  }, [setIsMetronomeInit, isInitialized, isMetronomeStarted])
 
   return {
     handleToggleMetronome,

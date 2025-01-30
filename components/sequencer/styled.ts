@@ -2,12 +2,12 @@ import { APP_CONFIG } from "#lib/config"
 import rc from "react-classmate"
 
 export const SequencerButton = rc.button.variants<{
-  $state: "current" | "inactive" | "halfs" | "eigths" | "fourths" | "edit"
+  $state: "current" | "inactive" | "halfs" | "eigths" | "fourths" | "edit" | "locked"
   $armed?: boolean
   $compact?: boolean
 }>({
   base: (p) =>
-    `inset-0 absolute z-2  ${p.$compact ? "" : `transition-all ${APP_CONFIG.transition.twShort}`} rounded-sm`, // sample styling
+    `inset-0 absolute z-2  ${p.$compact ? "" : `rounded-sm transition-all ${APP_CONFIG.transition.twShort}`}`, // sample styling
   variants: {
     $state: {
       current: (p) => `
@@ -16,9 +16,24 @@ export const SequencerButton = rc.button.variants<{
       `,
       edit: "!bg-primaryLight scale-110 animate-pulse",
       inactive: (p) => `${p.$armed ? "bg-secondary/50" : "bg-grayDark hover:bg-secondaryLight/50"}`,
+      locked: "bg-grayDark/50",
       halfs: (p) => `${p.$armed ? "bg-secondary" : "bg-grayDark hover:bg-secondaryLight/50"}`,
       fourths: (p) => `${p.$armed ? "bg-secondary" : "bg-grayContrast hover:bg-secondaryLight/50"}`,
       eigths: (p) => `${p.$armed ? "bg-secondary/60" : "bg-grayContrast/50 hover:bg-secondaryLight/50"}`,
     },
   },
 })
+
+export const StepsOuter = rc.div<{ $compact?: boolean }>`
+  flex flex-col
+  ${(p) => (p.$compact ? "gap-0.5" : "gap-1")}
+`
+
+export const StepRow = rc.div<{ $compact?: boolean }>`
+  ${(p) => (p.$compact ? "min-h-5 gap-0.5" : "min-h-20 gap-1")}
+  lg:flex
+  lg:mb-0
+  mb-0
+  grid
+  grid-cols-8
+`
