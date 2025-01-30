@@ -9,6 +9,7 @@ export const internalLinks = {
     monoSynth: `${base}/mono-synth/`,
     metalSynth: `${base}/metal-synth/`,
     duoSynth: `${base}/duo-synth/`,
+    membraneSynth: `${base}/membrane-synth/`,
   },
 }
 

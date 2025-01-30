@@ -8,6 +8,7 @@ import MetalSynthSequencer from "#components/sequencer/MetalSynth"
 import { internalLinks } from "#lib/links"
 import { List } from "lucide-react"
 import rc from "react-classmate"
+import MembraneSynthSequencer from "#components/sequencer/MembraneSynth"
 
 const Headline = rc.extend(H3Headline)`mb-4`
 
@@ -42,6 +43,12 @@ const Sequencer1Page = () => {
             <LinkComponent href={internalLinks.synths.metalSynth}>Metal Synth</LinkComponent>
           </Headline>
           <MetalSynthSequencer compact />
+        </div>
+        <div>
+          <Headline as="h2">
+            <LinkComponent href={internalLinks.synths.membraneSynth}>Membrane Synth</LinkComponent>
+          </Headline>
+          <MembraneSynthSequencer compact />
         </div>
       </div>
     </LayoutComponent>

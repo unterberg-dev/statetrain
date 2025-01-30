@@ -1,5 +1,5 @@
 import type { Config } from "vike/types"
 
 export default {
-  title: "Duo Synth | statetrain",
+  title: "Membrane Synth | statetrain",
 } satisfies Config
