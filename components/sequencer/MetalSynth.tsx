@@ -1,8 +1,9 @@
 // StepSequencerUi.tsx
 import SequencerLayout from "#components/sequencer/SequencerLayout"
+import { internalLinks } from "#lib/links"
 import useSequencer from "#tone/useSequencer"
 
-const MembraneSynth = ({ compact = false }: { compact?: boolean }) => {
+const MetalSynthSequencer = ({ compact = false }: { compact?: boolean }) => {
   const {
     sequencer4,
     sequencer4Steps,
@@ -23,8 +24,9 @@ const MembraneSynth = ({ compact = false }: { compact?: boolean }) => {
       steps={sequencer4Steps}
       volume={sequencer4Volume}
       setVolume={setSequencer4Volume}
+      navTo={internalLinks.synths.metalSynth}
     />
   )
 }
 
-export default MembraneSynth
+export default MetalSynthSequencer

@@ -1,5 +1,6 @@
 // StepSequencerUi.tsx
 import SequencerLayout from "#components/sequencer/SequencerLayout"
+import { internalLinks } from "#lib/links"
 import useSequencer from "#tone/useSequencer"
 
 const DuoSynthSequencer = ({ compact = false }: { compact?: boolean }) => {
@@ -23,6 +24,7 @@ const DuoSynthSequencer = ({ compact = false }: { compact?: boolean }) => {
       steps={sequencer3Steps}
       volume={sequencer3Volume}
       setVolume={setSequencer3Volume}
+      navTo={internalLinks.synths.duoSynth}
     />
   )
 }

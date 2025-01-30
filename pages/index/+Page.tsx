@@ -4,7 +4,7 @@ import LinkComponent from "#components/common/LinkComponent"
 import AMSynthSequencer from "#components/sequencer/AMSynth"
 import MonoSynthSequencer from "#components/sequencer/MonoSynth"
 import DuoSynthSequencer from "#components/sequencer/DuoSynth"
-import MembraneSynth from "#components/sequencer/MembraneSynth"
+import MetalSynthSequencer from "#components/sequencer/MetalSynth"
 import { internalLinks } from "#lib/links"
 import { List } from "lucide-react"
 import rc from "react-classmate"
@@ -39,9 +39,9 @@ const Sequencer1Page = () => {
         </div>
         <div>
           <Headline as="h2">
-            <LinkComponent href={internalLinks.synths.membraneSynth}>Membrane Synth</LinkComponent>
+            <LinkComponent href={internalLinks.synths.metalSynth}>Metal Synth</LinkComponent>
           </Headline>
-          <MembraneSynth compact />
+          <MetalSynthSequencer compact />
         </div>
       </div>
     </LayoutComponent>

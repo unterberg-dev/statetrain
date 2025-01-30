@@ -1,4 +1,5 @@
 import SequencerLayout from "#components/sequencer/SequencerLayout"
+import { internalLinks } from "#lib/links"
 import useSequencer from "#tone/useSequencer"
 
 const MonoSynthSequencer = ({ compact = false }: { compact?: boolean }) => {
@@ -22,6 +23,7 @@ const MonoSynthSequencer = ({ compact = false }: { compact?: boolean }) => {
       steps={sequencer2Steps}
       volume={sequencer2Volume}
       setVolume={setSequencer2Volume}
+      navTo={internalLinks.synths.monoSynth}
     />
   )
 }

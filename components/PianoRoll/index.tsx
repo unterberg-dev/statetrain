@@ -7,6 +7,7 @@ import useTone from "#tone/useTone"
 import type { Steps } from "#types/tone"
 import { use, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import rc from "react-classmate"
+import { usePageContext } from "vike-react/usePageContext"
 
 interface StyledKeyProps {
   $pressed: boolean
@@ -62,15 +63,20 @@ const PianoRoll = ({ sequencer, steps, activeStep }: PianoRollProps) => {
   const { editStepIndex } = useSequencer()
   const [currentOctave, setCurrentOctave] = useState(3)
   const [notesPressed, setNotesPressed] = useState<number[] | null>(null)
-  const timeoutRef = useRef<NodeJS.Timeout | null>(null) // To store the timeout reference
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  // we only need this for diplaying what user choosen to edit on this step
   const [editStepNotesMap, setEditStepNotesMap] = useState<Record<number, number[]>>({})
-
-  // currently buggin if key was 0
   const notesInCurrentOctave = keyMap.filter(
     (keyItem) => keyItem.index >= currentOctave * 12 && keyItem.index < (currentOctave + 1) * 12,
   )
+
+  // on change of editStepIndex it should prefill editStepNotesMap with the notes of the step
+  useEffect(() => {
+    if (editStepIndex === undefined || !steps?.length || !tone) return
+
+    const stepNotes = steps[editStepIndex].notes.map((note) => tone.Frequency(note.value).toMidi())
+    setEditStepNotesMap({ [editStepIndex]: stepNotes })
+  }, [editStepIndex, steps, tone])
 
   const currentActiveStep = useMemo(
     () => steps?.find((step) => step.index === activeStep),

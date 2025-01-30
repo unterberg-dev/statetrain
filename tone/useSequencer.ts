@@ -4,6 +4,8 @@ import {
   sequencer3DefaultMeasures,
   sequencer4DefaultMeasures,
   sequencer5DefaultMeasures,
+  sequencer6DefaultMeasures,
+  sequencer7DefaultMeasures,
 } from "#lib/defaultSteps"
 import ToneManager from "#tone/class/ToneManager"
 import useTone from "#tone/useTone"
@@ -76,6 +78,24 @@ export const useInternalSequencer5Store = create<SequencerStoreValues>()((set) =
   setVolume: (payload) => set(() => ({ volume: payload })),
 }))
 
+export const useInternalSequencer6Store = create<SequencerStoreValues>()((set) => ({
+  steps: [], // sequencer4DefaultSteps,
+  setSteps: (payload) => set(() => ({ steps: payload })),
+  measures: sequencer6DefaultMeasures,
+  setMeasures: (payload) => set(() => ({ measures: payload })),
+  volume: 0,
+  setVolume: (payload) => set(() => ({ volume: payload })),
+}))
+
+export const useInternalSequencer7Store = create<SequencerStoreValues>()((set) => ({
+  steps: [], // sequencer4DefaultSteps,
+  setSteps: (payload) => set(() => ({ steps: payload })),
+  measures: sequencer7DefaultMeasures,
+  setMeasures: (payload) => set(() => ({ measures: payload })),
+  volume: 0,
+  setVolume: (payload) => set(() => ({ volume: payload })),
+}))
+
 const useSequencer = () => {
   const { isInitialized } = useTone()
 
@@ -111,13 +131,41 @@ const useSequencer = () => {
   const sequencer4Volume = useInternalSequencer4Store((state) => state.volume)
   const setSequencer4Volume = useInternalSequencer4Store((state) => state.setVolume)
 
+  // sequencer 5
+  const sequencer5Steps = useInternalSequencer5Store((state) => state.steps)
+  const setSequencer5Steps = useInternalSequencer5Store((state) => state.setSteps)
+  const sequencer5Measures = useInternalSequencer5Store((state) => state.measures)
+  const setSequencer5Measures = useInternalSequencer5Store((state) => state.setMeasures)
+  const sequencer5Volume = useInternalSequencer5Store((state) => state.volume)
+  const setSequencer5Volume = useInternalSequencer5Store((state) => state.setVolume)
+
+  // sequencer 6
+  const sequencer6Steps = useInternalSequencer6Store((state) => state.steps)
+  const setSequencer6Steps = useInternalSequencer6Store((state) => state.setSteps)
+  const sequencer6Measures = useInternalSequencer6Store((state) => state.measures)
+  const setSequencer6Measures = useInternalSequencer6Store((state) => state.setMeasures)
+  const sequencer6Volume = useInternalSequencer6Store((state) => state.volume)
+  const setSequencer6Volume = useInternalSequencer6Store((state) => state.setVolume)
+
+  // sequencer 7
+  const sequencer7Steps = useInternalSequencer7Store((state) => state.steps)
+  const setSequencer7Steps = useInternalSequencer7Store((state) => state.setSteps)
+  const sequencer7Measures = useInternalSequencer7Store((state) => state.measures)
+  const setSequencer7Measures = useInternalSequencer7Store((state) => state.setMeasures)
+  const sequencer7Volume = useInternalSequencer7Store((state) => state.volume)
+  const setSequencer7Volume = useInternalSequencer7Store((state) => state.setVolume)
+
   const editStepIndex = useInternalSequencerStoreConfigStore((state) => state.editStepIndex)
   const setEditStepIndex = useInternalSequencerStoreConfigStore((state) => state.setEditStepIndex)
 
-  const sequencer1 = isInitialized ? ToneManager.getSequencer1() : null
-  const sequencer2 = isInitialized ? ToneManager.getSequencer2() : null
-  const sequencer3 = isInitialized ? ToneManager.getSequencer3() : null
-  const sequencer4 = isInitialized ? ToneManager.getSequencer4() : null
+  const sequencer1 = isInitialized ? ToneManager.getAmSynth() : null
+  const sequencer2 = isInitialized ? ToneManager.getMonoSynth() : null
+  const sequencer3 = isInitialized ? ToneManager.getDuoSynth() : null
+  const sequencer4 = isInitialized ? ToneManager.getMetalSynth() : null
+
+  const sequencer5 = isInitialized ? ToneManager.getMembraneSynth() : null
+  const sequencer6 = isInitialized ? ToneManager.getFmSynth() : null
+  const sequencer7 = isInitialized ? ToneManager.getPluckSynth() : null
 
   return {
     editStepIndex,
@@ -158,6 +206,32 @@ const useSequencer = () => {
     setSequencer4Measures,
     sequencer4Volume,
     setSequencer4Volume,
+
+    // sequencer 5
+    sequencer5,
+    sequencer5Steps,
+    setSequencer5Steps,
+    sequencer5Measures,
+    setSequencer5Measures,
+    sequencer5Volume,
+    setSequencer5Volume,
+
+    // sequencer 6
+    sequencer6,
+    sequencer6Steps,
+    setSequencer6Steps,
+    sequencer6Measures,
+    setSequencer6Measures,
+    sequencer6Volume,
+
+    // sequencer 7
+    sequencer7,
+    sequencer7Steps,
+    setSequencer7Steps,
+    sequencer7Measures,
+    setSequencer7Measures,
+    sequencer7Volume,
+    setSequencer7Volume,
   }
 }
 

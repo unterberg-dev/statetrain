@@ -308,25 +308,25 @@ class ToneManager {
     }
   }
 
-  public getSequencer1() {
+  public getAmSynth() {
     return this.amSynthSequencer
   }
-  public getSequencer2() {
+  public getMonoSynth() {
     return this.monoSynthSequencer
   }
-  public getSequencer3() {
+  public getDuoSynth() {
     return this.duoSynthSequencer
   }
-  public getSequencer4() {
+  public getMetalSynth() {
     return this.metalSynthSequencer
   }
-  public getSequencer5() {
+  public getMembraneSynth() {
     return this.membraneSynthSequencer
   }
-  public getSequencer6() {
+  public getFmSynth() {
     return this.fmSynthSequencer
   }
-  public getSequencer7() {
+  public getPluckSynth() {
     return this.pluckSynthSequencer
   }
 
