@@ -144,10 +144,9 @@ const SequencerLayout = ({
         setSequencerSteps={setSequencerSteps}
         activeStep={activeStep}
         steps={steps}
+        compact={compact}
       />
-      {!compact && editStepIndex !== undefined && (
-        <PianoRoll steps={steps} activeStep={activeStep} sequencer={sequencer} />
-      )}
+      {!compact && <PianoRoll steps={steps} activeStep={activeStep} sequencer={sequencer} />}
     </div>
   )
 }

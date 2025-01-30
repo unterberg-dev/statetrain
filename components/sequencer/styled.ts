@@ -4,13 +4,15 @@ import rc from "react-classmate"
 export const SequencerButton = rc.button.variants<{
   $state: "current" | "inactive" | "halfs" | "eigths" | "fourths" | "edit"
   $armed?: boolean
+  $compact?: boolean
 }>({
-  base: `inset-0 absolute z-2 transition-all rounded-sm ${APP_CONFIG.transition.twShort}`, // sample styling
+  base: (p) =>
+    `inset-0 absolute z-2  ${p.$compact ? "" : `transition-all ${APP_CONFIG.transition.twShort}`} rounded-sm`, // sample styling
   variants: {
     $state: {
       current: (p) => `
         ${p.$armed ? "bg-primaryLight" : "bg-light hover:bg-warning/50"}
-        !-translate-y-2
+        ${p.$compact ? "" : "!-translate-y-2"}
       `,
       edit: "!bg-primaryLight scale-110 animate-pulse",
       inactive: (p) => `${p.$armed ? "bg-secondary/50" : "bg-grayDark hover:bg-secondaryLight/50"}`,

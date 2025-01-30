@@ -10,6 +10,7 @@ import { List } from "lucide-react"
 import rc from "react-classmate"
 import MembraneSynthSequencer from "#components/sequencer/templates/MembraneSynth"
 import FMSynthSequencer from "#components/sequencer/templates/FmSynth"
+import PluckSynthSequencer from "#components/sequencer/templates/PluckSynth"
 
 const Headline = rc.extend(H3Headline)`mb-4`
 
@@ -56,6 +57,12 @@ const Sequencer1Page = () => {
             <LinkComponent href={internalLinks.synths.fmSynth}>FM Synth</LinkComponent>
           </Headline>
           <FMSynthSequencer compact />
+        </div>
+        <div>
+          <Headline as="h2">
+            <LinkComponent href={internalLinks.synths.pluckSynth}>Pluck Synth</LinkComponent>
+          </Headline>
+          <PluckSynthSequencer compact />
         </div>
       </div>
     </LayoutComponent>

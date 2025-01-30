@@ -115,21 +115,23 @@ const PianoRoll = ({ sequencer, steps, activeStep }: PianoRollProps) => {
       const synth = sequencer?.getSynth()
       const value = Number(event.currentTarget.dataset.keyIndex)
 
-      console.log("handlePlayNote", editStepIndex)
-      if (editStepIndex === undefined) return
-
-      setEditStepNotesMap((prev) => {
-        const prevNotes = prev[editStepIndex] || []
-        const newNotes = prevNotes.includes(value)
-          ? prevNotes.filter((n) => n !== value)
-          : [...prevNotes, value]
-        return { ...prev, [editStepIndex]: newNotes }
-      })
-
       if (synth && tone && sequencer) {
         const note = tone.Frequency(value, "midi").toNote()
-        sequencer.toggleStep(editStepIndex, note, 0.5)
         synth.triggerAttackRelease(note, "16n", tone.now(), 0.5)
+
+        // if not edit, at least play the note
+        if (editStepIndex === undefined) {
+          setNotesPressed([value])
+        } else {
+          sequencer.toggleStep(editStepIndex, note, 0.5)
+          setEditStepNotesMap((prev) => {
+            const prevNotes = prev[editStepIndex] || []
+            const newNotes = prevNotes.includes(value)
+              ? prevNotes.filter((n) => n !== value)
+              : [...prevNotes, value]
+            return { ...prev, [editStepIndex]: newNotes }
+          })
+        }
       }
 
       // Clear pressed state after timeout

@@ -13,9 +13,17 @@ interface StepButtonMapProps {
   sequencer: StepSequencer | null
   setSequencerSteps: (steps: Steps) => void
   navTo?: string
+  compact?: boolean
 }
 
-const StepButtonMap = ({ activeStep, steps, sequencer, setSequencerSteps, navTo }: StepButtonMapProps) => {
+const StepButtonMap = ({
+  activeStep,
+  steps,
+  sequencer,
+  setSequencerSteps,
+  navTo,
+  compact,
+}: StepButtonMapProps) => {
   const { timeSignature, loopLength } = useTone()
   const measureSize = useMemo(() => timeSignature * loopLength, [timeSignature, loopLength])
   const { editStepIndex, setEditStepIndex } = useSequencer()
@@ -30,14 +38,25 @@ const StepButtonMap = ({ activeStep, steps, sequencer, setSequencerSteps, navTo 
   const handleToggleStepEvent = useCallback(
     async (e: React.MouseEvent<HTMLButtonElement>) => {
       if (!sequencer) return
+
+      // if (editStepIndex === Number(e.currentTarget.dataset.stepIndex)) {
+      //   setEditStepIndex(undefined)
+      //   return
+      // }
+
       const stepIndex = Number(e.currentTarget.dataset.stepIndex)
-      console.log("navTo", navTo)
 
       if (navTo) {
         const navigateOnButtonClick = navTo ? navigate(navTo) : () => {}
         await navigateOnButtonClick
       }
-      setEditStepIndex(stepIndex)
+      setEditStepIndex((prev) => {
+        // check if it was the same step, then remove setEditStepIndex
+        if (prev === stepIndex) {
+          return undefined
+        }
+        return stepIndex
+      })
     },
     [setEditStepIndex, sequencer, navTo],
   )
@@ -99,6 +118,7 @@ const StepButtonMap = ({ activeStep, steps, sequencer, setSequencerSteps, navTo 
                 <SequencerButton
                   $state={computedState}
                   $armed={isArmed}
+                  $compact={compact}
                   data-step-index={globalStepIdx}
                   onClick={handleToggleStepEvent}
                 />

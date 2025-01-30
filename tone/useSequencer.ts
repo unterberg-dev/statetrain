@@ -9,19 +9,26 @@ import {
 } from "#lib/defaultSteps"
 import ToneManager from "#tone/class/ToneManager"
 import useTone from "#tone/useTone"
-import type { Steps } from "#types/tone"
+import type { Steps, StoreReactStateSetter } from "#types/tone"
 import { create } from "zustand"
 
 export type SequencerMeasuresValue = 1 | 2 | 3 | 4
 
-export interface SequencerStoreConfig {
+interface SequencerStoreConfig {
   editStepIndex: number | undefined
-  setEditStepIndex: (payload: number | undefined) => void
+  setEditStepIndex: (setterFn: StoreReactStateSetter<number | undefined>) => void
 }
 
 export const useInternalSequencerStoreConfigStore = create<SequencerStoreConfig>()((set) => ({
   editStepIndex: undefined,
-  setEditStepIndex: (payload) => set(() => ({ editStepIndex: payload })),
+  setEditStepIndex: (setterFn) => {
+    set(({ editStepIndex }) => {
+      const setter = setterFn
+      return {
+        editStepIndex: typeof setter === "function" ? setter(editStepIndex) : setter,
+      }
+    })
+  },
 }))
 
 export interface SequencerStoreValues {

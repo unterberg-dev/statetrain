@@ -62,3 +62,6 @@ export type Step = {
 }
 
 export type Steps = Step[]
+
+// accept argument of type T or a callback using previous state of type T
+export type StoreReactStateSetter<T> = T | ((prev: T) => T)
