@@ -7,6 +7,7 @@ import type {
   DuoSynthOptions,
   MonoSynth,
   MonoSynthOptions,
+  PolySynth,
   Synth,
   SynthOptions,
 } from "tone"
@@ -52,13 +53,10 @@ class SynthManager {
    * @param options Tone.MonoSynthOptions to configure the MonoSynth
    * @returns MonoSynth instance
    */
-  public createMonoSynth(options?: RecursivePartial<MonoSynthOptions>): MonoSynth {
+  public createMonoSynth(options?: RecursivePartial<MonoSynthOptions>): PolySynth<MonoSynth> {
     const Tone = ToneManager.getTone()
-    const monoSynth = new Tone.MonoSynth(options).toDestination()
-
-    this.emitter.emit("monoSynthCreated", monoSynth)
-    consola.info("MonoSynth created successfully.")
-    return monoSynth
+    const polySynth = new Tone.PolySynth(Tone.MonoSynth, options).toDestination()
+    return polySynth
   }
 
   /**

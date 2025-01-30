@@ -1,8 +1,6 @@
+import { getPercent } from "#utils/index"
 import { useCallback, useEffect, useRef, useState } from "react"
 import rc from "react-classmate"
-
-export const getPercent = (value: number, min: number, max: number) =>
-  Number((((value - min) / (max - min)) * 100).toFixed(2))
 
 const StyledSlider = rc.div`
   slider

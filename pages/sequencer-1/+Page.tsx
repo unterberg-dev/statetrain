@@ -1,8 +1,6 @@
 import { H1Headline } from "#components/common/Headline"
 import LayoutComponent from "#components/common/LayoutComponent"
-import LinkComponent from "#components/common/LinkComponent"
 import Sequencer1 from "#components/sequencer/Sequencer1"
-import { internalLinks } from "#lib/links"
 
 // todo: the current implementation must be oursourced to a separate file out of the page context
 const Sequencer1Page = () => (

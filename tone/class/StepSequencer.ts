@@ -2,6 +2,7 @@ import ToneManager from "#tone/class/ToneManager"
 import type { SequencerMeasuresValue } from "#tone/useSequencer"
 import type { AvailableSynths, Steps } from "#types/tone"
 import consola from "consola"
+import { Frequency } from "tone/build/esm/core/type/Units"
 
 export class StepSequencer {
   private steps: Steps = []
@@ -11,8 +12,9 @@ export class StepSequencer {
   public currentStep = 0
   public monoVoice = true
 
-  constructor(measureCount = 4, steps: Steps = []) {
+  constructor(measureCount = 4, steps: Steps = [], monoVoice = true) {
     this.measureCount = measureCount
+    this.monoVoice = monoVoice
     this.steps = steps.length ? steps : this.initSteps(measureCount)
   }
 
@@ -65,6 +67,9 @@ export class StepSequencer {
             for (const note of step.notes) {
               this.synth?.triggerAttackRelease(note.value, "16n", time, note.velocity)
             }
+            // maybe use single triggerAttackRelease with array of notes? - ts?
+            // const rawNotes = step.notes.map((n) => n.value)
+            // this.synth?.triggerAttackRelease([...rawNotes], "16n", time, note.velocity)
           }
         }
         this.currentStep++

@@ -60,7 +60,7 @@ class ToneManager {
 
   // add sequencers
   private stepSequencer1: StepSequencer | null = null
-  private stepSequencer2: StepSequencer | null = null
+  private monoSynthSequencer: StepSequencer | null = null
   private stepSequencer3: StepSequencer | null = null
   private stepSequencer4: StepSequencer | null = null
 
@@ -147,10 +147,10 @@ class ToneManager {
       this.stepSequencer1.registerTransportCallback()
     }
 
-    if (!this.stepSequencer2) {
+    if (!this.monoSynthSequencer) {
       consola.info("Initializing StepSequencer 2 with measureCount:", measureCount)
-      this.stepSequencer2 = new StepSequencer(sequencer2DefaultMeasures, [])
-      this.stepSequencer2.initializeSynth(
+      this.monoSynthSequencer = new StepSequencer(sequencer2DefaultMeasures, [], false)
+      this.monoSynthSequencer.initializeSynth(
         SynthManager.createMonoSynth({
           volume: 0,
           oscillator: {
@@ -178,7 +178,7 @@ class ToneManager {
           },
         }),
       )
-      this.stepSequencer2.registerTransportCallback()
+      this.monoSynthSequencer.registerTransportCallback()
     }
 
     if (!this.stepSequencer3) {
@@ -255,7 +255,7 @@ class ToneManager {
     return this.stepSequencer1
   }
   public getSequencer2() {
-    return this.stepSequencer2
+    return this.monoSynthSequencer
   }
   public getSequencer3() {
     return this.stepSequencer3
