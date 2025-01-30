@@ -1,9 +1,15 @@
+import { APP_CONFIG } from "#lib/config"
+
+const base = APP_CONFIG.viteUrl
+
 export const internalLinks = {
   home: "/",
-  sequencer1: "/sequencer-1",
-  sequencer2: "/sequencer-2",
-  sequencer3: "/sequencer-3",
-  sequencer4: "/sequencer-4",
+  synths: {
+    amSynth: `${base}/am-synth/`,
+    monoSynth: `${base}/mono-synth/`,
+    membraneSynth: `${base}/membrane-synth/`,
+    duoSynth: `${base}/duo-synth/`,
+  },
 }
 
 export const externalLinks = {

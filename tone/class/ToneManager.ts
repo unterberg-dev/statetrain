@@ -5,10 +5,6 @@ import type { InternalToneType, InternalTransportType } from "#types/tone"
 import { TRANSPORT_CONFIG } from "#lib/config"
 import { StepSequencer } from "#tone/class/StepSequencer"
 import type { SequencerMeasuresValue } from "#tone/useSequencer"
-import { useInternalSequencer1Store as useInternalSequencer1Steps } from "#tone/useSequencer"
-import { useInternalSequencer2Store as useInternalSequencer2Steps } from "#tone/useSequencer"
-import { useInternalSequencer3Store as useInternalSequencer3Steps } from "#tone/useSequencer"
-import { useInternalSequencer4Store as useInternalSequencer4Steps } from "#tone/useSequencer"
 import SynthManager from "#tone/class/SynthManager"
 import {
   sequencer1DefaultMeasures,
@@ -59,10 +55,13 @@ class ToneManager {
   public totalSixteenthNotes = this.currentTimeSignature * 4 * this.currentLoopLength
 
   // add sequencers
-  private stepSequencer1: StepSequencer | null = null
+  private amSynthSequencer: StepSequencer | null = null
   private monoSynthSequencer: StepSequencer | null = null
-  private stepSequencer3: StepSequencer | null = null
-  private stepSequencer4: StepSequencer | null = null
+  private duoSynthSequencer: StepSequencer | null = null
+  private metalSynthSequencer: StepSequencer | null = null
+  private membraneSynthSequencer: StepSequencer | null = null
+  private fmSynthSequencer: StepSequencer | null = null
+  private pluckSynthSequencer: StepSequencer | null = null
 
   // Global EventEmitter
   public emitter = new EventEmitter()
@@ -112,10 +111,11 @@ class ToneManager {
       throw new Error("Tone.js is not yet initialized.")
     }
 
-    if (!this.stepSequencer1) {
+    // @todo: separate sequencer initialization :O
+    if (!this.amSynthSequencer) {
       consola.info("Initializing StepSequencer 1 with measureCount:", measureCount)
-      this.stepSequencer1 = new StepSequencer(sequencer1DefaultMeasures, [])
-      this.stepSequencer1.initializeSynth(
+      this.amSynthSequencer = new StepSequencer(sequencer1DefaultMeasures, [], false)
+      this.amSynthSequencer.initializeSynth(
         SynthManager.createAMSynth({
           harmonicity: 2,
           volume: 10,
@@ -144,7 +144,7 @@ class ToneManager {
           },
         }),
       )
-      this.stepSequencer1.registerTransportCallback()
+      this.amSynthSequencer.registerTransportCallback()
     }
 
     if (!this.monoSynthSequencer) {
@@ -181,10 +181,10 @@ class ToneManager {
       this.monoSynthSequencer.registerTransportCallback()
     }
 
-    if (!this.stepSequencer3) {
+    if (!this.duoSynthSequencer) {
       consola.info("Initializing StepSequencer 3 with measureCount:", measureCount)
-      this.stepSequencer3 = new StepSequencer(sequencer3DefaultMeasures, [])
-      this.stepSequencer3.initializeSynth(
+      this.duoSynthSequencer = new StepSequencer(sequencer3DefaultMeasures, [], false)
+      this.duoSynthSequencer.initializeSynth(
         SynthManager.createDuoSynth({
           detune: -10,
           harmonicity: 2,
@@ -224,20 +224,16 @@ class ToneManager {
           },
         }),
       )
-      this.stepSequencer3.registerTransportCallback()
+      this.duoSynthSequencer.registerTransportCallback()
     }
 
-    if (!this.stepSequencer4) {
+    if (!this.metalSynthSequencer) {
       consola.info("Initializing StepSequencer 4 with measureCount:", measureCount)
-      this.stepSequencer4 = new StepSequencer(sequencer4DefaultMeasures, [])
-      this.stepSequencer4.initializeSynth(
-        SynthManager.createSynth({
+      this.metalSynthSequencer = new StepSequencer(sequencer4DefaultMeasures, [], false)
+      this.metalSynthSequencer.initializeSynth(
+        SynthManager.createMetalSynth({
           detune: 5,
           volume: -8,
-          oscillator: {
-            type: "amtriangle22",
-            modulationType: "sine",
-          },
           envelope: {
             attack: 0.01,
             decay: 0.14,
@@ -247,21 +243,91 @@ class ToneManager {
           },
         }),
       )
-      this.stepSequencer4.registerTransportCallback()
+      this.metalSynthSequencer.registerTransportCallback()
+    }
+
+    if (!this.membraneSynthSequencer) {
+      consola.info("Initializing StepSequencer 5 with measureCount:", measureCount)
+      this.membraneSynthSequencer = new StepSequencer(sequencer4DefaultMeasures, [], false)
+      this.membraneSynthSequencer.initializeSynth(
+        SynthManager.createMembraneSynth({
+          pitchDecay: 0.05,
+          octaves: 10,
+          volume: -10,
+          envelope: {
+            attack: 0.001,
+            decay: 0.4,
+            sustain: 0.01,
+            release: 1.4,
+            attackCurve: "exponential",
+          },
+        }),
+      )
+      this.membraneSynthSequencer.registerTransportCallback()
+    }
+
+    if (!this.fmSynthSequencer) {
+      consola.info("Initializing StepSequencer 6 with measureCount:", measureCount)
+      this.fmSynthSequencer = new StepSequencer(sequencer4DefaultMeasures, [], false)
+      this.fmSynthSequencer.initializeSynth(
+        SynthManager.createFMSynth({
+          harmonicity: 3,
+          modulationIndex: 10,
+          volume: -10,
+          envelope: {
+            attack: 0.01,
+            decay: 0.2,
+            sustain: 0.3,
+            release: 1.2,
+          },
+          modulation: {
+            type: "sine",
+          },
+          modulationEnvelope: {
+            attack: 0.01,
+            decay: 0.5,
+            sustain: 0.5,
+            release: 0.1,
+          },
+        }),
+      )
+      this.fmSynthSequencer.registerTransportCallback()
+    }
+
+    if (!this.pluckSynthSequencer) {
+      consola.info("Initializing StepSequencer 7 with measureCount:", measureCount)
+      this.pluckSynthSequencer = new StepSequencer(sequencer4DefaultMeasures, [])
+      this.pluckSynthSequencer.initializeSynth(
+        SynthManager.createPluckSynth({
+          volume: -10,
+          resonance: 0.9,
+          dampening: 4000,
+        }),
+      )
+      this.pluckSynthSequencer.registerTransportCallback()
     }
   }
 
   public getSequencer1() {
-    return this.stepSequencer1
+    return this.amSynthSequencer
   }
   public getSequencer2() {
     return this.monoSynthSequencer
   }
   public getSequencer3() {
-    return this.stepSequencer3
+    return this.duoSynthSequencer
   }
   public getSequencer4() {
-    return this.stepSequencer4
+    return this.metalSynthSequencer
+  }
+  public getSequencer5() {
+    return this.membraneSynthSequencer
+  }
+  public getSequencer6() {
+    return this.fmSynthSequencer
+  }
+  public getSequencer7() {
+    return this.pluckSynthSequencer
   }
 
   /**

@@ -1,5 +1,5 @@
 import type { Config } from "vike/types"
 
 export default {
-  title: "Sequencer 2 | statetrain",
+  title: "Mono Synth | statetrain",
 } satisfies Config

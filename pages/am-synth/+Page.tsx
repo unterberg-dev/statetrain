@@ -1,12 +1,12 @@
 import { H1Headline } from "#components/common/Headline"
 import LayoutComponent from "#components/common/LayoutComponent"
-import Sequencer1 from "#components/sequencer/Sequencer1"
+import AMSynthSequencer from "#components/sequencer/AMSynth"
 
 // todo: the current implementation must be oursourced to a separate file out of the page context
-const Sequencer1Page = () => (
+const AmSynthPage = () => (
   <LayoutComponent className="mt-10">
-    <H1Headline className="mb-5">💫 Sequencer 1</H1Headline>
-    <Sequencer1 />
+    <H1Headline className="mb-5">💫 AM Synth</H1Headline>
+    <AMSynthSequencer />
   </LayoutComponent>
 )
-export default Sequencer1Page
+export default AmSynthPage

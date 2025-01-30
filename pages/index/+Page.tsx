@@ -1,10 +1,10 @@
 import { H2Headline, H3Headline } from "#components/common/Headline"
 import LayoutComponent from "#components/common/LayoutComponent"
 import LinkComponent from "#components/common/LinkComponent"
-import Sequencer1 from "#components/sequencer/Sequencer1"
-import Sequencer2 from "#components/sequencer/Sequencer2"
-import Sequencer3 from "#components/sequencer/Sequencer3"
-import Sequencer4 from "#components/sequencer/Sequencer4"
+import AMSynthSequencer from "#components/sequencer/AMSynth"
+import MonoSynthSequencer from "#components/sequencer/MonoSynth"
+import DuoSynthSequencer from "#components/sequencer/DuoSynth"
+import MembraneSynth from "#components/sequencer/MembraneSynth"
 import { internalLinks } from "#lib/links"
 import { List } from "lucide-react"
 import rc from "react-classmate"
@@ -21,27 +21,27 @@ const Sequencer1Page = () => {
       <div className="flex flex-col gap-10">
         <div>
           <Headline as="h2">
-            <LinkComponent href={internalLinks.sequencer1}>Sequencer / Synth 1</LinkComponent>
+            <LinkComponent href={internalLinks.synths.amSynth}>AM Synth</LinkComponent>
           </Headline>
-          <Sequencer1 compact />
+          <AMSynthSequencer compact />
         </div>
         <div>
           <Headline as="h2">
-            <LinkComponent href={internalLinks.sequencer2}>Sequencer / Synth 2</LinkComponent>
+            <LinkComponent href={internalLinks.synths.monoSynth}>Mono Synth</LinkComponent>
           </Headline>
-          <Sequencer2 compact />
+          <MonoSynthSequencer compact />
         </div>
         <div>
           <Headline as="h2">
-            <LinkComponent href={internalLinks.sequencer3}>Sequencer / Synth 3</LinkComponent>
+            <LinkComponent href={internalLinks.synths.duoSynth}>Duo Synth</LinkComponent>
           </Headline>
-          <Sequencer3 compact />
+          <DuoSynthSequencer compact />
         </div>
         <div>
           <Headline as="h2">
-            <LinkComponent href={internalLinks.sequencer4}>Sequencer / Synth 4</LinkComponent>
+            <LinkComponent href={internalLinks.synths.membraneSynth}>Membrane Synth</LinkComponent>
           </Headline>
-          <Sequencer4 compact />
+          <MembraneSynth compact />
         </div>
       </div>
     </LayoutComponent>

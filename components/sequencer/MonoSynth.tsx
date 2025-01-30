@@ -1,7 +1,7 @@
 import SequencerLayout from "#components/sequencer/SequencerLayout"
 import useSequencer from "#tone/useSequencer"
 
-const Sequencer2 = ({ compact = false }: { compact?: boolean }) => {
+const MonoSynthSequencer = ({ compact = false }: { compact?: boolean }) => {
   const {
     sequencer2,
     sequencer2Steps,
@@ -26,4 +26,4 @@ const Sequencer2 = ({ compact = false }: { compact?: boolean }) => {
   )
 }
 
-export default Sequencer2
+export default MonoSynthSequencer

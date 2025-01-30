@@ -2,12 +2,30 @@ import type * as Tone from "tone"
 import type { TransportClass } from "tone/build/esm/core/clock/Transport"
 
 import type { SequencerStoreValues } from "#tone/useSequencer"
-import type { AMSynth, DuoSynth, MonoSynth, PolySynth, Synth } from "tone"
+import type {
+  AMSynth,
+  DuoSynth,
+  FMSynth,
+  MembraneSynth,
+  MetalSynth,
+  MonoSynth,
+  PluckSynth,
+  PolySynth,
+  Synth,
+} from "tone"
 
 export type InternalToneType = typeof Tone
 export type InternalTransportType = TransportClass
 
-export type AvailableSynths = Synth | PolySynth<MonoSynth> | AMSynth | DuoSynth
+export type AvailableSynths =
+  | PolySynth<Synth>
+  | PolySynth<MonoSynth>
+  | PolySynth<AMSynth>
+  | PolySynth<DuoSynth>
+  | PolySynth<FMSynth>
+  | PolySynth<MetalSynth>
+  | PolySynth<MembraneSynth>
+  | PluckSynth
 
 export type TransportConfigType = {
   bpm: {

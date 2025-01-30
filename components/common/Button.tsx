@@ -16,6 +16,7 @@ interface ButtonBaseProps {
   $loading?: boolean
   $noShadow?: boolean
   $noGutter?: boolean
+  $active?: boolean
 }
 
 const buttonVariants: VariantsConfig<ButtonVariantProps, ButtonBaseProps> = {
@@ -38,9 +39,10 @@ const buttonVariants: VariantsConfig<ButtonVariantProps, ButtonBaseProps> = {
     },
     $color: {
       hollow: "",
-      primary: ({ $disabled }) => `
+      primary: ({ $disabled, $active }) => `
         text-lightNeutral
         bg-primaryDarkNeutral
+        ${$active ? "!bg-primaryLight !text-dark" : ""}
         ${!$disabled ? "hover:bg-primary" : ""}
       `,
       secondary: ({ $disabled }) => `
@@ -87,6 +89,7 @@ export interface ButtonProps extends HTMLAttributes<HTMLAnchorElement | HTMLButt
   loading?: ButtonBaseProps["$loading"]
   noShadow?: ButtonBaseProps["$noShadow"]
   noGutter?: ButtonBaseProps["$noGutter"]
+  active?: ButtonBaseProps["$active"]
 }
 
 const Button = ({ children, icon, link, ...buttonProps }: ButtonProps) => {
@@ -100,6 +103,7 @@ const Button = ({ children, icon, link, ...buttonProps }: ButtonProps) => {
     loading: "$loading",
     disabled: "$disabled",
     color: "$color",
+    active: "$active",
   })
 
   return (

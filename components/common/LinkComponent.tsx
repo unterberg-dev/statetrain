@@ -38,7 +38,7 @@ const LinkComponent = ({
 
   return (
     <StyledLink
-      href={isExternal ? href : `${APP_CONFIG.viteUrl}${href}`}
+      href={href}
       target={isExternal ? "_blank" : target}
       rel={isExternal ? "noreferrer" : ""}
       $isExternal={isExternal}

@@ -2,7 +2,6 @@ import ToneManager from "#tone/class/ToneManager"
 import type { SequencerMeasuresValue } from "#tone/useSequencer"
 import type { AvailableSynths, Steps } from "#types/tone"
 import consola from "consola"
-import { Frequency } from "tone/build/esm/core/type/Units"
 
 export class StepSequencer {
   private steps: Steps = []

@@ -3,6 +3,7 @@ import {
   sequencer2DefaultMeasures,
   sequencer3DefaultMeasures,
   sequencer4DefaultMeasures,
+  sequencer5DefaultMeasures,
 } from "#lib/defaultSteps"
 import ToneManager from "#tone/class/ToneManager"
 import useTone from "#tone/useTone"
@@ -61,6 +62,15 @@ export const useInternalSequencer4Store = create<SequencerStoreValues>()((set) =
   steps: [], // sequencer4DefaultSteps,
   setSteps: (payload) => set(() => ({ steps: payload })),
   measures: sequencer4DefaultMeasures,
+  setMeasures: (payload) => set(() => ({ measures: payload })),
+  volume: 0,
+  setVolume: (payload) => set(() => ({ volume: payload })),
+}))
+
+export const useInternalSequencer5Store = create<SequencerStoreValues>()((set) => ({
+  steps: [], // sequencer4DefaultSteps,
+  setSteps: (payload) => set(() => ({ steps: payload })),
+  measures: sequencer5DefaultMeasures,
   setMeasures: (payload) => set(() => ({ measures: payload })),
   volume: 0,
   setVolume: (payload) => set(() => ({ volume: payload })),

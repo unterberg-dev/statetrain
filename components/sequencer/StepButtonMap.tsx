@@ -5,15 +5,17 @@ import useSequencer from "#tone/useSequencer"
 import useTone from "#tone/useTone"
 import type { Steps } from "#types/tone"
 import { useCallback, useEffect, useMemo } from "react"
+import { navigate } from "vike/client/router"
 
 interface StepButtonMapProps {
   activeStep?: number
   steps: Steps
   sequencer: StepSequencer | null
   setSequencerSteps: (steps: Steps) => void
+  navTo?: string
 }
 
-const StepButtonMap = ({ activeStep, steps, sequencer, setSequencerSteps }: StepButtonMapProps) => {
+const StepButtonMap = ({ activeStep, steps, sequencer, setSequencerSteps, navTo }: StepButtonMapProps) => {
   const { timeSignature, loopLength } = useTone()
   const measureSize = useMemo(() => timeSignature * loopLength, [timeSignature, loopLength])
   const { editStepIndex, setEditStepIndex } = useSequencer()
@@ -26,12 +28,18 @@ const StepButtonMap = ({ activeStep, steps, sequencer, setSequencerSteps }: Step
 
   /** Toggles a step in the sequencer + updates local state copy of steps */
   const handleToggleStepEvent = useCallback(
-    (e: React.MouseEvent<HTMLButtonElement>) => {
+    async (e: React.MouseEvent<HTMLButtonElement>) => {
       if (!sequencer) return
       const stepIndex = Number(e.currentTarget.dataset.stepIndex)
+      console.log("navTo", navTo)
+
+      if (navTo) {
+        const navigateOnButtonClick = navTo ? navigate(navTo) : () => {}
+        await navigateOnButtonClick
+      }
       setEditStepIndex(stepIndex)
     },
-    [setEditStepIndex, sequencer],
+    [setEditStepIndex, sequencer, navTo],
   )
 
   // 2) Create an array [0..(totalSteps-1)]

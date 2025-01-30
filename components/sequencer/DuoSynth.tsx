@@ -2,7 +2,7 @@
 import SequencerLayout from "#components/sequencer/SequencerLayout"
 import useSequencer from "#tone/useSequencer"
 
-const Sequencer3 = ({ compact = false }: { compact?: boolean }) => {
+const DuoSynthSequencer = ({ compact = false }: { compact?: boolean }) => {
   const {
     sequencer3,
     sequencer3Steps,
@@ -27,4 +27,4 @@ const Sequencer3 = ({ compact = false }: { compact?: boolean }) => {
   )
 }
 
-export default Sequencer3
+export default DuoSynthSequencer

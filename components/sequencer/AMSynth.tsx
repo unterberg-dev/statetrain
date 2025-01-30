@@ -1,7 +1,8 @@
 import SequencerLayout from "#components/sequencer/SequencerLayout"
+import { internalLinks } from "#lib/links"
 import useSequencer from "#tone/useSequencer"
 
-const Sequencer1 = ({ compact = false }: { compact?: boolean }) => {
+const AMSynthSequencer = ({ compact = false }: { compact?: boolean }) => {
   const {
     sequencer1,
     sequencer1Steps,
@@ -22,8 +23,9 @@ const Sequencer1 = ({ compact = false }: { compact?: boolean }) => {
       steps={sequencer1Steps}
       volume={sequencer1Volume}
       setVolume={setSequencer1Volume}
+      navTo={internalLinks.synths.amSynth}
     />
   )
 }
 
-export default Sequencer1
+export default AMSynthSequencer

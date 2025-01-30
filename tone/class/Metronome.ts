@@ -1,5 +1,5 @@
 import { consola } from "consola/browser"
-import type { Synth, SynthOptions } from "tone"
+import type { PluckSynth, PolySynth, Synth, SynthOptions } from "tone"
 import type { RecursivePartial } from "tone/build/esm/core/util/Interface"
 
 import SynthManager from "#tone/class/SynthManager"
@@ -13,8 +13,8 @@ class Metronome {
   private measureScheduleId?: number
 
   /** Synths used for quarter-note click and measure-downbeat click */
-  private quarterSynth?: Synth
-  private measureSynth?: Synth
+  private quarterSynth?: PolySynth<Synth>
+  private measureSynth?: PolySynth<Synth>
 
   /** Tracks if the metronome has started scheduling events */
   private isPlaying = false
@@ -40,6 +40,7 @@ class Metronome {
     const sharedOptions = {
       envelope: {
         sustain: 0.3,
+        release: 0.3,
       },
       oscillator: {
         type: "sine3",

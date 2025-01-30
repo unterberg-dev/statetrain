@@ -10,6 +10,7 @@ import PianoRoll from "#components/PianoRoll"
 import type { Steps } from "#types/tone"
 import useSequencer from "#tone/useSequencer"
 import { getPercentSingleValue, ruleOfThree } from "#utils/index"
+import ToneManager from "#tone/class/ToneManager"
 
 interface SequencerLayoutProps {
   compact?: boolean
@@ -20,6 +21,7 @@ interface SequencerLayoutProps {
   sequencer: StepSequencer | null
   steps: Steps
   setSequencerSteps: (steps: Steps) => void
+  navTo?: string
 }
 
 const SequencerLayout = ({
@@ -31,6 +33,7 @@ const SequencerLayout = ({
   setSequencerMeasures,
   setSequencerSteps,
   steps,
+  navTo,
 }: SequencerLayoutProps) => {
   const { timeSignature, isPlaying, loopLength, transport, registerSixteenthTick, unregisterSixteenthTick } =
     useTone()
@@ -39,6 +42,41 @@ const SequencerLayout = ({
 
   const measureSize = useMemo(() => timeSignature * loopLength, [timeSignature, loopLength])
   const totalSteps = useMemo(() => measureSize * measures, [measureSize, measures])
+
+  const handleMeasureSelect = useCallback(
+    async (newCount: SequencerMeasuresValue) => {
+      if (!sequencer) return
+
+      // Update measures in Tone.js
+      setSequencerMeasures(newCount)
+      const newSteps = sequencer.setMeasureCount(newCount)
+
+      setSequencerSteps(newSteps)
+
+      // Adjust active step based on Tone.Transport position
+      const posString = ToneManager.toneTransport?.position as string
+      if (posString) {
+        const totalSixteenthCount = parseTransportPosition(posString, timeSignature)
+
+        // Calculate new total steps based on updated measures
+        const newTotalSteps = newCount * timeSignature * loopLength
+
+        // Determine the new active step
+        const currentStep = totalSixteenthCount % newTotalSteps
+        setActiveStep(Math.floor(currentStep))
+      } else {
+        setActiveStep(0) // Fallback if position is unavailable
+      }
+    },
+    [setSequencerSteps, setSequencerMeasures, timeSignature, loopLength, sequencer],
+  )
+
+  // @todo: potential bad side effect
+  // we need this to update the sequencer when the timeSignature change
+  useEffect(() => {
+    if (!sequencer || !timeSignature) return
+    handleMeasureSelect(measures)
+  }, [sequencer, timeSignature, measures, handleMeasureSelect])
 
   // track the current step for UI highlight
   useEffect(() => {
@@ -99,14 +137,9 @@ const SequencerLayout = ({
           />
         </div>
       </div>
-      <SequencerControls
-        measures={measures}
-        setSequencerMeasures={setSequencerMeasures}
-        setSequencerSteps={setSequencerSteps}
-        setActiveStep={setActiveStep}
-        sequencer={sequencer}
-      />
+      {!compact && <SequencerControls measures={measures} handleMeasureSelect={handleMeasureSelect} />}
       <StepButtonMap
+        navTo={compact && navTo ? navTo : undefined}
         sequencer={sequencer}
         setSequencerSteps={setSequencerSteps}
         activeStep={activeStep}

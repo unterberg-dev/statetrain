@@ -89,10 +89,10 @@ const PianoRoll = ({ sequencer, steps, activeStep }: PianoRollProps) => {
   }, [])
 
   const currentEditStepNotesValuesToMidi: number[] = useMemo(() => {
-    if (!tone || !editStepIndex) return []
+    if (!tone || editStepIndex === undefined || !steps?.length) return []
     const stepNotes = editStepNotesMap[editStepIndex] || []
     return stepNotes.map((note) => tone.Frequency(note, "midi").toMidi())
-  }, [editStepNotesMap, editStepIndex, tone])
+  }, [editStepNotesMap, editStepIndex, tone, steps?.length])
 
   useEffect(() => {
     if (sequencer && currentActiveStep?.active && tone) {
@@ -144,11 +144,7 @@ const PianoRoll = ({ sequencer, steps, activeStep }: PianoRollProps) => {
 
   return (
     <>
-      <H3Headline className="text-white mt-5 mb-3">WIP: Piano Roll</H3Headline>
-      <p className="text-lg mb-3">
-        This piano roll is currently only connected to the same synth, but does not "know" about the played
-        note.
-      </p>
+      <H3Headline className="text-white mt-5 mb-3">Piano Roll</H3Headline>
       <div className="w-50 mb-5">
         <NumberInput
           id="current-octave"

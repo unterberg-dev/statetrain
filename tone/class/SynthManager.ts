@@ -1,12 +1,19 @@
 import { EventEmitter } from "eventemitter3"
-import { consola } from "consola/browser"
 import type {
   AMSynth,
   AMSynthOptions,
   DuoSynth,
   DuoSynthOptions,
+  FMSynth,
+  FMSynthOptions,
+  MembraneSynth,
+  MembraneSynthOptions,
+  MetalSynth,
+  MetalSynthOptions,
   MonoSynth,
   MonoSynthOptions,
+  PluckSynth,
+  PluckSynthOptions,
   PolySynth,
   Synth,
   SynthOptions,
@@ -35,51 +42,47 @@ class SynthManager {
   public emitter = new EventEmitter()
 
   /**
-   * Create a new Synth instance routed to the destination.
-   * @param options Tone.SynthOptions to configure the Synth
-   * @returns Synth instance
+   * @deprecated Just for testing
    */
-  public createSynth(options?: RecursivePartial<SynthOptions>): Synth {
+  public createSynth(options?: RecursivePartial<SynthOptions>): PolySynth<Synth> {
     const Tone = ToneManager.getTone()
-    const synth = new Tone.Synth(options).toDestination()
-
-    this.emitter.emit("synthCreated", synth)
-    consola.info("Synth created successfully.")
-    return synth
+    return new Tone.PolySynth(Tone.Synth, options).toDestination()
   }
 
-  /**
-   * Create a new MonoSynth instance routed to the destination.
-   * @param options Tone.MonoSynthOptions to configure the MonoSynth
-   * @returns MonoSynth instance
-   */
+  // only monophonic
+  public createPluckSynth(options?: RecursivePartial<PluckSynthOptions>): PluckSynth {
+    const Tone = ToneManager.getTone()
+    return new Tone.PluckSynth(options).toDestination()
+  }
+
+  public createMetalSynth(options?: RecursivePartial<MetalSynthOptions>): PolySynth<MetalSynth> {
+    const Tone = ToneManager.getTone()
+    return new Tone.PolySynth(Tone.MetalSynth, options).toDestination()
+  }
+
+  public createMembraneSynth(options?: RecursivePartial<MembraneSynthOptions>): PolySynth<MembraneSynth> {
+    const Tone = ToneManager.getTone()
+    return new Tone.PolySynth(Tone.MembraneSynth, options).toDestination()
+  }
+
+  public createFMSynth(options?: RecursivePartial<FMSynthOptions>): PolySynth<FMSynth> {
+    const Tone = ToneManager.getTone()
+    return new Tone.PolySynth(Tone.FMSynth, options).toDestination()
+  }
+
   public createMonoSynth(options?: RecursivePartial<MonoSynthOptions>): PolySynth<MonoSynth> {
     const Tone = ToneManager.getTone()
-    const polySynth = new Tone.PolySynth(Tone.MonoSynth, options).toDestination()
-    return polySynth
+    return new Tone.PolySynth(Tone.MonoSynth, options).toDestination()
   }
 
-  /**
-   * Create a new AMSynth instance routed to the destination.
-   * @param options Tone.AMSynthOptions to configure the AMSynth
-   * @returns AMSynth instance
-   */
-  public createAMSynth(options?: RecursivePartial<AMSynthOptions>): AMSynth {
+  public createAMSynth(options?: RecursivePartial<AMSynthOptions>): PolySynth<AMSynth> {
     const Tone = ToneManager.getTone()
-    const amSynth = new Tone.AMSynth(options).toDestination()
-
-    this.emitter.emit("amSynthCreated", amSynth)
-    consola.info("AMSynth created successfully.")
-    return amSynth
+    return new Tone.PolySynth(Tone.AMSynth, options).toDestination()
   }
 
-  public createDuoSynth(options?: RecursivePartial<DuoSynthOptions>): DuoSynth {
+  public createDuoSynth(options?: RecursivePartial<DuoSynthOptions>): PolySynth<DuoSynth> {
     const Tone = ToneManager.getTone()
-    const duoSynth = new Tone.DuoSynth(options).toDestination()
-
-    this.emitter.emit("duoSynthCreated", duoSynth)
-    consola.info("DuoSynth created successfully.")
-    return duoSynth
+    return new Tone.PolySynth(Tone.DuoSynth, options).toDestination()
   }
 }
 

@@ -2,7 +2,7 @@
 import SequencerLayout from "#components/sequencer/SequencerLayout"
 import useSequencer from "#tone/useSequencer"
 
-const Sequencer4 = ({ compact = false }: { compact?: boolean }) => {
+const MembraneSynth = ({ compact = false }: { compact?: boolean }) => {
   const {
     sequencer4,
     sequencer4Steps,
@@ -27,4 +27,4 @@ const Sequencer4 = ({ compact = false }: { compact?: boolean }) => {
   )
 }
 
-export default Sequencer4
+export default MembraneSynth

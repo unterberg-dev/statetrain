@@ -1,12 +1,12 @@
 import { H1Headline } from "#components/common/Headline"
 import LayoutComponent from "#components/common/LayoutComponent"
-import Sequencer2 from "#components/sequencer/Sequencer2"
+import MonoSynthSequencer from "#components/sequencer/MonoSynth"
 
 // todo: the current implementation must be oursourced to a separate file out of the page context
-const Sequencer1Page = () => (
+const MonoSynthPage = () => (
   <LayoutComponent className="mt-10">
     <H1Headline className="mb-5">💫 Mono Synth</H1Headline>
-    <Sequencer2 />
+    <MonoSynthSequencer />
   </LayoutComponent>
 )
-export default Sequencer1Page
+export default MonoSynthPage
