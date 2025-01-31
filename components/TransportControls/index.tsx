@@ -3,7 +3,6 @@ import { useCallback } from "react"
 
 import Button from "#components/common/Button"
 import ElementContainer from "#components/common/ElementContainer"
-import Layout from "#components/common/LayoutComponent"
 import TransportSettings from "#components/TransportControls/TransportSettings"
 import TransportVisualizer from "#components/TransportControls/TransportVisualizer"
 import useTone from "#tone/useTone"

@@ -1,5 +1,5 @@
 import { consola } from "consola/browser"
-import type { PluckSynth, PolySynth, Synth, SynthOptions } from "tone"
+import type { PolySynth, Synth, SynthOptions } from "tone"
 import type { RecursivePartial } from "tone/build/esm/core/util/Interface"
 
 import SynthManager from "#tone/class/SynthManager"
@@ -20,7 +20,6 @@ class Metronome {
   private isPlaying = false
 
   private constructor() {
-    // Reconfigure if time signature changes
     ToneManager.emitter.on("timeSignatureChanged", this.handleTimeSignatureChanged.bind(this))
   }
 
