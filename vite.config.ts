@@ -19,8 +19,14 @@ export default defineConfig({
   optimizeDeps: {
     include: ["react/jsx-runtime", "react", "react-dom"],
   },
-  server: { port: 5247 },
-  preview: { port: 4248 },
+  server: {
+    port: 5247,
+    host: true,
+  },
+  preview: {
+    port: 5247,
+    host: true,
+  },
   resolve: {
     alias: Object.entries(tsConf.compilerOptions.paths).map(([key, [value]]) => ({
       find: key.replace("/*", ""),

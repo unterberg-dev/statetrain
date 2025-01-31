@@ -2,20 +2,13 @@ import { Github, Smile } from "lucide-react"
 
 import LayoutComponent from "#components/common/LayoutComponent"
 import LinkComponent from "#components/common/LinkComponent"
-import useTone from "#tone/useTone"
 import { externalLinks } from "#lib/links"
-import CompactMixer from "#components/CompactMixer"
 
 const Footer = () => {
-  const { isPlaying } = useTone()
-
   return (
     <>
-      <LayoutComponent>
-        <CompactMixer />
-      </LayoutComponent>
       <LayoutComponent className="mt-10 mb-5 flex flex-col gap-2 justify-center items-center">
-        <Smile size={32} className={`${isPlaying ? "animate-spin" : ""}`} />
+        <Smile size={32} />
         <LinkComponent href={externalLinks.author} className="flex items-center gap-2">
           unterberg.dev
         </LinkComponent>

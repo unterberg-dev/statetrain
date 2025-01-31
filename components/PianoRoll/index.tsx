@@ -10,8 +10,8 @@ import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import rc from "react-classmate"
 
 interface StyledKeyProps {
-  $pressed: boolean
   $active: boolean
+  $locked?: boolean
 }
 
 interface StyledKeyVariants {
@@ -19,19 +19,19 @@ interface StyledKeyVariants {
 }
 
 const StyledKey = rc.button.variants<StyledKeyProps, StyledKeyVariants>({
-  base: `h-40 cursor-pointer transition-colors ${APP_CONFIG.transition.twShort}`,
+  base: "h-40 cursor-pointer relative",
   variants: {
     $type: {
       white: (p) => `
-        ${p.$pressed ? "!bg-primary" : ""}
         ${p.$active ? "bg-secondary/80" : "bg-white"}
+        ${p.$locked ? "!bg-error/30" : ""}
         flex-1
         border-r-3
         border-dark
       `,
       black: (p) => `
-        ${p.$pressed ? "!bg-primary" : ""}
         ${p.$active ? "bg-secondary/50" : "bg-dark"}
+        ${p.$locked ? "!bg-error/10" : ""}
         flex-1
         border-r-3
          border-dark
@@ -40,9 +40,9 @@ const StyledKey = rc.button.variants<StyledKeyProps, StyledKeyVariants>({
   },
 })
 
-const StyledKeyNoteValue = rc.span<{ $white: boolean; $pressed: boolean }>`
+const StyledKeyNoteValue = rc.span<{ $white: boolean; $pressed: boolean; $locked?: boolean }>`
   block
-  text-sm
+  ${(p) => (p.$locked ? "!text-error text-micro" : "text-sm")}
   ${(p) => (p.$white ? "text-gray mt-24" : "text-gray mt-12")}
   ${(p) => (p.$pressed ? "!text-white" : "")}
 `
@@ -61,6 +61,27 @@ const keyMap = Array.from({ length: 128 }, (_, i) => ({
   isWhite: whiteBlackKeySequence[i % whiteBlackKeySequence.length],
 }))
 
+const SCALES = {
+  none: null,
+  major: [0, 2, 4, 5, 7, 9, 11],
+  minor: [0, 2, 3, 5, 7, 8, 10],
+  pentatonic: [0, 2, 4, 7, 9],
+  blues: [0, 3, 5, 6, 7, 10],
+}
+
+const getPlayableNotes = (root: number, scalePattern: number[] | null) => {
+  if (!scalePattern) return new Set(Array.from({ length: 128 }, (_, i) => i)) // All notes playable
+
+  const playableNotes = new Set<number>()
+  for (let octave = 0; octave < 11; octave++) {
+    for (const step of scalePattern) {
+      const midiNote = root + step + octave * 12
+      if (midiNote < 128) playableNotes.add(midiNote)
+    }
+  }
+  return playableNotes
+}
+
 interface PianoRollProps {
   sequencer: StepSequencer | null
   steps: Steps | undefined
@@ -69,11 +90,14 @@ interface PianoRollProps {
 
 /** Piano Roll protype */
 const PianoRoll = ({ sequencer, steps, activeStep }: PianoRollProps) => {
-  const { tone } = useTone()
+  const { tone, scale, setScale, bpm } = useTone()
   const { editStepIndex } = useSequencer()
   const [currentOctave, setCurrentOctave] = useState(3)
   const [displayedOctaves, setDisplayedOctaves] = useState(2)
   const [notesPressed, setNotesPressed] = useState<number[] | null>(null)
+
+  const rootNote = currentOctave * 12 // Root is first note of the displayed octave
+  const playableNotes = useMemo(() => getPlayableNotes(rootNote, scale), [rootNote, scale])
 
   const [editStepNotesMap, setEditStepNotesMap] = useState<Record<number, number[]>>({})
   const timeoutRef = useRef<NodeJS.Timeout | null>(null)
@@ -96,7 +120,7 @@ const PianoRoll = ({ sequencer, steps, activeStep }: PianoRollProps) => {
     }
     timeoutRef.current = setTimeout(() => {
       setNotesPressed(null)
-    }, APP_CONFIG.transition.timeShort)
+    }, APP_CONFIG.transition.timeShort / 1.5)
   }, [])
 
   const currentEditStepNotesValuesToMidi =
@@ -165,18 +189,23 @@ const PianoRoll = ({ sequencer, steps, activeStep }: PianoRollProps) => {
   // Filter keys based on the current octave and displayed range
   const notesInCurrentOctaves = useMemo(
     () =>
-      keyMap.filter(
-        (keyItem) =>
-          keyItem.index >= currentOctave * 12 &&
-          keyItem.index < Math.min((currentOctave + displayedOctaves) * 12, 128), // Prevent overflow
-      ),
-    [currentOctave, displayedOctaves],
+      keyMap
+        .filter(
+          (keyItem) =>
+            keyItem.index >= currentOctave * 12 &&
+            keyItem.index < Math.min((currentOctave + displayedOctaves) * 12, 128),
+        )
+        .map((keyItem) => ({
+          ...keyItem,
+          locked: !playableNotes.has(keyItem.index), // Lock keys outside the scale
+        })),
+    [currentOctave, displayedOctaves, playableNotes],
   )
 
   return (
     <>
       <H3Headline className="text-white mt-5 mb-3">Piano Roll</H3Headline>
-      <div className="flex flex-wrap gap-5 mb-5">
+      <div className="flex flex-wrap gap-5 mb-5 items-center">
         <div className="w-50">
           <NumberInput
             id="current-octave"
@@ -196,29 +225,53 @@ const PianoRoll = ({ sequencer, steps, activeStep }: PianoRollProps) => {
             onIncrease={() => handleSetDisplayedOctaves(displayedOctaves + 1)}
           />
         </div>
+        <div className="flex gap-1 items-center">
+          <label htmlFor="apply-scale">Apply scale: </label>
+          <select
+            value={Object.keys(SCALES).find((key) => SCALES[key as keyof typeof SCALES] === scale) || "none"}
+            id="apply-scale"
+            onChange={(e) => setScale(SCALES[e.target.value as keyof typeof SCALES])}
+            className="p-1 rounded bg-grayDark text-white"
+          >
+            {Object.keys(SCALES).map((scale) => (
+              <option key={scale} value={scale}>
+                {scale}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
       <div className="flex bg-grayDark">
-        {notesInCurrentOctaves.map((keyItem) => (
-          <MemoizedStyledKey
-            onMouseDown={handlePlayNote}
-            key={keyItem.index}
-            data-key-index={keyItem.index}
-            $pressed={notesPressed?.includes(keyItem.index) || false}
-            $active={currentEditStepNotesValuesToMidi.includes(keyItem.index)}
-            $type={keyItem.isWhite ? "white" : "black"}
-          >
-            <MemoizedStyledKeyNoteValue
-              $pressed={
-                notesPressed?.includes(keyItem.index) ||
-                currentEditStepNotesValuesToMidi.includes(keyItem.index) ||
-                false
-              }
-              $white={keyItem.isWhite}
+        {notesInCurrentOctaves.map((keyItem) => {
+          const wasPressed = notesPressed?.includes(keyItem.index) || false
+          const isCurrentEditStep = currentEditStepNotesValuesToMidi.includes(keyItem.index)
+
+          return (
+            <MemoizedStyledKey
+              $locked={keyItem.locked}
+              onMouseDown={keyItem.locked ? undefined : handlePlayNote}
+              key={keyItem.index}
+              data-key-index={keyItem.index}
+              $active={isCurrentEditStep}
+              $type={keyItem.isWhite ? "white" : "black"}
             >
-              {midiToNote(keyItem.index)}
-            </MemoizedStyledKeyNoteValue>
-          </MemoizedStyledKey>
-        ))}
+              <MemoizedStyledKeyNoteValue
+                $locked={keyItem.locked}
+                $pressed={isCurrentEditStep || wasPressed}
+                $white={keyItem.isWhite}
+              >
+                {midiToNote(keyItem.index)}
+              </MemoizedStyledKeyNoteValue>
+              <div
+                style={{
+                  opacity: wasPressed ? 1 : 0,
+                  transition: `opacity ${20 / bpm}s ease-out`,
+                }}
+                className="absolute top-0 left-0 w-full h-full bg-primary bg-opacity-100 z-100 pointer-events-none"
+              />
+            </MemoizedStyledKey>
+          )
+        })}
       </div>
     </>
   )

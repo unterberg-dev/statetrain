@@ -13,8 +13,6 @@ interface StyledLinkProps {
 
 const StyledLink = rc.a<StyledLinkProps>`
   link
-  transition-colors
-  ${APP_CONFIG.transition.tw}
   inline-block
   hover:text-light
   ${(p) => (p.$isActive ? "!text-primaryDark/70 underline isActive" : "")}

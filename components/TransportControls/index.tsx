@@ -32,7 +32,7 @@ const TransportControls = () => {
   }, 300)
 
   return (
-    <LayoutComponent className="flex justify-end !sticky !top-0 z-20">
+    <LayoutComponent className="flex justify-end z-20">
       <ElementContainer className="inline-flex gap-3 items-stretch h-20">
         <TransportVisualizer />
         <TransportSettings />

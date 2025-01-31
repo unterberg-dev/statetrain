@@ -13,43 +13,16 @@ import Knob from "#components/Knob"
 import rc from "react-classmate"
 import useThrottledCallback from "#lib/hooks/useThrottledCallback"
 import EffectBus from "#tone/class/EffectBus"
+import useSequencer from "#tone/useSequencer"
+import LayoutComponent from "#components/common/LayoutComponent"
+import { usePageContext } from "vike-react/usePageContext"
 
-const StyledKnobOuter = rc.div<{ $compact: boolean }>`
+const StyledKnobOuter = rc.div`
   flex
-  ${(p) => (p.$compact ? "flex-col mb-5 items-center justify-center gap-2" : "justify-end gap-4")}
+  justify-end gap-4
 `
 
-interface SequencerLayoutProps {
-  compact?: boolean
-  volume: number
-  setVolume: (value: number) => void
-  measures: SequencerMeasuresValue
-  setSequencerMeasures: (payload: SequencerMeasuresValue) => void
-  sequencer: StepSequencer | null
-  steps: Steps
-  setSequencerSteps: (steps: Steps) => void
-  navTo?: string
-  reverb: number
-  setReverb: (value: number) => void
-  delay: number
-  setDelay: (value: number) => void
-}
-
-const SequencerLayout = ({
-  sequencer,
-  compact = false,
-  volume,
-  setVolume,
-  measures,
-  setSequencerMeasures,
-  setSequencerSteps,
-  steps,
-  navTo,
-  reverb,
-  setReverb,
-  delay,
-  setDelay,
-}: SequencerLayoutProps) => {
+const SequencerLayout = () => {
   const {
     timeSignature,
     isPlaying,
@@ -60,6 +33,22 @@ const SequencerLayout = ({
     unregisterSixteenthTick,
   } = useTone()
   const [activeStep, setActiveStep] = useState<number | undefined>()
+
+  const {
+    currentSequencer: {
+      measures,
+      sequencer,
+      setReverbMix: setReverb,
+      setDelayMix: setDelay,
+      setMeasures: setSequencerMeasures,
+      setSteps: setSequencerSteps,
+      setVolume,
+      volume,
+      steps,
+      reverbMix: reverb,
+      delayMix: delay,
+    },
+  } = useSequencer()
 
   const measureSize = useMemo(() => timeSignature * loopLength, [timeSignature, loopLength])
   const totalSteps = useMemo(() => measureSize * measures, [measureSize, measures])
@@ -131,6 +120,7 @@ const SequencerLayout = ({
     function handleTick() {
       setActiveStep((prev) => (typeof prev === "number" ? (prev + 1) % totalSteps : 0))
     }
+    // we are doing it wrong: https://github.com/Tonejs/Tone.js/wiki/Performance#syncing-visuals
     registerSixteenthTick(handleTick)
     return () => {
       unregisterSixteenthTick(handleTick)
@@ -174,10 +164,10 @@ const SequencerLayout = ({
   }, 300)
 
   return (
-    <div className="p-4 rounded-sm bg-black">
-      <div className={`${compact ? "flex flex-col" : "flex justify-between items-center mb-5"}`}>
-        {!compact && <SequencerControls measures={measures} handleMeasureSelect={handleMeasureSelect} />}
-        <StyledKnobOuter $compact={compact}>
+    <LayoutComponent className="p-4 rounded-sm bg-black">
+      <div className="flex justify-between items-center mb-5">
+        <SequencerControls measures={measures} handleMeasureSelect={handleMeasureSelect} />
+        <StyledKnobOuter>
           <Knob
             label="Volume"
             onChange={onChangeVolume}
@@ -195,15 +185,13 @@ const SequencerLayout = ({
         </StyledKnobOuter>
       </div>
       <StepButtonMap
-        navTo={compact && navTo ? navTo : undefined}
         sequencer={sequencer}
         setSequencerSteps={setSequencerSteps}
         activeStep={activeStep}
         steps={steps}
-        compact={compact}
       />
-      {!compact && <PianoRoll steps={steps} activeStep={activeStep} sequencer={sequencer} />}
-    </div>
+      <PianoRoll steps={steps} activeStep={activeStep} sequencer={sequencer} />
+    </LayoutComponent>
   )
 }
 

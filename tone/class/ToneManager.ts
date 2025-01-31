@@ -72,7 +72,6 @@ class ToneManager {
   private metalSynthSequencer: StepSequencer | null = null
   private membraneSynthSequencer: StepSequencer | null = null
   private fmSynthSequencer: StepSequencer | null = null
-  private pluckSynthSequencer: StepSequencer | null = null
 
   // Global EventEmitter
   public emitter = new EventEmitter()
@@ -163,13 +162,6 @@ class ToneManager {
       this.fmSynthSequencer.initializeSynth(SynthManager.createFMSynth(fmDefaultPreset))
       this.fmSynthSequencer.registerTransportCallback()
     }
-
-    // if (!this.pluckSynthSequencer) {
-    //   consola.info("Initializing StepSequencer 7 with measureCount:", measureCount)
-    //   this.pluckSynthSequencer = new StepSequencer(sequencer4DefaultMeasures, [])
-    //   this.pluckSynthSequencer.initializeSynth(SynthManager.createPluckSynth(pluckDefaultPreset))
-    //   this.pluckSynthSequencer.registerTransportCallback()
-    // }
   }
 
   public getAmSynth() {
@@ -189,9 +181,6 @@ class ToneManager {
   }
   public getFmSynth() {
     return this.fmSynthSequencer
-  }
-  public getPluckSynth() {
-    return this.pluckSynthSequencer
   }
 
   /**

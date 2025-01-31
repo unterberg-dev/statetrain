@@ -12,8 +12,6 @@ import type {
   MetalSynthOptions,
   MonoSynth,
   MonoSynthOptions,
-  PluckSynth,
-  PluckSynthOptions,
   PolySynth,
   Synth,
   SynthOptions,
@@ -50,16 +48,6 @@ class SynthManager {
     return new Tone.PolySynth(Tone.Synth, options).toDestination()
   }
 
-  // only monophonic
-  public createPluckSynth(options?: RecursivePartial<PluckSynthOptions>): PluckSynth {
-    const Tone = ToneManager.getTone()
-    return new Tone.PluckSynth(options).toDestination()
-  }
-
-  // public createMetalSynth(options?: RecursivePartial<MetalSynthOptions>): PolySynth<MetalSynth> {
-  //   const Tone = ToneManager.getTone()
-  //   return new Tone.PolySynth(Tone.MetalSynth, options).toDestination()
-  // }
   public createMetalSynth(options?: RecursivePartial<MetalSynthOptions>): PolySynth<MetalSynth> {
     const Tone = ToneManager.getTone()
     const synth = new Tone.PolySynth(Tone.MetalSynth, options)

@@ -9,12 +9,14 @@ interface TransportStoreGetter {
   bpm: number
   timeSignature: number
   isPlaying: boolean
+  scale: number[] | null
 }
 
 interface TransportStoreSetter {
   setBpm: (payload: number | undefined) => void
   setTimeSignature: (payload: number | undefined) => void
   setIsPlaying: (payload: boolean | undefined) => void
+  setScale: (payload: number[] | null) => void
 }
 
 export type TransportStoreValues = TransportStoreGetter & TransportStoreSetter
@@ -26,6 +28,8 @@ const useInternalTransportStore = create<TransportStoreValues>()((set) => ({
   setTimeSignature: (payload) => set(() => ({ timeSignature: payload })),
   isPlaying: TRANSPORT_CONFIG.isPlaying,
   setIsPlaying: (payload) => set(() => ({ isPlaying: payload })),
+  scale: null,
+  setScale: (payload) => set(() => ({ scale: payload })),
 }))
 
 /** the tone controller */
@@ -39,6 +43,8 @@ const useTone = () => {
   const setBpm = useInternalTransportStore((state) => state.setBpm)
   const timeSignature = useInternalTransportStore((state) => state.timeSignature)
   const setTimeSignature = useInternalTransportStore((state) => state.setTimeSignature)
+  const scale = useInternalTransportStore((state) => state.scale)
+  const setScale = useInternalTransportStore((state) => state.setScale)
 
   const initTone = useCallback(() => {
     if (context?.initTone) {
@@ -83,9 +89,9 @@ const useTone = () => {
 
   const registerQuarterTick = useCallback((event: () => void) => {
     ToneManager.emitter.on("quarterTick", event)
-    return () => {
-      ToneManager.emitter.off("quarterTick", event)
-    }
+    // return () => {
+    //   ToneManager.emitter.off("quarterTick", event)
+    // }
   }, [])
 
   const unregisterQuarterTick = useCallback((event: () => void) => {
@@ -94,10 +100,10 @@ const useTone = () => {
 
   const registerSixteenthTick = useCallback((event: () => void) => {
     ToneManager.emitter.on("sixteenthTick", event)
-    return () => {
-      consola.log("unregistering sixteenth tick")
-      ToneManager.emitter.off("sixteenthTick", event)
-    }
+    // return () => {
+    //   consola.log("unregistering sixteenth tick")
+    //   ToneManager.emitter.off("sixteenthTick", event)
+    // }
   }, [])
 
   const unregisterSixteenthTick = useCallback((event: () => void) => {
@@ -125,6 +131,8 @@ const useTone = () => {
     unregisterQuarterTick,
     registerSixteenthTick,
     unregisterSixteenthTick,
+    scale,
+    setScale,
   } as const
 }
 

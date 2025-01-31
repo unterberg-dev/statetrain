@@ -15,7 +15,7 @@ export const TRANSPORT_CONFIG: TransportConfigType = {
   bpm: {
     default: 115,
     min: 60,
-    max: 240,
+    max: 200,
   },
   loop: {
     default: true,

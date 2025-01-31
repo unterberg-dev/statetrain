@@ -10,9 +10,19 @@ import {
 import ToneManager from "#tone/class/ToneManager"
 import useTone from "#tone/useTone"
 import type { Steps, StoreReactStateSetter } from "#types/tone"
+import { useMemo } from "react"
 import { create } from "zustand"
 
 export type SequencerMeasuresValue = 1 | 2 | 3 | 4
+
+export enum Sequencer {
+  AM = 0,
+  Mono = 1,
+  Duo = 2,
+  Metal = 3,
+  Membrane = 4,
+  FM = 5,
+}
 
 // Store Interface
 export interface SequencerStoreValues {
@@ -50,12 +60,13 @@ export const useInternalSequencer3Store = createSequencerStore(sequencer3Default
 export const useInternalSequencer4Store = createSequencerStore(sequencer4DefaultMeasures)
 export const useInternalSequencer5Store = createSequencerStore(sequencer5DefaultMeasures)
 export const useInternalSequencer6Store = createSequencerStore(sequencer6DefaultMeasures)
-export const useInternalSequencer7Store = createSequencerStore(sequencer7DefaultMeasures)
 
 // Store for edit step index
 interface SequencerStoreConfig {
   editStepIndex: number | undefined
   setEditStepIndex: (setterFn: StoreReactStateSetter<number | undefined>) => void
+  activeSequencer: Sequencer | undefined
+  setActiveSequencer: (payload: Sequencer | undefined) => void
 }
 
 export const useInternalSequencerStoreConfigStore = create<SequencerStoreConfig>()((set) => ({
@@ -64,6 +75,8 @@ export const useInternalSequencerStoreConfigStore = create<SequencerStoreConfig>
     set(({ editStepIndex }) => ({
       editStepIndex: typeof setterFn === "function" ? setterFn(editStepIndex) : setterFn,
     })),
+  activeSequencer: undefined,
+  setActiveSequencer: (payload) => set({ activeSequencer: payload }),
 }))
 
 const useSequencer = () => {
@@ -141,20 +154,11 @@ const useSequencer = () => {
   const sequencer6DelayMix = useInternalSequencer6Store((state) => state.delayMix)
   const setSequencer6DelayMix = useInternalSequencer6Store((state) => state.setDelayMix)
 
-  // sequencer 7
-  const sequencer7Steps = useInternalSequencer7Store((state) => state.steps)
-  const setSequencer7Steps = useInternalSequencer7Store((state) => state.setSteps)
-  const sequencer7Measures = useInternalSequencer7Store((state) => state.measures)
-  const setSequencer7Measures = useInternalSequencer7Store((state) => state.setMeasures)
-  const sequencer7Volume = useInternalSequencer7Store((state) => state.volume)
-  const setSequencer7Volume = useInternalSequencer7Store((state) => state.setVolume)
-  const sequencer7ReverbMix = useInternalSequencer7Store((state) => state.reverbMix)
-  const setSequencer7ReverbMix = useInternalSequencer7Store((state) => state.setReverbMix)
-  const sequencer7DelayMix = useInternalSequencer7Store((state) => state.delayMix)
-  const setSequencer7DelayMix = useInternalSequencer7Store((state) => state.setDelayMix)
-
   const editStepIndex = useInternalSequencerStoreConfigStore((state) => state.editStepIndex)
   const setEditStepIndex = useInternalSequencerStoreConfigStore((state) => state.setEditStepIndex)
+
+  const activeSequencer = useInternalSequencerStoreConfigStore((state) => state.activeSequencer)
+  const setActiveSequencer = useInternalSequencerStoreConfigStore((state) => state.setActiveSequencer)
 
   const sequencer1 = isInitialized ? ToneManager.getAmSynth() : null
   const sequencer2 = isInitialized ? ToneManager.getMonoSynth() : null
@@ -162,13 +166,109 @@ const useSequencer = () => {
   const sequencer4 = isInitialized ? ToneManager.getMetalSynth() : null
   const sequencer5 = isInitialized ? ToneManager.getMembraneSynth() : null
   const sequencer6 = isInitialized ? ToneManager.getFmSynth() : null
-  const sequencer7 = isInitialized ? ToneManager.getPluckSynth() : null
 
-  return {
-    editStepIndex,
-    setEditStepIndex,
-
-    // sequencer 1
+  const currentSequencer = useMemo(() => {
+    switch (activeSequencer) {
+      case Sequencer.AM:
+        return {
+          sequencer: sequencer1,
+          steps: sequencer1Steps,
+          setSteps: setSequencer1Steps,
+          measures: sequencer1Measures,
+          setMeasures: setSequencer1Measures,
+          volume: sequencer1Volume,
+          setVolume: setSequencer1Volume,
+          reverbMix: sequencer1ReverbMix,
+          setReverbMix: setSequencer1ReverbMix,
+          delayMix: sequencer1DelayMix,
+          setDelayMix: setSequencer1DelayMix,
+        }
+      case Sequencer.Mono:
+        return {
+          sequencer: sequencer2,
+          steps: sequencer2Steps,
+          setSteps: setSequencer2Steps,
+          measures: sequencer2Measures,
+          setMeasures: setSequencer2Measures,
+          volume: sequencer2Volume,
+          setVolume: setSequencer2Volume,
+          reverbMix: sequencer2ReverbMix,
+          setReverbMix: setSequencer2ReverbMix,
+          delayMix: sequencer2DelayMix,
+          setDelayMix: setSequencer2DelayMix,
+        }
+      case Sequencer.Duo:
+        return {
+          sequencer: sequencer3,
+          steps: sequencer3Steps,
+          setSteps: setSequencer3Steps,
+          measures: sequencer3Measures,
+          setMeasures: setSequencer3Measures,
+          volume: sequencer3Volume,
+          setVolume: setSequencer3Volume,
+          reverbMix: sequencer3ReverbMix,
+          setReverbMix: setSequencer3ReverbMix,
+          delayMix: sequencer3DelayMix,
+          setDelayMix: setSequencer3DelayMix,
+        }
+      case Sequencer.Metal:
+        return {
+          sequencer: sequencer4,
+          steps: sequencer4Steps,
+          setSteps: setSequencer4Steps,
+          measures: sequencer4Measures,
+          setMeasures: setSequencer4Measures,
+          volume: sequencer4Volume,
+          setVolume: setSequencer4Volume,
+          reverbMix: sequencer4ReverbMix,
+          setReverbMix: setSequencer4ReverbMix,
+          delayMix: sequencer4DelayMix,
+          setDelayMix: setSequencer4DelayMix,
+        }
+      case Sequencer.Membrane:
+        return {
+          sequencer: sequencer5,
+          steps: sequencer5Steps,
+          setSteps: setSequencer5Steps,
+          measures: sequencer5Measures,
+          setMeasures: setSequencer5Measures,
+          volume: sequencer5Volume,
+          setVolume: setSequencer5Volume,
+          reverbMix: sequencer5ReverbMix,
+          setReverbMix: setSequencer5ReverbMix,
+          delayMix: sequencer5DelayMix,
+          setDelayMix: setSequencer5DelayMix,
+        }
+      case Sequencer.FM:
+        return {
+          sequencer: sequencer6,
+          steps: sequencer6Steps,
+          setSteps: setSequencer6Steps,
+          measures: sequencer6Measures,
+          setMeasures: setSequencer6Measures,
+          volume: sequencer6Volume,
+          setVolume: setSequencer6Volume,
+          reverbMix: sequencer6ReverbMix,
+          setReverbMix: setSequencer6ReverbMix,
+          delayMix: sequencer6DelayMix,
+          setDelayMix: setSequencer6DelayMix,
+        }
+      default:
+        return {
+          sequencer: sequencer1,
+          steps: sequencer1Steps,
+          setSteps: setSequencer1Steps,
+          measures: sequencer1Measures,
+          setMeasures: setSequencer1Measures,
+          volume: sequencer1Volume,
+          setVolume: setSequencer1Volume,
+          reverbMix: sequencer1ReverbMix,
+          setReverbMix: setSequencer1ReverbMix,
+          delayMix: sequencer1DelayMix,
+          setDelayMix: setSequencer1DelayMix,
+        }
+    }
+  }, [
     sequencer1,
     sequencer1Steps,
     setSequencer1Steps,
@@ -180,8 +280,6 @@ const useSequencer = () => {
     setSequencer1ReverbMix,
     sequencer1DelayMix,
     setSequencer1DelayMix,
-
-    // sequencer 2
     sequencer2,
     sequencer2Steps,
     setSequencer2Steps,
@@ -193,8 +291,6 @@ const useSequencer = () => {
     setSequencer2ReverbMix,
     sequencer2DelayMix,
     setSequencer2DelayMix,
-
-    // sequencer 3
     sequencer3,
     sequencer3Steps,
     setSequencer3Steps,
@@ -206,8 +302,6 @@ const useSequencer = () => {
     setSequencer3ReverbMix,
     sequencer3DelayMix,
     setSequencer3DelayMix,
-
-    // sequencer 4
     sequencer4,
     sequencer4Steps,
     setSequencer4Steps,
@@ -219,8 +313,6 @@ const useSequencer = () => {
     setSequencer4ReverbMix,
     sequencer4DelayMix,
     setSequencer4DelayMix,
-
-    // sequencer 5
     sequencer5,
     sequencer5Steps,
     setSequencer5Steps,
@@ -232,8 +324,6 @@ const useSequencer = () => {
     setSequencer5ReverbMix,
     sequencer5DelayMix,
     setSequencer5DelayMix,
-
-    // sequencer 6
     sequencer6,
     sequencer6Steps,
     setSequencer6Steps,
@@ -245,19 +335,17 @@ const useSequencer = () => {
     setSequencer6ReverbMix,
     sequencer6DelayMix,
     setSequencer6DelayMix,
+    activeSequencer,
+  ])
 
-    // sequencer 7
-    sequencer7,
-    sequencer7Steps,
-    setSequencer7Steps,
-    sequencer7Measures,
-    setSequencer7Measures,
-    sequencer7Volume,
-    setSequencer7Volume,
-    sequencer7ReverbMix,
-    setSequencer7ReverbMix,
-    sequencer7DelayMix,
-    setSequencer7DelayMix,
+  return {
+    editStepIndex,
+    setEditStepIndex,
+
+    activeSequencer,
+    setActiveSequencer,
+
+    currentSequencer,
   }
 }
 

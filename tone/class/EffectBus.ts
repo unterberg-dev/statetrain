@@ -130,6 +130,10 @@ class EffectBus {
     const bpm = ToneManager.toneTransport.bpm.value
     const beatTimeQuarter = ToneManager.getTone().Time("4n").toSeconds() // 8th note duration
     const beatTimeEigthsDotted = ToneManager.getTone().Time("8n.").toSeconds() // Dotted 8th note duration
+
+    // only change the calculated new delay time has changed
+    if (this.pingPongDelay.delayTime.value === beatTimeQuarter) return
+
     this.pingPongDelay.delayTime.value = beatTimeQuarter
     this.feedbackDelay.delayTime.value = beatTimeEigthsDotted
 

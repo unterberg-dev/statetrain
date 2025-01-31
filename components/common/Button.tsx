@@ -2,7 +2,6 @@ import { LoaderCircle } from "lucide-react"
 import type { HTMLAttributes, ReactNode } from "react"
 import { type VariantsConfig, convertRcProps, createVariantMap } from "react-classmate"
 
-import { APP_CONFIG } from "#lib/config"
 import type { Colors } from "#types/ui"
 import isExternalLink from "#lib/utils/isExternalLink"
 
@@ -14,28 +13,24 @@ interface ButtonVariantProps {
 interface ButtonBaseProps {
   $disabled?: boolean
   $loading?: boolean
-  $noShadow?: boolean
   $noGutter?: boolean
   $active?: boolean
 }
 
 const buttonVariants: VariantsConfig<ButtonVariantProps, ButtonBaseProps> = {
-  base: ({ $noShadow, $noGutter, $disabled, $loading }) => `
-    transition-colors
+  base: ({ $noGutter, $disabled, $loading }) => `
     inline-flex items-center justify-center gap-2
     font-bold
-    ${APP_CONFIG.transition.tw}
-    ${$noShadow ? "!shadow-none" : "shadow-darkNeutral/20"}
     ${$noGutter ? "!p-0" : ""}
     ${$disabled ? "opacity-60 cursor-not-allowed" : ""}
     ${$loading ? "opacity-80 pointer-events-none" : ""}
   `,
   variants: {
     $size: {
-      xs: "py-1 px-2 rounded-sm text-xs shadow-sm",
-      sm: "py-1.5 px-2.5 rounded-sm text-sm shadow-sm",
-      md: "py-1.5 px-3 rounded-sm shadow-sm",
-      lg: "py-3 px-4 rounded shadow-md",
+      xs: "py-1 px-2 rounded-sm text-xs",
+      sm: "py-1.5 px-2.5 rounded-sm text-sm ",
+      md: "py-1.5 px-3 rounded-sm ",
+      lg: "py-3 px-4 rounded ",
     },
     $color: {
       hollow: "",
@@ -87,7 +82,6 @@ export interface ButtonProps extends HTMLAttributes<HTMLAnchorElement | HTMLButt
   color?: ButtonVariantProps["$color"]
   disabled?: ButtonBaseProps["$disabled"]
   loading?: ButtonBaseProps["$loading"]
-  noShadow?: ButtonBaseProps["$noShadow"]
   noGutter?: ButtonBaseProps["$noGutter"]
   active?: ButtonBaseProps["$active"]
 }
@@ -98,7 +92,6 @@ const Button = ({ children, icon, link, ...buttonProps }: ButtonProps) => {
 
   const preparedProps = convertRcProps(buttonProps, {
     size: "$size",
-    noShadow: "$noShadow",
     noGutter: "$noGutter",
     loading: "$loading",
     disabled: "$disabled",

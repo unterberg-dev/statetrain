@@ -1,12 +1,20 @@
 import { H2Headline } from "#components/common/Headline"
 import LayoutComponent from "#components/common/LayoutComponent"
-import DuoSynthSequencer from "#components/sequencer/templates/DuoSynth"
+import useSequencer, { Sequencer } from "#tone/useSequencer"
+import { useEffect } from "react"
 
 // todo: the current implementation must be oursourced to a separate file out of the page context
-const DuoSynthPage = () => (
-  <LayoutComponent className="mt-10">
-    <H2Headline className="mb-5">💫 Duo Synth</H2Headline>
-    <DuoSynthSequencer />
-  </LayoutComponent>
-)
+const DuoSynthPage = () => {
+  const { setActiveSequencer } = useSequencer()
+
+  useEffect(() => {
+    setActiveSequencer(Sequencer.Duo)
+  }, [setActiveSequencer])
+
+  return (
+    <LayoutComponent className="mt-10">
+      <H2Headline className="mb-5">💫 Duo Synth</H2Headline>
+    </LayoutComponent>
+  )
+}
 export default DuoSynthPage

@@ -6,11 +6,10 @@ import type { Steps } from "#types/tone"
 interface MissingStepButtonMapProps {
   steps: Steps
   measureSize: number
-  compact?: boolean
   totalLength: number
 }
 
-const MissingStepButtonMap = ({ steps, measureSize, totalLength, compact }: MissingStepButtonMapProps) => {
+const MissingStepButtonMap = ({ steps, measureSize, totalLength }: MissingStepButtonMapProps) => {
   const { timeSignature, loopLength } = useTone()
   const totalMissingSteps = timeSignature * loopLength * 4 - steps.length
   if (totalMissingSteps <= 0) return null
@@ -22,10 +21,10 @@ const MissingStepButtonMap = ({ steps, measureSize, totalLength, compact }: Miss
   const missingStepChunks = chunkArray(missingStepObjects, measureSize)
 
   return missingStepChunks.map((missingSteps, missingMeasureIndex) => (
-    <StepRow key={getUniqueStepId(totalLength + missingMeasureIndex, 0)} $compact={compact}>
+    <StepRow key={getUniqueStepId(totalLength + missingMeasureIndex, 0)}>
       {missingSteps.map((_, localIndex) => (
         <div className="relative flex-1" key={getUniqueStepId(totalLength + missingMeasureIndex, localIndex)}>
-          <SequencerButton $state="locked" $compact={compact} disabled />
+          <SequencerButton $state="locked" disabled />
         </div>
       ))}
     </StepRow>

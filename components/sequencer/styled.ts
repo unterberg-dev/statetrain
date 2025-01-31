@@ -1,20 +1,13 @@
-import { APP_CONFIG } from "#lib/config"
 import rc from "react-classmate"
 
 export const SequencerButton = rc.button.variants<{
   $state: "current" | "inactive" | "halfs" | "eigths" | "fourths" | "edit" | "locked"
   $armed?: boolean
-  $compact?: boolean
 }>({
-  base: (p) =>
-    `inset-0 absolute z-2 overflow-hidden ${p.$compact ? "" : `rounded-sm transition-all ${APP_CONFIG.transition.twShort}`}`, // sample styling
+  base: "inset-0 absolute z-2 overflow-hidden rounded-sm",
   variants: {
     $state: {
-      current: (p) => `
-        ${p.$armed ? "bg-primaryLight" : "bg-light"}
-        ${p.$compact ? "" : "!-translate-y-2"}
-      `,
-      edit: "!bg-primaryLight scale-110 animate-pulse",
+      edit: "!bg-error scale-110 z-200",
       inactive: (p) => `${p.$armed ? "bg-secondary/50" : "bg-grayDark hover:bg-secondaryLight/50"}`,
       locked: "bg-grayDark/50",
       halfs: (p) => `${p.$armed ? "bg-secondary" : "bg-grayDark hover:bg-secondaryLight/50"}`,
@@ -24,13 +17,13 @@ export const SequencerButton = rc.button.variants<{
   },
 })
 
-export const StepsOuter = rc.div<{ $compact?: boolean }>`
+export const StepsOuter = rc.div`
   flex flex-col
-  ${(p) => (p.$compact ? "gap-0.5" : "gap-1")}
+  gap-1
 `
 
-export const StepRow = rc.div<{ $compact?: boolean }>`
-  ${(p) => (p.$compact ? "min-h-5 gap-0.5" : "min-h-20 gap-1")}
+export const StepRow = rc.div`
+  min-h-20 gap-1
   lg:flex
   lg:mb-0
   mb-3
