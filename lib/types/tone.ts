@@ -25,7 +25,7 @@ export type AvailableSynths =
   | PolySynth<FMSynth>
   | PolySynth<MetalSynth>
   | PolySynth<MembraneSynth>
-  | PluckSynth
+// | PluckSynth
 
 export type TransportConfigType = {
   bpm: {

@@ -33,7 +33,7 @@ const TransportControls = () => {
         />
         <Button
           className="flex-1 w-14"
-          color={isMetronomeStarted ? "warning" : "success"}
+          color={isMetronomeStarted ? "primary" : "success"}
           icon={
             <img
               src={`${APP_CONFIG.viteUrl}/icons/metronome-svgrepo-com.svg`}

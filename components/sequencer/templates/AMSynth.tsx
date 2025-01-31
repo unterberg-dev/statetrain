@@ -11,10 +11,18 @@ const AMSynthSequencer = ({ compact = false }: { compact?: boolean }) => {
     setSequencer1Measures,
     setSequencer1Volume,
     sequencer1Volume,
+    sequencer1ReverbMix,
+    setSequencer1ReverbMix,
+    sequencer1DelayMix,
+    setSequencer1DelayMix,
   } = useSequencer()
 
   return (
     <SequencerLayout
+      delay={sequencer1DelayMix}
+      setDelay={setSequencer1DelayMix}
+      reverb={sequencer1ReverbMix}
+      setReverb={setSequencer1ReverbMix}
       compact={compact}
       measures={sequencer1Measures}
       sequencer={sequencer1}

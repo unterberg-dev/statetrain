@@ -7,11 +7,12 @@ interface NumberInputProps {
   value: number | string
   label: ReactNode
   id: string
+  className?: string
 }
 
-const NumberInput = ({ onIncrease, onDecrease, value, label, id }: NumberInputProps) => {
+const NumberInput = ({ onIncrease, onDecrease, value, label, id, className }: NumberInputProps) => {
   return (
-    <div className="flex justify-between items-center gap-2 items-stretch flex-1">
+    <div className={`flex items-center gap-2 items-stretch flex-1 ${className || ""}`}>
       <div className="whitespace-nowrap text-sm flex flex-col items-center justify-center">{label}</div>
       <div className="relative flex items-center max-w-24">
         <StyledToggleButton $pos="left" type="button" onClick={onDecrease} aria-label="Decrement">

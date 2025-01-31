@@ -7,6 +7,7 @@ const TransportSettings = () => {
   return (
     <div className="flex flex-col items-stretch justify-between gap-1">
       <NumberInput
+        className="justify-between"
         id="bpm"
         label="Global BPM"
         value={bpm}
@@ -14,6 +15,7 @@ const TransportSettings = () => {
         onDecrease={() => handleChangeBpm(bpm - 1)}
       />
       <NumberInput
+        className="justify-between"
         id="time-signature"
         label="Time Signature"
         value={`${timeSignature}/4`}

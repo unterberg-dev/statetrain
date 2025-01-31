@@ -11,10 +11,18 @@ const FMSynthSequencer = ({ compact = false }: { compact?: boolean }) => {
     setSequencer6Measures,
     setSequencer6Volume,
     sequencer6Volume,
+    sequencer6ReverbMix,
+    setSequencer6ReverbMix,
+    sequencer6DelayMix,
+    setSequencer6DelayMix,
   } = useSequencer()
 
   return (
     <SequencerLayout
+      delay={sequencer6DelayMix}
+      setDelay={setSequencer6DelayMix}
+      reverb={sequencer6ReverbMix}
+      setReverb={setSequencer6ReverbMix}
       compact={compact}
       measures={sequencer6Measures}
       sequencer={sequencer6}

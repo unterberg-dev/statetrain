@@ -21,6 +21,7 @@ import type {
 import type { RecursivePartial } from "tone/build/esm/core/util/Interface"
 
 import ToneManager from "#tone/class/ToneManager"
+import EffectBus from "#tone/class/EffectBus"
 
 /**
  * Manages creation and management of Synth instances.
@@ -55,34 +56,50 @@ class SynthManager {
     return new Tone.PluckSynth(options).toDestination()
   }
 
+  // public createMetalSynth(options?: RecursivePartial<MetalSynthOptions>): PolySynth<MetalSynth> {
+  //   const Tone = ToneManager.getTone()
+  //   return new Tone.PolySynth(Tone.MetalSynth, options).toDestination()
+  // }
   public createMetalSynth(options?: RecursivePartial<MetalSynthOptions>): PolySynth<MetalSynth> {
     const Tone = ToneManager.getTone()
-    return new Tone.PolySynth(Tone.MetalSynth, options).toDestination()
+    const synth = new Tone.PolySynth(Tone.MetalSynth, options)
+    EffectBus.routeSynth(synth)
+    return synth
   }
 
   public createMembraneSynth(options?: RecursivePartial<MembraneSynthOptions>): PolySynth<MembraneSynth> {
     const Tone = ToneManager.getTone()
-    return new Tone.PolySynth(Tone.MembraneSynth, options).toDestination()
+    const synth = new Tone.PolySynth(Tone.MembraneSynth, options)
+    EffectBus.routeSynth(synth)
+    return synth
   }
 
   public createFMSynth(options?: RecursivePartial<FMSynthOptions>): PolySynth<FMSynth> {
     const Tone = ToneManager.getTone()
-    return new Tone.PolySynth(Tone.FMSynth, options).toDestination()
+    const synth = new Tone.PolySynth(Tone.FMSynth, options)
+    EffectBus.routeSynth(synth)
+    return synth
   }
 
   public createMonoSynth(options?: RecursivePartial<MonoSynthOptions>): PolySynth<MonoSynth> {
     const Tone = ToneManager.getTone()
-    return new Tone.PolySynth(Tone.MonoSynth, options).toDestination()
+    const synth = new Tone.PolySynth(Tone.MonoSynth, options)
+    EffectBus.routeSynth(synth)
+    return synth
   }
 
   public createAMSynth(options?: RecursivePartial<AMSynthOptions>): PolySynth<AMSynth> {
     const Tone = ToneManager.getTone()
-    return new Tone.PolySynth(Tone.AMSynth, options).toDestination()
+    const synth = new Tone.PolySynth(Tone.AMSynth, options)
+    EffectBus.routeSynth(synth)
+    return synth
   }
 
   public createDuoSynth(options?: RecursivePartial<DuoSynthOptions>): PolySynth<DuoSynth> {
     const Tone = ToneManager.getTone()
-    return new Tone.PolySynth(Tone.DuoSynth, options).toDestination()
+    const synth = new Tone.PolySynth(Tone.DuoSynth, options)
+    EffectBus.routeSynth(synth)
+    return synth
   }
 }
 

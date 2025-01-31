@@ -11,10 +11,18 @@ const MembraneSynthSequencer = ({ compact = false }: { compact?: boolean }) => {
     setSequencer5Measures,
     setSequencer5Volume,
     sequencer5Volume,
+    sequencer5ReverbMix,
+    setSequencer5ReverbMix,
+    sequencer5DelayMix,
+    setSequencer5DelayMix,
   } = useSequencer()
 
   return (
     <SequencerLayout
+      delay={sequencer5DelayMix}
+      setDelay={setSequencer5DelayMix}
+      reverb={sequencer5ReverbMix}
+      setReverb={setSequencer5ReverbMix}
       compact={compact}
       measures={sequencer5Measures}
       sequencer={sequencer5}

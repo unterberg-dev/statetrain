@@ -12,10 +12,18 @@ const MetalSynthSequencer = ({ compact = false }: { compact?: boolean }) => {
     setSequencer4Measures,
     sequencer4Volume,
     setSequencer4Volume,
+    sequencer4ReverbMix,
+    setSequencer4ReverbMix,
+    sequencer4DelayMix,
+    setSequencer4DelayMix,
   } = useSequencer()
 
   return (
     <SequencerLayout
+      delay={sequencer4DelayMix}
+      setDelay={setSequencer4DelayMix}
+      reverb={sequencer4ReverbMix}
+      setReverb={setSequencer4ReverbMix}
       compact={compact}
       measures={sequencer4Measures}
       sequencer={sequencer4}

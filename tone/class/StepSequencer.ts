@@ -1,18 +1,15 @@
 import ToneManager from "#tone/class/ToneManager"
-import type { SequencerMeasuresValue } from "#tone/useSequencer"
 import type { AvailableSynths, Steps } from "#types/tone"
 import consola from "consola"
 
 export class StepSequencer {
   private steps: Steps = []
-  private measureCount: number
   private scheduledId: number | null = null
   private synth: AvailableSynths | null = null
   public currentStep = 0
   public monoVoice = true
 
   constructor(measureCount = 4, steps: Steps = [], monoVoice = true) {
-    this.measureCount = measureCount
     this.monoVoice = monoVoice
     this.steps = steps.length ? steps : this.initSteps(measureCount)
   }
@@ -141,8 +138,6 @@ export class StepSequencer {
   }
 
   public setMeasureCount(newCount: number) {
-    this.measureCount = newCount as SequencerMeasuresValue
-
     const actualTimeSig = ToneManager.currentTimeSignature
     const newTotalSteps = newCount * actualTimeSig * 4
     const oldSteps = this.steps

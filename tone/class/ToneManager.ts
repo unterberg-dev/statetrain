@@ -22,6 +22,8 @@ import {
   pluckDefaultPreset,
 } from "#utils/synthdefaultPresets"
 
+import EffectBus from "#tone/class/EffectBus"
+
 interface TransportSettings {
   bpm?: number
   timeSignature?: number
@@ -96,6 +98,8 @@ class ToneManager {
           this.toneTransport = this.toneCore.getTransport()
           this.isInitialized = true
 
+          await EffectBus.init()
+
           consola.success("Tone.js initialized successfully (dynamic import).")
           this.emitter.emit("initialized")
 
@@ -160,12 +164,12 @@ class ToneManager {
       this.fmSynthSequencer.registerTransportCallback()
     }
 
-    if (!this.pluckSynthSequencer) {
-      consola.info("Initializing StepSequencer 7 with measureCount:", measureCount)
-      this.pluckSynthSequencer = new StepSequencer(sequencer4DefaultMeasures, [])
-      this.pluckSynthSequencer.initializeSynth(SynthManager.createPluckSynth(pluckDefaultPreset))
-      this.pluckSynthSequencer.registerTransportCallback()
-    }
+    // if (!this.pluckSynthSequencer) {
+    //   consola.info("Initializing StepSequencer 7 with measureCount:", measureCount)
+    //   this.pluckSynthSequencer = new StepSequencer(sequencer4DefaultMeasures, [])
+    //   this.pluckSynthSequencer.initializeSynth(SynthManager.createPluckSynth(pluckDefaultPreset))
+    //   this.pluckSynthSequencer.registerTransportCallback()
+    // }
   }
 
   public getAmSynth() {

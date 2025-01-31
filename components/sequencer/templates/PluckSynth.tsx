@@ -11,10 +11,18 @@ const PluckSynthSequencer = ({ compact = false }: { compact?: boolean }) => {
     setSequencer7Measures,
     setSequencer7Volume,
     sequencer7Volume,
+    sequencer7ReverbMix,
+    setSequencer7ReverbMix,
+    sequencer7DelayMix,
+    setSequencer7DelayMix,
   } = useSequencer()
 
   return (
     <SequencerLayout
+      delay={sequencer7DelayMix}
+      setDelay={setSequencer7DelayMix}
+      reverb={sequencer7ReverbMix}
+      setReverb={setSequencer7ReverbMix}
       compact={compact}
       measures={sequencer7Measures}
       sequencer={sequencer7}

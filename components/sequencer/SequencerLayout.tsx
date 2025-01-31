@@ -12,10 +12,11 @@ import ToneManager from "#tone/class/ToneManager"
 import Knob from "#components/Knob"
 import rc from "react-classmate"
 import useThrottledCallback from "#lib/hooks/useThrottledCallback"
+import EffectBus from "#tone/class/EffectBus"
 
 const StyledKnobOuter = rc.div<{ $compact: boolean }>`
-  flex items-baseline
-  ${(p) => (p.$compact ? "justify-center mb-5" : "justify-between")}
+  flex
+  ${(p) => (p.$compact ? "flex-col mb-5 items-center justify-center gap-2" : "justify-end gap-4")}
 `
 
 interface SequencerLayoutProps {
@@ -28,6 +29,10 @@ interface SequencerLayoutProps {
   steps: Steps
   setSequencerSteps: (steps: Steps) => void
   navTo?: string
+  reverb: number
+  setReverb: (value: number) => void
+  delay: number
+  setDelay: (value: number) => void
 }
 
 const SequencerLayout = ({
@@ -40,13 +45,51 @@ const SequencerLayout = ({
   setSequencerSteps,
   steps,
   navTo,
+  reverb,
+  setReverb,
+  delay,
+  setDelay,
 }: SequencerLayoutProps) => {
-  const { timeSignature, isPlaying, loopLength, transport, registerSixteenthTick, unregisterSixteenthTick } =
-    useTone()
+  const {
+    timeSignature,
+    isPlaying,
+    bpm,
+    loopLength,
+    transport,
+    registerSixteenthTick,
+    unregisterSixteenthTick,
+  } = useTone()
   const [activeStep, setActiveStep] = useState<number | undefined>()
 
   const measureSize = useMemo(() => timeSignature * loopLength, [timeSignature, loopLength])
   const totalSteps = useMemo(() => measureSize * measures, [measureSize, measures])
+
+  const synth = sequencer?.getSynth() // Get the sequencer's synth instance
+
+  useEffect(() => {
+    if (bpm) {
+      EffectBus.updateDelayTime()
+    }
+  }, [bpm])
+
+  // Handle FX mix knob change
+  const onChangeReverbMix = useThrottledCallback((value: number) => {
+    if (setReverb) {
+      setReverb(value)
+    }
+    if (sequencer && synth) {
+      const interpolatedValue = ruleOfThree(value, 0, 1) // Convert 0-100% to 0-1
+      EffectBus.updateSynthReverbMix(synth, interpolatedValue)
+    }
+  }, 300)
+
+  const onChangeDelayMix = useThrottledCallback((value: number) => {
+    setDelay(value)
+    if (sequencer && synth) {
+      const interpolatedValue = ruleOfThree(value, 0, 1) // Convert 0-100% to 0-1
+      EffectBus.updateSynthDelayMix(synth, interpolatedValue)
+    }
+  }, 300)
 
   const handleMeasureSelect = useCallback(
     async (newCount: SequencerMeasuresValue) => {
@@ -132,21 +175,25 @@ const SequencerLayout = ({
 
   return (
     <div className="p-4 rounded-sm bg-black">
-      <StyledKnobOuter $compact={compact}>
+      <div className={`${compact ? "flex flex-col" : "flex justify-between items-center mb-5"}`}>
         {!compact && <SequencerControls measures={measures} handleMeasureSelect={handleMeasureSelect} />}
-        <Knob
-          label="Volume"
-          onChange={onChangeVolume}
-          value={
-            volume ||
-            getPercentSingleValue({
-              min: -50,
-              max: 20,
-              value: 0,
-            })
-          }
-        />
-      </StyledKnobOuter>
+        <StyledKnobOuter $compact={compact}>
+          <Knob
+            label="Volume"
+            onChange={onChangeVolume}
+            value={
+              volume ||
+              getPercentSingleValue({
+                min: -50,
+                max: 20,
+                value: 0,
+              })
+            }
+          />
+          <Knob label="Reverb" onChange={onChangeReverbMix} value={reverb ? reverb : 0} />
+          <Knob label="Delay" onChange={onChangeDelayMix} value={delay ? delay : 0} />
+        </StyledKnobOuter>
+      </div>
       <StepButtonMap
         navTo={compact && navTo ? navTo : undefined}
         sequencer={sequencer}

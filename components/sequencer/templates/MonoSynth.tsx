@@ -11,10 +11,18 @@ const MonoSynthSequencer = ({ compact = false }: { compact?: boolean }) => {
     setSequencer2Measures,
     sequencer2Volume,
     setSequencer2Volume,
+    sequencer2ReverbMix,
+    setSequencer2ReverbMix,
+    sequencer2DelayMix,
+    setSequencer2DelayMix,
   } = useSequencer()
 
   return (
     <SequencerLayout
+      delay={sequencer2DelayMix}
+      setDelay={setSequencer2DelayMix}
+      reverb={sequencer2ReverbMix}
+      setReverb={setSequencer2ReverbMix}
       compact={compact}
       measures={sequencer2Measures}
       sequencer={sequencer2}

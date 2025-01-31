@@ -12,10 +12,18 @@ const DuoSynthSequencer = ({ compact = false }: { compact?: boolean }) => {
     setSequencer3Measures,
     sequencer3Volume,
     setSequencer3Volume,
+    sequencer3ReverbMix,
+    setSequencer3ReverbMix,
+    sequencer3DelayMix,
+    setSequencer3DelayMix,
   } = useSequencer()
 
   return (
     <SequencerLayout
+      delay={sequencer3DelayMix}
+      setDelay={setSequencer3DelayMix}
+      reverb={sequencer3ReverbMix}
+      setReverb={setSequencer3ReverbMix}
       compact={compact}
       measures={sequencer3Measures}
       sequencer={sequencer3}
