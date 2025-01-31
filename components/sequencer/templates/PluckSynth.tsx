@@ -23,7 +23,7 @@ const PluckSynthSequencer = ({ compact = false }: { compact?: boolean }) => {
       steps={sequencer7Steps}
       volume={sequencer7Volume}
       setVolume={setSequencer7Volume}
-      navTo={internalLinks.synths.pluckSynth}
+      // navTo={internalLinks.synths.pluckSynth} <--- Uncomment this line
     />
   )
 }

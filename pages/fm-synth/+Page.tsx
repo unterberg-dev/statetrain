@@ -1,12 +1,12 @@
-import { H1Headline } from "#components/common/Headline"
+import { H2Headline } from "#components/common/Headline"
 import LayoutComponent from "#components/common/LayoutComponent"
 import FMSynthSequencer from "#components/sequencer/templates/FmSynth"
 
 // todo: the current implementation must be oursourced to a separate file out of the page context
-const MetalSynthPage = () => (
+const FMSynthPage = () => (
   <LayoutComponent className="mt-10">
-    <H1Headline className="mb-5">💫 FM Synth</H1Headline>
+    <H2Headline className="mb-5">💫 FM Synth</H2Headline>
     <FMSynthSequencer />
   </LayoutComponent>
 )
-export default MetalSynthPage
+export default FMSynthPage

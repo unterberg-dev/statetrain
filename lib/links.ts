@@ -7,11 +7,11 @@ export const internalLinks = {
   synths: {
     amSynth: `${base}/am-synth/`,
     monoSynth: `${base}/mono-synth/`,
-    metalSynth: `${base}/metal-synth/`,
     duoSynth: `${base}/duo-synth/`,
+    metalSynth: `${base}/metal-synth/`,
     membraneSynth: `${base}/membrane-synth/`,
     fmSynth: `${base}/fm-synth/`,
-    pluckSynth: `${base}/pluck-synth/`,
+    // pluckSynth: `${base}/pluck-synth/`,
   },
 }
 

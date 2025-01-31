@@ -5,14 +5,18 @@ import { parseTransportPosition } from "#components/sequencer/utils"
 import useTone from "#tone/useTone"
 import { useState, useMemo, useEffect, useCallback } from "react"
 import type { SequencerMeasuresValue } from "#tone/useSequencer"
-import RangeSlider from "#components/form/RangeSlider"
 import PianoRoll from "#components/PianoRoll"
 import type { Steps } from "#types/tone"
-import useSequencer from "#tone/useSequencer"
 import { getPercentSingleValue, ruleOfThree } from "#utils/index"
 import ToneManager from "#tone/class/ToneManager"
 import Knob from "#components/Knob"
-import useDebouncedCallback from "#lib/hooks/useDebouncedCallback"
+import rc from "react-classmate"
+import useThrottledCallback from "#lib/hooks/useThrottledCallback"
+
+const StyledKnobOuter = rc.div<{ $compact: boolean }>`
+  flex items-baseline
+  ${(p) => (p.$compact ? "justify-center mb-5" : "justify-between")}
+`
 
 interface SequencerLayoutProps {
   compact?: boolean
@@ -40,7 +44,6 @@ const SequencerLayout = ({
   const { timeSignature, isPlaying, loopLength, transport, registerSixteenthTick, unregisterSixteenthTick } =
     useTone()
   const [activeStep, setActiveStep] = useState<number | undefined>()
-  const { editStepIndex } = useSequencer()
 
   const measureSize = useMemo(() => timeSignature * loopLength, [timeSignature, loopLength])
   const totalSteps = useMemo(() => measureSize * measures, [measureSize, measures])
@@ -110,42 +113,40 @@ const SequencerLayout = ({
     setActiveStep(Math.floor(currentStep))
   }, [timeSignature, totalSteps, transport])
 
-  const [realTimeVolume, setRealTimeVolume] = useState<number>(volume)
+  const onChangeVolume = useCallback(
+    (value: number) => {
+      if (sequencer) {
+        throttledOnChangeVolume(Math.floor(value)) // Delay actual volume update
+      }
+    },
+    [sequencer],
+  )
 
-  const onChangeVolume = useCallback((value: number) => {
-    setRealTimeVolume(Math.floor(value)) // Update UI instantly
-    debouncedOnChangeVolume(Math.floor(value)) // Delay actual volume update
-  }, [])
-
-  const debouncedOnChangeVolume = useDebouncedCallback((value: number) => {
+  const throttledOnChangeVolume = useThrottledCallback((value: number) => {
     if (sequencer) {
-      console.log("debouncedOnChangeVolume", value)
-      setVolume(value)
+      setVolume(Math.floor(value))
       const interpolatedValue = ruleOfThree(value, -50, 20)
       sequencer.setVolume(interpolatedValue)
     }
-  }, 50) // Adjust the debounce delay as needed (e.g., 300ms)
-
-  useEffect(() => {
-    console.log(setVolume)
-  }, [setVolume])
+  }, 300)
 
   return (
-    <div className="p-4 border-grayDark bg-black border-1">
-      <Knob
-        label="Volume"
-        onChange={onChangeVolume}
-        rotateDegrees={-180}
-        value={
-          realTimeVolume ||
-          getPercentSingleValue({
-            min: -50,
-            max: 20,
-            value: 0,
-          })
-        }
-      />
-      {!compact && <SequencerControls measures={measures} handleMeasureSelect={handleMeasureSelect} />}
+    <div className="p-4 rounded-sm bg-black">
+      <StyledKnobOuter $compact={compact}>
+        {!compact && <SequencerControls measures={measures} handleMeasureSelect={handleMeasureSelect} />}
+        <Knob
+          label="Volume"
+          onChange={onChangeVolume}
+          value={
+            volume ||
+            getPercentSingleValue({
+              min: -50,
+              max: 20,
+              value: 0,
+            })
+          }
+        />
+      </StyledKnobOuter>
       <StepButtonMap
         navTo={compact && navTo ? navTo : undefined}
         sequencer={sequencer}

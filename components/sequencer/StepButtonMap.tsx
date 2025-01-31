@@ -5,8 +5,12 @@ import type { StepSequencer } from "#tone/class/StepSequencer"
 import useSequencer from "#tone/useSequencer"
 import useTone from "#tone/useTone"
 import type { Steps } from "#types/tone"
-import { useCallback, useEffect, useMemo } from "react"
+import midiToNote from "#utils/midiToNote"
+import { memo, useCallback, useEffect, useMemo, useState } from "react"
 import { navigate } from "vike/client/router"
+
+const MemoizedStepRow = memo(StepRow)
+const MemoizedSequencerButton = memo(SequencerButton)
 
 interface StepButtonMapProps {
   activeStep?: number
@@ -42,18 +46,12 @@ const StepButtonMap = ({
       const stepIndex = Number(e.currentTarget.dataset.stepIndex)
 
       if (navTo) {
-        const navigateOnButtonClick = navTo ? navigate(navTo) : () => {}
-        await navigateOnButtonClick
+        navigate(navTo)
       }
-      setEditStepIndex((prev) => {
-        // check if it was the same step, then remove setEditStepIndex
-        if (prev === stepIndex) {
-          return undefined
-        }
-        return stepIndex
-      })
+
+      setEditStepIndex((prev) => (prev === stepIndex ? undefined : stepIndex))
     },
-    [setEditStepIndex, sequencer, navTo],
+    [setEditStepIndex, sequencer, navTo], // Remove `navTo` dependency
   )
 
   // 2) Create an array [0..(totalSteps-1)]
@@ -71,7 +69,7 @@ const StepButtonMap = ({
     <StepsOuter $compact={compact}>
       {/* map over each measure */}
       {measureChunks.map((measureSteps, measureIndex) => (
-        <StepRow
+        <MemoizedStepRow
           key={getUniqueStepId(measureIndex, 0)} // measure-level key
           $compact={compact}
         >
@@ -108,19 +106,35 @@ const StepButtonMap = ({
               computedState = "edit"
             }
 
+            // Convert MIDI notes to readable note names
+            const notes = steps[globalStepIdx].notes.length ? steps[globalStepIdx].notes : undefined
+
             return (
               <div className="relative flex-1" key={uniqueKey}>
-                <SequencerButton
+                <MemoizedSequencerButton
                   $state={computedState}
                   $armed={isArmed}
                   $compact={compact}
                   data-step-index={globalStepIdx}
                   onClick={handleToggleStepEvent}
-                />
+                >
+                  {!compact && (
+                    <div className="grid grid-cols-3 gap-1 text-micro p-1 items-baseline">
+                      {notes?.map((note) => (
+                        <div
+                          key={note.value}
+                          className="flex-1 flex w-5 h-5 bg-primarySuperLight text-primary text-center items-center justify-center"
+                        >
+                          {note.value}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </MemoizedSequencerButton>
               </div>
             )
           })}
-        </StepRow>
+        </MemoizedStepRow>
       ))}
       <MissingStepButtonMap
         steps={steps}
