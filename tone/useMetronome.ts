@@ -9,6 +9,8 @@ export interface MetronomeStoreValues {
   setIsMetronomeStarted: (payload: boolean | undefined) => void
   isMetronomeInit: boolean
   setIsMetronomeInit: (payload: boolean | undefined) => void
+  volume: number
+  setVolume: (payload: number | undefined) => void
 }
 
 const useInternalMetronomeStore = create<MetronomeStoreValues>()((set) => ({
@@ -16,6 +18,8 @@ const useInternalMetronomeStore = create<MetronomeStoreValues>()((set) => ({
   setIsMetronomeStarted: (payload) => set(() => ({ isMetronomeStarted: payload })),
   isMetronomeInit: false,
   setIsMetronomeInit: (payload) => set(() => ({ isMetronomeInit: payload })),
+  volume: 0,
+  setVolume: (payload) => set(() => ({ volume: payload })),
 }))
 
 const useMetronome = () => {
@@ -24,6 +28,8 @@ const useMetronome = () => {
   const setIsMetronomeStarted = useInternalMetronomeStore((state) => state.setIsMetronomeStarted)
   const isMetronomeInit = useInternalMetronomeStore((state) => state.isMetronomeInit)
   const setIsMetronomeInit = useInternalMetronomeStore((state) => state.setIsMetronomeInit)
+  const volume = useInternalMetronomeStore((state) => state.volume)
+  const setVolume = useInternalMetronomeStore((state) => state.setVolume)
 
   const handleToggleMetronome = useCallback(() => {
     if (!isMetronomeInit) {
@@ -58,6 +64,8 @@ const useMetronome = () => {
     isMetronomeStarted,
     setIsMetronomeStarted,
     handleMetronomeInit,
+    volume,
+    setVolume,
   }
 }
 

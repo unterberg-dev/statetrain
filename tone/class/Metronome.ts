@@ -103,6 +103,15 @@ class Metronome {
     )
   }
 
+  public setVolume(value: number) {
+    if (this.measureSynth?.volume) {
+      this.measureSynth.volume.value = value
+    }
+    if (this.quarterSynth?.volume) {
+      this.quarterSynth.volume.value = value
+    }
+  }
+
   /**
    * Stop scheduling the metronome clicks and clear any events.
    */
