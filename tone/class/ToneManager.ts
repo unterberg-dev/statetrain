@@ -12,6 +12,15 @@ import {
   sequencer3DefaultMeasures,
   sequencer4DefaultMeasures,
 } from "#lib/defaultSteps"
+import {
+  amDefaultPreset,
+  duoDefaultPreset,
+  fmDefaultPreset,
+  membraneDefaultPreset,
+  metalDefaultPreset,
+  monoDefaultPreset,
+  pluckDefaultPreset,
+} from "#utils/synthdefaultPresets"
 
 interface TransportSettings {
   bpm?: number
@@ -84,12 +93,10 @@ class ToneManager {
         try {
           const ToneModule = await import("tone")
           this.toneCore = ToneModule
-
           this.toneTransport = this.toneCore.getTransport()
-
           this.isInitialized = true
-          consola.success("Tone.js initialized successfully (dynamic import).")
 
+          consola.success("Tone.js initialized successfully (dynamic import).")
           this.emitter.emit("initialized")
 
           resolve()
@@ -111,204 +118,52 @@ class ToneManager {
       throw new Error("Tone.js is not yet initialized.")
     }
 
-    // @todo: separate sequencer initialization :O
     if (!this.amSynthSequencer) {
       consola.info("Initializing StepSequencer 1 with measureCount:", measureCount)
       this.amSynthSequencer = new StepSequencer(sequencer1DefaultMeasures, [], false)
-      this.amSynthSequencer.initializeSynth(
-        SynthManager.createAMSynth({
-          harmonicity: 2,
-          volume: 10,
-          oscillator: {
-            type: "amsine2",
-            modulationType: "sine",
-            harmonicity: 1.01,
-          },
-          envelope: {
-            attack: 0.006,
-            decay: 4,
-            sustain: 0.04,
-            release: 1.2,
-          },
-          modulation: {
-            volume: 15,
-            type: "amsine2",
-            modulationType: "sine",
-            harmonicity: 12,
-          },
-          modulationEnvelope: {
-            attack: 0.006,
-            decay: 0.2,
-            sustain: 0.2,
-            release: 0.4,
-          },
-        }),
-      )
+      this.amSynthSequencer.initializeSynth(SynthManager.createAMSynth(amDefaultPreset))
       this.amSynthSequencer.registerTransportCallback()
     }
 
     if (!this.monoSynthSequencer) {
       consola.info("Initializing StepSequencer 2 with measureCount:", measureCount)
       this.monoSynthSequencer = new StepSequencer(sequencer2DefaultMeasures, [], false)
-      this.monoSynthSequencer.initializeSynth(
-        SynthManager.createMonoSynth({
-          volume: 0,
-          oscillator: {
-            type: "sawtooth",
-          },
-          filter: {
-            Q: 2,
-            type: "bandpass",
-            rolloff: -24,
-          },
-          envelope: {
-            attack: 0.01,
-            decay: 0.1,
-            sustain: 0.2,
-            release: 0.6,
-          },
-          filterEnvelope: {
-            attack: 0.02,
-            decay: 0.4,
-            sustain: 1,
-            release: 0.7,
-            releaseCurve: "linear",
-            baseFrequency: 20,
-            octaves: 5,
-          },
-        }),
-      )
+      this.monoSynthSequencer.initializeSynth(SynthManager.createMonoSynth(monoDefaultPreset))
       this.monoSynthSequencer.registerTransportCallback()
     }
 
     if (!this.duoSynthSequencer) {
       consola.info("Initializing StepSequencer 3 with measureCount:", measureCount)
       this.duoSynthSequencer = new StepSequencer(sequencer3DefaultMeasures, [], false)
-      this.duoSynthSequencer.initializeSynth(
-        SynthManager.createDuoSynth({
-          detune: -10,
-          harmonicity: 2,
-          volume: -10,
-          voice0: {
-            envelope: {
-              attack: 0.01,
-              decay: 0.2,
-              sustain: 0.1,
-              release: 0.1,
-            },
-            filter: {
-              frequency: 2000,
-              Q: 8,
-            },
-            filterEnvelope: {
-              attack: 0.25,
-              sustain: 0.05,
-              release: 0.1,
-            },
-          },
-          voice1: {
-            filter: {
-              frequency: 400,
-              Q: 12,
-            },
-            envelope: {
-              attack: 0.01,
-              decay: 0.2,
-              sustain: 0.1,
-              release: 0.2,
-            },
-            filterEnvelope: {
-              sustain: 0.05,
-              release: 0.1,
-            },
-          },
-        }),
-      )
+      this.duoSynthSequencer.initializeSynth(SynthManager.createDuoSynth(duoDefaultPreset))
       this.duoSynthSequencer.registerTransportCallback()
     }
 
     if (!this.metalSynthSequencer) {
       consola.info("Initializing StepSequencer 4 with measureCount:", measureCount)
       this.metalSynthSequencer = new StepSequencer(sequencer4DefaultMeasures, [], false)
-      this.metalSynthSequencer.initializeSynth(
-        SynthManager.createMetalSynth({
-          detune: 5,
-          volume: -8,
-          envelope: {
-            attack: 0.01,
-            decay: 0.14,
-            sustain: 0.2,
-            releaseCurve: "bounce",
-            release: 0.4,
-          },
-        }),
-      )
+      this.metalSynthSequencer.initializeSynth(SynthManager.createMetalSynth(metalDefaultPreset))
       this.metalSynthSequencer.registerTransportCallback()
     }
 
     if (!this.membraneSynthSequencer) {
       consola.info("Initializing StepSequencer 5 with measureCount:", measureCount)
       this.membraneSynthSequencer = new StepSequencer(sequencer4DefaultMeasures, [], false)
-      this.membraneSynthSequencer.initializeSynth(
-        SynthManager.createMembraneSynth({
-          pitchDecay: 0.05,
-          octaves: 10,
-          volume: -10,
-          envelope: {
-            attack: 0.001,
-            decay: 0.4,
-            sustain: 0.01,
-            release: 1.4,
-            attackCurve: "exponential",
-          },
-        }),
-      )
+      this.membraneSynthSequencer.initializeSynth(SynthManager.createMembraneSynth(membraneDefaultPreset))
       this.membraneSynthSequencer.registerTransportCallback()
     }
 
     if (!this.fmSynthSequencer) {
       consola.info("Initializing StepSequencer 6 with measureCount:", measureCount)
       this.fmSynthSequencer = new StepSequencer(sequencer4DefaultMeasures, [], false)
-      this.fmSynthSequencer.initializeSynth(
-        SynthManager.createFMSynth({
-          harmonicity: 4,
-          oscillator: {
-            type: "sine",
-          },
-          modulationIndex: 10,
-          volume: 0,
-          envelope: {
-            attack: 0.01,
-            decay: 0.5,
-            sustain: 0.3,
-            release: 1.2,
-            attackCurve: "exponential",
-          },
-          modulation: {
-            type: "sawtooth",
-            phase: 30,
-          },
-          modulationEnvelope: {
-            attack: 0.01,
-            decay: 0.5,
-            sustain: 0.5,
-            release: 0.1,
-          },
-        }),
-      )
+      this.fmSynthSequencer.initializeSynth(SynthManager.createFMSynth(fmDefaultPreset))
       this.fmSynthSequencer.registerTransportCallback()
     }
 
     if (!this.pluckSynthSequencer) {
       consola.info("Initializing StepSequencer 7 with measureCount:", measureCount)
       this.pluckSynthSequencer = new StepSequencer(sequencer4DefaultMeasures, [])
-      this.pluckSynthSequencer.initializeSynth(
-        SynthManager.createPluckSynth({
-          volume: -10,
-          resonance: 0.9,
-          dampening: 4000,
-        }),
-      )
+      this.pluckSynthSequencer.initializeSynth(SynthManager.createPluckSynth(pluckDefaultPreset))
       this.pluckSynthSequencer.registerTransportCallback()
     }
   }
