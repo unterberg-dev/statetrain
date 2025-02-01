@@ -69,6 +69,8 @@ const SCALES = {
   blues: [0, 3, 5, 6, 7, 10],
 }
 
+const maxVoices = 6
+
 const getPlayableNotes = (root: number, scalePattern: number[] | null) => {
   if (!scalePattern) return new Set(Array.from({ length: 128 }, (_, i) => i)) // All notes playable
 
@@ -95,6 +97,7 @@ const PianoRoll = ({ sequencer, steps, activeStep }: PianoRollProps) => {
   const [currentOctave, setCurrentOctave] = useState(3)
   const [displayedOctaves, setDisplayedOctaves] = useState(2)
   const [notesPressed, setNotesPressed] = useState<number[] | null>(null)
+  const [maxVoicesReached, setMaxVoicesReached] = useState(false)
 
   const rootNote = currentOctave * 12 // Root is first note of the displayed octave
   const playableNotes = useMemo(() => getPlayableNotes(rootNote, scale), [rootNote, scale])
@@ -140,6 +143,7 @@ const PianoRoll = ({ sequencer, steps, activeStep }: PianoRollProps) => {
     (event: React.MouseEvent<HTMLButtonElement>) => {
       const synth = sequencer?.getSynth()
       const value = Number(event.currentTarget.dataset.keyIndex)
+      const nextNotePossible = currentEditStepNotesValuesToMidi.length < maxVoices
 
       if (synth && tone && sequencer) {
         const note = tone.Frequency(value, "midi").toNote()
@@ -149,12 +153,20 @@ const PianoRoll = ({ sequencer, steps, activeStep }: PianoRollProps) => {
         if (editStepIndex === undefined) {
           setNotesPressed([value])
         } else {
-          sequencer.toggleStep(editStepIndex, note, 0.5)
+          if (nextNotePossible) {
+            sequencer.toggleStep(editStepIndex, note, 0.5)
+            setMaxVoicesReached(false)
+          } else {
+            setMaxVoicesReached(true)
+          }
+
           setEditStepNotesMap((prev) => {
             const prevNotes = prev[editStepIndex] || []
-            const newNotes = prevNotes.includes(value)
-              ? prevNotes.filter((n) => n !== value)
-              : [...prevNotes, value]
+
+            // prevent adding next note if already n notes are added
+            const nextValue = nextNotePossible ? [...prevNotes, value] : prevNotes
+
+            const newNotes = prevNotes.includes(value) ? prevNotes.filter((n) => n !== value) : nextValue
             return { ...prev, [editStepIndex]: newNotes }
           })
         }
@@ -168,7 +180,7 @@ const PianoRoll = ({ sequencer, steps, activeStep }: PianoRollProps) => {
         setNotesPressed(null)
       }, APP_CONFIG.transition.timeShort)
     },
-    [sequencer, tone, editStepIndex],
+    [sequencer, tone, editStepIndex, currentEditStepNotesValuesToMidi],
   )
 
   const handleSetCurrentOctave = useCallback((octave: number) => {
@@ -205,42 +217,51 @@ const PianoRoll = ({ sequencer, steps, activeStep }: PianoRollProps) => {
   return (
     <>
       <H3Headline className="text-white mt-5 mb-3">Piano Roll</H3Headline>
-      <div className="flex flex-wrap gap-5 mb-5 items-center">
-        <div className="w-50">
+
+      <div className="flex justify-between items-center mb-5">
+        <div className="flex flex-wrap gap-5 items-center">
           <NumberInput
             id="current-octave"
             label="Current Octave"
             value={currentOctave}
+            className="!text-base"
             onDecrease={() => handleSetCurrentOctave(currentOctave - 1)}
             onIncrease={() => handleSetCurrentOctave(currentOctave + 1)}
           />
-        </div>
-        {/* Displayed Octaves Selection */}
-        <div className="w-50">
+          {/* Displayed Octaves Selection */}
           <NumberInput
             id="displayed-octaves"
             label="Number of Octaves"
             value={displayedOctaves}
+            className="!text-base"
             onDecrease={() => handleSetDisplayedOctaves(displayedOctaves - 1)}
             onIncrease={() => handleSetDisplayedOctaves(displayedOctaves + 1)}
           />
+          <div className="flex gap-1 items-center">
+            <label htmlFor="apply-scale">Apply scale: </label>
+            <select
+              value={
+                Object.keys(SCALES).find((key) => SCALES[key as keyof typeof SCALES] === scale) || "none"
+              }
+              id="apply-scale"
+              onChange={(e) => setScale(SCALES[e.target.value as keyof typeof SCALES])}
+              className="p-1 rounded bg-grayDark text-white"
+            >
+              {Object.keys(SCALES).map((scale) => (
+                <option key={scale} value={scale}>
+                  {scale}
+                </option>
+              ))}
+            </select>
+          </div>
         </div>
-        <div className="flex gap-1 items-center">
-          <label htmlFor="apply-scale">Apply scale: </label>
-          <select
-            value={Object.keys(SCALES).find((key) => SCALES[key as keyof typeof SCALES] === scale) || "none"}
-            id="apply-scale"
-            onChange={(e) => setScale(SCALES[e.target.value as keyof typeof SCALES])}
-            className="p-1 rounded bg-grayDark text-white"
-          >
-            {Object.keys(SCALES).map((scale) => (
-              <option key={scale} value={scale}>
-                {scale}
-              </option>
-            ))}
-          </select>
-        </div>
+        {maxVoicesReached && (
+          <p className="text-error p-1 px-2 border-error border-1 rounded text-sm">
+            Max Voices reached: {maxVoices}
+          </p>
+        )}
       </div>
+
       <div className="flex bg-grayDark">
         {notesInCurrentOctaves.map((keyItem) => {
           const wasPressed = notesPressed?.includes(keyItem.index) || false

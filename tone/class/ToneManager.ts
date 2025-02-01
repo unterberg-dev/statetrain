@@ -116,6 +116,7 @@ class ToneManager {
     return this.initPromise
   }
 
+  // problem with this is that we always init all synths, so it's under heavy load all the time
   public initializeSequencer(measureCount?: number): void {
     if (!this.isInitialized) {
       throw new Error("Tone.js is not yet initialized.")

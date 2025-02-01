@@ -1,7 +1,6 @@
 import LayoutComponent from "#components/common/LayoutComponent"
 import InstrumentNav from "#components/InstrumentNav"
 import TransportControls from "#components/TransportControls"
-import useTone from "#tone/useTone"
 import { Smile } from "lucide-react"
 
 const Header = () => {
