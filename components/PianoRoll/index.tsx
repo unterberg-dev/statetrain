@@ -8,6 +8,7 @@ import type { Steps } from "#types/tone"
 import midiToNote from "#utils/midiToNote"
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react"
 import rc from "react-classmate"
+import { usePageContext } from "vike-react/usePageContext"
 
 interface StyledKeyProps {
   $active: boolean
@@ -137,6 +138,16 @@ const PianoRoll = ({ sequencer, steps, activeStep }: PianoRollProps) => {
     }
   }, [sequencer, currentActiveStep, tone, handleNotePress])
 
+  useEffect(() => {
+    if (sequencer) {
+      if (currentEditStepNotesValuesToMidi.length < sequencer.maxVoices) {
+        setMaxVoicesReached(false)
+      } else {
+        setMaxVoicesReached(true)
+      }
+    }
+  }, [sequencer, currentEditStepNotesValuesToMidi.length])
+
   const handlePlayNote = useCallback(
     (event: React.MouseEvent<HTMLButtonElement>) => {
       const synth = sequencer?.getSynth()
@@ -153,9 +164,6 @@ const PianoRoll = ({ sequencer, steps, activeStep }: PianoRollProps) => {
         } else {
           if (nextNotePossible) {
             sequencer.toggleStep(editStepIndex, note, 0.5)
-            setMaxVoicesReached(false)
-          } else {
-            setMaxVoicesReached(true)
           }
 
           setEditStepNotesMap((prev) => {
