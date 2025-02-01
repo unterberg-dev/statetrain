@@ -6,10 +6,12 @@ export class Sequencer {
   private steps: Steps = []
   private scheduledId: number | null = null
   private synth: AvailableSynths | null = null
+  public maxVoices = 1
   public currentStep = 0
 
-  constructor(measureCount = 4, steps: Steps = []) {
-    this.steps = steps.length ? steps : this.initSteps(measureCount)
+  constructor(maxVoices = 1) {
+    this.steps = this.initSteps(4)
+    this.maxVoices = maxVoices
   }
 
   private initSteps(measureCount: number): Steps {

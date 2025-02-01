@@ -15,6 +15,7 @@ import {
   monoDefaultPreset,
 } from "#utils/synthdefaultPresets"
 import EffectBus from "#tone/class/EffectBus"
+import { SequencerKey } from "#lib/constants"
 
 interface TransportSettings {
   bpm?: number
@@ -112,38 +113,44 @@ class ToneManager {
       throw new Error("Tone.js is not yet initialized.")
     }
 
-    if (!this.amSynthSequencer) {
-      this.amSynthSequencer = new Sequencer()
+    if (!this.amSynthSequencer && TRANSPORT_CONFIG.availableSequencer.includes(SequencerKey.AM)) {
+      consola.info("AM synth initialized")
+      this.amSynthSequencer = new Sequencer(1)
       this.amSynthSequencer.initializeSynth(SynthManager.createAMSynth(amDefaultPreset))
       this.amSynthSequencer.registerTransportCallback()
     }
 
-    if (!this.monoSynthSequencer) {
-      this.monoSynthSequencer = new Sequencer()
+    if (!this.monoSynthSequencer && TRANSPORT_CONFIG.availableSequencer.includes(SequencerKey.Mono)) {
+      consola.info("Mono synth initialized")
+      this.monoSynthSequencer = new Sequencer(7)
       this.monoSynthSequencer.initializeSynth(SynthManager.createMonoSynth(monoDefaultPreset))
       this.monoSynthSequencer.registerTransportCallback()
     }
 
-    if (!this.duoSynthSequencer) {
-      this.duoSynthSequencer = new Sequencer()
+    if (!this.duoSynthSequencer && TRANSPORT_CONFIG.availableSequencer.includes(SequencerKey.Duo)) {
+      consola.info("Duo synth initialized")
+      this.duoSynthSequencer = new Sequencer(2)
       this.duoSynthSequencer.initializeSynth(SynthManager.createDuoSynth(duoDefaultPreset))
       this.duoSynthSequencer.registerTransportCallback()
     }
 
-    if (!this.metalSynthSequencer) {
-      this.metalSynthSequencer = new Sequencer()
+    if (!this.metalSynthSequencer && TRANSPORT_CONFIG.availableSequencer.includes(SequencerKey.Metal)) {
+      consola.info("Metal synth initialized")
+      this.metalSynthSequencer = new Sequencer(1)
       this.metalSynthSequencer.initializeSynth(SynthManager.createMetalSynth(metalDefaultPreset))
       this.metalSynthSequencer.registerTransportCallback()
     }
 
-    if (!this.membraneSynthSequencer) {
-      this.membraneSynthSequencer = new Sequencer()
+    if (!this.membraneSynthSequencer && TRANSPORT_CONFIG.availableSequencer.includes(SequencerKey.Membrane)) {
+      consola.info("Membrane synth initialized")
+      this.membraneSynthSequencer = new Sequencer(1)
       this.membraneSynthSequencer.initializeSynth(SynthManager.createMembraneSynth(membraneDefaultPreset))
       this.membraneSynthSequencer.registerTransportCallback()
     }
 
-    if (!this.fmSynthSequencer) {
-      this.fmSynthSequencer = new Sequencer()
+    if (!this.fmSynthSequencer && TRANSPORT_CONFIG.availableSequencer.includes(SequencerKey.FM)) {
+      consola.info("FM synth initialized")
+      this.fmSynthSequencer = new Sequencer(2)
       this.fmSynthSequencer.initializeSynth(SynthManager.createFMSynth(fmDefaultPreset))
       this.fmSynthSequencer.registerTransportCallback()
     }

@@ -1,6 +1,7 @@
 import { H2Headline } from "#components/common/Headline"
 import LayoutComponent from "#components/common/LayoutComponent"
-import useSequencer, { Sequencer } from "#tone/useSequencer"
+import { SequencerKey } from "#lib/constants"
+import useSequencer from "#tone/useSequencer"
 import { useEffect } from "react"
 
 // todo: the current implementation must be oursourced to a separate file out of the page context
@@ -8,7 +9,7 @@ const MonoSynthPage = () => {
   const { setActiveSequencer } = useSequencer()
 
   useEffect(() => {
-    setActiveSequencer(Sequencer.Mono)
+    setActiveSequencer(SequencerKey.Mono)
   }, [setActiveSequencer])
 
   return (

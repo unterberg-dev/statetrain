@@ -1,3 +1,4 @@
+import { SequencerKey } from "#lib/constants"
 import type { TransportConfigType } from "#types/tone"
 
 export const APP_CONFIG = {
@@ -12,6 +13,7 @@ export const APP_CONFIG = {
 }
 
 export const TRANSPORT_CONFIG: TransportConfigType = {
+  availableSequencer: [SequencerKey.FM, SequencerKey.Mono],
   bpm: {
     default: 115,
     min: 60,

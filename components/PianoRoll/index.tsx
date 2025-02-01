@@ -69,8 +69,6 @@ const SCALES = {
   blues: [0, 3, 5, 6, 7, 10],
 }
 
-const maxVoices = 6
-
 const getPlayableNotes = (root: number, scalePattern: number[] | null) => {
   if (!scalePattern) return new Set(Array.from({ length: 128 }, (_, i) => i)) // All notes playable
 
@@ -143,9 +141,9 @@ const PianoRoll = ({ sequencer, steps, activeStep }: PianoRollProps) => {
     (event: React.MouseEvent<HTMLButtonElement>) => {
       const synth = sequencer?.getSynth()
       const value = Number(event.currentTarget.dataset.keyIndex)
-      const nextNotePossible = currentEditStepNotesValuesToMidi.length < maxVoices
 
       if (synth && tone && sequencer) {
+        const nextNotePossible = currentEditStepNotesValuesToMidi.length < sequencer.maxVoices
         const note = tone.Frequency(value, "midi").toNote()
         synth.triggerAttackRelease(note, "16n", tone.now(), 0.5)
 
@@ -257,7 +255,7 @@ const PianoRoll = ({ sequencer, steps, activeStep }: PianoRollProps) => {
         </div>
         {maxVoicesReached && (
           <p className="text-error p-1 px-2 border-error border-1 rounded text-sm">
-            Max Voices reached: {maxVoices}
+            Max Voices reached: {sequencer?.maxVoices}
           </p>
         )}
       </div>

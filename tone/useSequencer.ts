@@ -1,4 +1,5 @@
 import { TRANSPORT_CONFIG } from "#lib/config"
+import { SequencerKey } from "#lib/constants"
 import ToneManager from "#tone/class/ToneManager"
 import useTone from "#tone/useTone"
 import type { Steps, StoreReactStateSetter } from "#types/tone"
@@ -6,15 +7,6 @@ import { useMemo } from "react"
 import { create } from "zustand"
 
 export type SequencerMeasuresValue = 1 | 2 | 3 | 4
-
-export enum Sequencer {
-  AM = 0,
-  Mono = 1,
-  Duo = 2,
-  Metal = 3,
-  Membrane = 4,
-  FM = 5,
-}
 
 export interface SequencerStoreValues {
   steps: Steps
@@ -57,8 +49,8 @@ export const useInternalSequencer6Store = createSequencerStore()
 interface SequencerStoreConfig {
   editStepIndex: number | undefined
   setEditStepIndex: (setterFn: StoreReactStateSetter<number | undefined>) => void
-  activeSequencer: Sequencer | undefined
-  setActiveSequencer: (payload: Sequencer | undefined) => void
+  activeSequencer: SequencerKey | undefined
+  setActiveSequencer: (payload: SequencerKey | undefined) => void
 }
 
 export const useInternalSequencerStoreConfigStore = create<SequencerStoreConfig>()((set) => ({
@@ -161,7 +153,7 @@ const useSequencer = () => {
 
   const currentSequencer = useMemo(() => {
     switch (activeSequencer) {
-      case Sequencer.AM:
+      case SequencerKey.AM:
         return {
           sequencer: sequencer1,
           steps: sequencer1Steps,
@@ -175,7 +167,7 @@ const useSequencer = () => {
           delayMix: sequencer1DelayMix,
           setDelayMix: setSequencer1DelayMix,
         }
-      case Sequencer.Mono:
+      case SequencerKey.Mono:
         return {
           sequencer: sequencer2,
           steps: sequencer2Steps,
@@ -189,7 +181,7 @@ const useSequencer = () => {
           delayMix: sequencer2DelayMix,
           setDelayMix: setSequencer2DelayMix,
         }
-      case Sequencer.Duo:
+      case SequencerKey.Duo:
         return {
           sequencer: sequencer3,
           steps: sequencer3Steps,
@@ -203,7 +195,7 @@ const useSequencer = () => {
           delayMix: sequencer3DelayMix,
           setDelayMix: setSequencer3DelayMix,
         }
-      case Sequencer.Metal:
+      case SequencerKey.Metal:
         return {
           sequencer: sequencer4,
           steps: sequencer4Steps,
@@ -217,7 +209,7 @@ const useSequencer = () => {
           delayMix: sequencer4DelayMix,
           setDelayMix: setSequencer4DelayMix,
         }
-      case Sequencer.Membrane:
+      case SequencerKey.Membrane:
         return {
           sequencer: sequencer5,
           steps: sequencer5Steps,
@@ -231,7 +223,7 @@ const useSequencer = () => {
           delayMix: sequencer5DelayMix,
           setDelayMix: setSequencer5DelayMix,
         }
-      case Sequencer.FM:
+      case SequencerKey.FM:
         return {
           sequencer: sequencer6,
           steps: sequencer6Steps,

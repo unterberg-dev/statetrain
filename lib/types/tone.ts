@@ -13,6 +13,7 @@ import type {
   PolySynth,
   Synth,
 } from "tone"
+import type { SequencerKey } from "#lib/constants"
 
 export type InternalToneType = typeof Tone
 export type InternalTransportType = TransportClass
@@ -28,6 +29,7 @@ export type AvailableSynths =
 // | PluckSynth
 
 export type TransportConfigType = {
+  availableSequencer: SequencerKey[]
   bpm: {
     default: number
     min: number

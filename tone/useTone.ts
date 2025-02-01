@@ -3,6 +3,7 @@ import ToneManager from "#tone/class/ToneManager"
 import { useCallback, useContext, useMemo } from "react"
 import { TRANSPORT_CONFIG } from "#lib/config"
 import { create } from "zustand"
+import { internalLinks } from "#lib/links"
 
 interface TransportStoreGetter {
   bpm: number
@@ -102,6 +103,10 @@ const useTone = () => {
     ToneManager.emitter.off("sixteenthTick", event)
   }, [])
 
+  const availableInstruments = TRANSPORT_CONFIG.availableSequencer.map((sequencer) =>
+    Object.values(internalLinks.synths).find((item) => item.key === sequencer),
+  )
+
   if (!context) {
     throw new Error("useTone must be used within a ToneContextProvider")
   }
@@ -125,6 +130,7 @@ const useTone = () => {
     unregisterSixteenthTick,
     scale,
     setScale,
+    availableInstruments,
   } as const
 }
 

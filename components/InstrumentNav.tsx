@@ -1,23 +1,25 @@
 import Button from "#components/common/Button"
 import { H4Headline } from "#components/common/Headline"
-import { APP_CONFIG } from "#lib/config"
+import { APP_CONFIG, TRANSPORT_CONFIG } from "#lib/config"
 import { internalLinks } from "#lib/links"
+import useTone from "#tone/useTone"
 import { useMemo } from "react"
 import { usePageContext } from "vike-react/usePageContext"
 
 const InstrumentNav = () => {
   const { urlOriginal } = usePageContext()
+  const { availableInstruments } = useTone()
 
   const buttonMap = useMemo(
     () =>
-      Object.entries(internalLinks.synths).map(([key, url]) => {
+      availableInstruments.map((item) => {
         return (
-          <Button size="sm" key={key} active={urlOriginal === url} link={url}>
-            {key}
+          <Button size="sm" key={item?.key} active={urlOriginal === item?.url} link={item?.url}>
+            {item?.title}
           </Button>
         )
       }),
-    [urlOriginal],
+    [urlOriginal, availableInstruments],
   )
 
   return (
