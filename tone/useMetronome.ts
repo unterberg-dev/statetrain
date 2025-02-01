@@ -23,7 +23,7 @@ const useInternalMetronomeStore = create<MetronomeStoreValues>()((set) => ({
 }))
 
 const useMetronome = () => {
-  const { isInitialized } = useTone()
+  const { isInitialized, timeSignature } = useTone()
   const isMetronomeStarted = useInternalMetronomeStore((state) => state.isMetronomeStarted)
   const setIsMetronomeStarted = useInternalMetronomeStore((state) => state.setIsMetronomeStarted)
   const isMetronomeInit = useInternalMetronomeStore((state) => state.isMetronomeInit)
@@ -48,16 +48,10 @@ const useMetronome = () => {
 
   const handleMetronomeInit = useCallback(() => {
     if (isInitialized) {
-      Metronome.stop()
       Metronome.initialize()
-
-      if (isMetronomeStarted) {
-        Metronome.start()
-      }
-
       setIsMetronomeInit(true)
     }
-  }, [setIsMetronomeInit, isInitialized, isMetronomeStarted])
+  }, [setIsMetronomeInit, isInitialized])
 
   return {
     handleToggleMetronome,

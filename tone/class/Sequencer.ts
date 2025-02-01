@@ -2,15 +2,13 @@ import ToneManager from "#tone/class/ToneManager"
 import type { AvailableSynths, Steps } from "#types/tone"
 import consola from "consola"
 
-export class StepSequencer {
+export class Sequencer {
   private steps: Steps = []
   private scheduledId: number | null = null
   private synth: AvailableSynths | null = null
   public currentStep = 0
-  public monoVoice = true
 
-  constructor(measureCount = 4, steps: Steps = [], monoVoice = true) {
-    this.monoVoice = monoVoice
+  constructor(measureCount = 4, steps: Steps = []) {
     this.steps = steps.length ? steps : this.initSteps(measureCount)
   }
 
@@ -57,15 +55,8 @@ export class StepSequencer {
         const step = this.steps[stepIndex]
 
         if (step.active && this.synth) {
-          if (this.monoVoice) {
-            this.synth?.triggerAttackRelease(step.notes[0].value, "16n", time, step.notes[0].velocity)
-          } else {
-            for (const note of step.notes) {
-              this.synth?.triggerAttackRelease(note.value, "16n", time, note.velocity)
-            }
-            // maybe use single triggerAttackRelease with array of notes? - ts?
-            // const rawNotes = step.notes.map((n) => n.value)
-            // this.synth?.triggerAttackRelease([...rawNotes], "16n", time, note.velocity)
+          for (const note of step.notes) {
+            this.synth?.triggerAttackRelease(note.value, "16n", time, note.velocity)
           }
         }
         this.currentStep++

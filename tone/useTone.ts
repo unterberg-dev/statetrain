@@ -3,7 +3,6 @@ import ToneManager from "#tone/class/ToneManager"
 import { useCallback, useContext, useMemo } from "react"
 import { TRANSPORT_CONFIG } from "#lib/config"
 import { create } from "zustand"
-import { consola } from "consola/browser"
 
 interface TransportStoreGetter {
   bpm: number
@@ -89,9 +88,6 @@ const useTone = () => {
 
   const registerQuarterTick = useCallback((event: () => void) => {
     ToneManager.emitter.on("quarterTick", event)
-    // return () => {
-    //   ToneManager.emitter.off("quarterTick", event)
-    // }
   }, [])
 
   const unregisterQuarterTick = useCallback((event: () => void) => {
@@ -100,10 +96,6 @@ const useTone = () => {
 
   const registerSixteenthTick = useCallback((event: () => void) => {
     ToneManager.emitter.on("sixteenthTick", event)
-    // return () => {
-    //   consola.log("unregistering sixteenth tick")
-    //   ToneManager.emitter.off("sixteenthTick", event)
-    // }
   }, [])
 
   const unregisterSixteenthTick = useCallback((event: () => void) => {

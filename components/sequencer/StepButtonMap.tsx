@@ -3,7 +3,7 @@ import { memo, useCallback, useEffect, useMemo } from "react"
 import MissingStepButtonMap from "#components/sequencer/MissingStepsMap"
 import { SequencerButton, StepRow, StepsOuter } from "#components/sequencer/styled"
 import { chunkArray, getUniqueStepId } from "#components/sequencer/utils"
-import type { StepSequencer } from "#tone/class/StepSequencer"
+import type { Sequencer } from "#tone/class/Sequencer"
 import useSequencer from "#tone/useSequencer"
 import useTone from "#tone/useTone"
 import type { Steps } from "#types/tone"
@@ -14,7 +14,7 @@ const MemoizedSequencerButton = memo(SequencerButton)
 interface StepButtonMapProps {
   activeStep?: number
   steps: Steps
-  sequencer: StepSequencer | null
+  sequencer: Sequencer | null
   setSequencerSteps: (steps: Steps) => void
 }
 

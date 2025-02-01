@@ -1,12 +1,10 @@
 import SequencerControls from "#components/sequencer/SequencerControls"
 import StepButtonMap from "#components/sequencer/StepButtonMap"
-import type { StepSequencer } from "#tone/class/StepSequencer"
 import { parseTransportPosition } from "#components/sequencer/utils"
 import useTone from "#tone/useTone"
 import { useState, useMemo, useEffect, useCallback } from "react"
 import type { SequencerMeasuresValue } from "#tone/useSequencer"
 import PianoRoll from "#components/PianoRoll"
-import type { Steps } from "#types/tone"
 import { getPercentSingleValue, ruleOfThree } from "#utils/index"
 import ToneManager from "#tone/class/ToneManager"
 import Knob from "#components/Knob"
@@ -15,7 +13,6 @@ import useThrottledCallback from "#lib/hooks/useThrottledCallback"
 import EffectBus from "#tone/class/EffectBus"
 import useSequencer from "#tone/useSequencer"
 import LayoutComponent from "#components/common/LayoutComponent"
-import { usePageContext } from "vike-react/usePageContext"
 
 const StyledKnobOuter = rc.div`
   flex

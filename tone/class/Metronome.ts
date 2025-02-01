@@ -1,9 +1,9 @@
 import { consola } from "consola/browser"
-import type { PolySynth, Synth, SynthOptions } from "tone"
-import type { RecursivePartial } from "tone/build/esm/core/util/Interface"
+import type { Player } from "tone"
 
-import SynthManager from "#tone/class/SynthManager"
 import ToneManager from "#tone/class/ToneManager"
+import PlayerManager from "#tone/class/PlayerManager"
+import { APP_CONFIG } from "#lib/config"
 
 class Metronome {
   private static instance: Metronome
@@ -13,8 +13,8 @@ class Metronome {
   private measureScheduleId?: number
 
   /** Synths used for quarter-note click and measure-downbeat click */
-  private quarterSynth?: PolySynth<Synth>
-  private measureSynth?: PolySynth<Synth>
+  private quarterSynth?: Player
+  private measureSynth?: Player
 
   /** Tracks if the metronome has started scheduling events */
   private isPlaying = false
@@ -36,23 +36,22 @@ class Metronome {
       throw new Error("[Metronome] Tone.js not initialized. Call ToneManager.init() first.")
     }
 
-    const sharedOptions = {
-      envelope: {
-        sustain: 0.3,
-        release: 0.3,
-      },
-      oscillator: {
-        type: "sine3",
-      },
-    } as RecursivePartial<SynthOptions>
+    // could be one sample too
+    this.quarterSynth = PlayerManager.createPlayer({
+      url: `${APP_CONFIG.viteUrl}/sounds/MPC2000/P_SN_RIM.wav`,
+    })
+    this.quarterSynth.playbackRate = 1.2
 
-    this.quarterSynth = SynthManager.createSynth(sharedOptions)
-    this.measureSynth = SynthManager.createSynth(sharedOptions)
+    this.measureSynth = PlayerManager.createPlayer({
+      url: `${APP_CONFIG.viteUrl}/sounds/MPC2000/P_SN_RIM.wav`,
+    })
+    this.measureSynth.playbackRate = 0.8
   }
 
   /** If the time signature changes, re-register schedules if currently playing. */
   private handleTimeSignatureChanged(): void {
     if (this.isPlaying) {
+      this.stop()
       this.start()
     }
   }
@@ -78,16 +77,16 @@ class Metronome {
     // Quarter-note click
     this.quarterNoteScheduleId = ToneManager.toneTransport?.scheduleRepeat(
       (time) => {
-        this.quarterSynth?.triggerAttackRelease("C3", "16n", time, 0.5)
+        this.quarterSynth?.start(time)
       },
       "4n",
       "0",
     )
 
-    // Measure-downbeat click
+    // Measure downbeat click
     this.measureScheduleId = ToneManager.toneTransport?.scheduleRepeat(
       (time) => {
-        this.measureSynth?.triggerAttackRelease("C4", "16n", time, 0.75)
+        this.measureSynth?.start(time)
       },
       "1m",
       "0",

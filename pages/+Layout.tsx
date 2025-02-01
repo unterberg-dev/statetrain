@@ -6,13 +6,12 @@ import "virtual:uno.css"
 
 import TonePortalContent from "#components/TonePortalContent"
 import ToneContextProvider from "#tone/ToneContextProvider"
-import useTone from "#tone/useTone"
 import Header from "#layout/Header"
-import useMetronome from "#tone/useMetronome"
 import Footer from "#layout/Footer"
 import SequencerLayout from "#components/sequencer/SequencerLayout"
-import useSequencer from "#tone/useSequencer"
 import { usePageContext } from "vike-react/usePageContext"
+import useTone from "#tone/useTone"
+import useMetronome from "#tone/useMetronome"
 
 const AppLayout = ({ children }: { children: ReactNode }) => {
   const { urlParsed } = usePageContext()
@@ -29,27 +28,15 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
 }
 
 const App = ({ children }: { children: ReactNode }) => {
-  const { isInitialized, handlePlay, timeSignature } = useTone()
+  const { isInitialized, handlePlay } = useTone()
   const { handleMetronomeInit } = useMetronome()
-  const { setActiveSequencer } = useSequencer()
-
-  useEffect(() => {
-    setActiveSequencer(2)
-  }, [setActiveSequencer])
-
-  // @todo - add custom error handling here
 
   useEffect(() => {
     if (isInitialized) {
+      handleMetronomeInit()
       handlePlay()
     }
-  }, [handlePlay, isInitialized])
-
-  useEffect(() => {
-    if (timeSignature) {
-      handleMetronomeInit()
-    }
-  }, [timeSignature, handleMetronomeInit])
+  }, [handlePlay, handleMetronomeInit, isInitialized])
 
   return isInitialized ? <AppLayout>{children}</AppLayout> : <TonePortalContent />
 }

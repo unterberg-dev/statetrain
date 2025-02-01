@@ -1,12 +1,4 @@
-import {
-  sequencer1DefaultMeasures,
-  sequencer2DefaultMeasures,
-  sequencer3DefaultMeasures,
-  sequencer4DefaultMeasures,
-  sequencer5DefaultMeasures,
-  sequencer6DefaultMeasures,
-  sequencer7DefaultMeasures,
-} from "#lib/defaultSteps"
+import { TRANSPORT_CONFIG } from "#lib/config"
 import ToneManager from "#tone/class/ToneManager"
 import useTone from "#tone/useTone"
 import type { Steps, StoreReactStateSetter } from "#types/tone"
@@ -24,7 +16,6 @@ export enum Sequencer {
   FM = 5,
 }
 
-// Store Interface
 export interface SequencerStoreValues {
   steps: Steps
   setSteps: (payload: Steps) => void
@@ -38,8 +29,9 @@ export interface SequencerStoreValues {
   setDelayMix: (payload: number) => void
 }
 
-// Factory function to create Zustand stores
-const createSequencerStore = (defaultMeasures: SequencerMeasuresValue) =>
+const createSequencerStore = (
+  defaultMeasures: SequencerMeasuresValue = TRANSPORT_CONFIG.loopLength.default,
+) =>
   create<SequencerStoreValues>()((set) => ({
     steps: [],
     setSteps: (payload) => set({ steps: payload }),
@@ -54,12 +46,12 @@ const createSequencerStore = (defaultMeasures: SequencerMeasuresValue) =>
   }))
 
 // Create stores with their respective default measures
-export const useInternalSequencer1Store = createSequencerStore(sequencer1DefaultMeasures)
-export const useInternalSequencer2Store = createSequencerStore(sequencer2DefaultMeasures)
-export const useInternalSequencer3Store = createSequencerStore(sequencer3DefaultMeasures)
-export const useInternalSequencer4Store = createSequencerStore(sequencer4DefaultMeasures)
-export const useInternalSequencer5Store = createSequencerStore(sequencer5DefaultMeasures)
-export const useInternalSequencer6Store = createSequencerStore(sequencer6DefaultMeasures)
+export const useInternalSequencer1Store = createSequencerStore()
+export const useInternalSequencer2Store = createSequencerStore()
+export const useInternalSequencer3Store = createSequencerStore()
+export const useInternalSequencer4Store = createSequencerStore()
+export const useInternalSequencer5Store = createSequencerStore()
+export const useInternalSequencer6Store = createSequencerStore()
 
 // Store for edit step index
 interface SequencerStoreConfig {

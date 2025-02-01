@@ -1,16 +1,17 @@
 import ToneManager from "#tone/class/ToneManager"
 import type { AvailableSynths } from "#types/tone"
 import consola from "consola"
-import type { Reverb, PingPongDelay, Gain, Filter, FeedbackDelay } from "tone"
+import type { Reverb, PingPongDelay, Gain, Filter, FeedbackDelay, Player, Sampler } from "tone"
 
 class EffectBus {
   private static instance: EffectBus
   private reverb: Reverb | null = null
   private pingPongDelay: PingPongDelay | null = null
   private feedbackDelay: FeedbackDelay | null = null
-  private lowCutFilter: Filter | null = null // 🔥 New low-cut filter
+  private lowCutFilter: Filter | null = null
   private isInitialized = false
   private synthWetGains: Map<AvailableSynths, { reverb: Gain; delay: Gain }> = new Map()
+  private playerWetGains: Map<Player | Sampler, { reverb: Gain; delay: Gain }> = new Map()
 
   private constructor() {}
 
@@ -85,13 +86,43 @@ class EffectBus {
 
       synth.connect(delayGain)
       delayGain.connect(this.pingPongDelay)
-      delayGain.connect(this.feedbackDelay) // ✅ Both delays receive the same input
+      delayGain.connect(this.feedbackDelay)
 
       this.synthWetGains.set(synth, { reverb: reverbGain, delay: delayGain })
     }
 
-    // Dry signal goes straight to output
     synth.toDestination()
+  }
+
+  /**
+   * Routes a player or sampler through the effect bus with individual wet mix control for reverb & delay.
+   * @param player - The player instance to route.
+   * @param reverbMix - Initial reverb mix (0-1).
+   * @param delayMix - Initial delay mix (0-1).
+   */
+  public routePlayer(player: Player | Sampler, reverbMix = 0, delayMix = 0): void {
+    if (!this.isInitialized || !this.reverb || !this.pingPongDelay || !this.feedbackDelay) {
+      consola.warn("[EffectBus] Not initialized yet. Queueing player routing.")
+      return
+    }
+
+    player.disconnect()
+    if (!this.playerWetGains.has(player)) {
+      const Tone = ToneManager.getTone()
+      const reverbGain = new Tone.Gain(reverbMix)
+      const delayGain = new Tone.Gain(delayMix)
+
+      player.connect(reverbGain)
+      reverbGain.connect(this.reverb)
+
+      player.connect(delayGain)
+      delayGain.connect(this.pingPongDelay)
+      delayGain.connect(this.feedbackDelay)
+
+      this.playerWetGains.set(player, { reverb: reverbGain, delay: delayGain })
+    }
+
+    player.toDestination()
   }
 
   /**

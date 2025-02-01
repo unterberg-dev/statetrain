@@ -1,7 +1,7 @@
 import { H3Headline } from "#components/common/Headline"
 import NumberInput from "#components/form/NumberInput"
 import { APP_CONFIG } from "#lib/config"
-import type { StepSequencer } from "#tone/class/StepSequencer"
+import type { Sequencer } from "#tone/class/Sequencer"
 import useSequencer from "#tone/useSequencer"
 import useTone from "#tone/useTone"
 import type { Steps } from "#types/tone"
@@ -85,7 +85,7 @@ const getPlayableNotes = (root: number, scalePattern: number[] | null) => {
 }
 
 interface PianoRollProps {
-  sequencer: StepSequencer | null
+  sequencer: Sequencer | null
   steps: Steps | undefined
   activeStep: number | undefined
 }

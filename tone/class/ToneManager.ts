@@ -3,15 +3,9 @@ import { consola } from "consola/browser"
 
 import type { InternalToneType, InternalTransportType } from "#types/tone"
 import { TRANSPORT_CONFIG } from "#lib/config"
-import { StepSequencer } from "#tone/class/StepSequencer"
+import { Sequencer } from "#tone/class/Sequencer"
 import type { SequencerMeasuresValue } from "#tone/useSequencer"
 import SynthManager from "#tone/class/SynthManager"
-import {
-  sequencer1DefaultMeasures,
-  sequencer2DefaultMeasures,
-  sequencer3DefaultMeasures,
-  sequencer4DefaultMeasures,
-} from "#lib/defaultSteps"
 import {
   amDefaultPreset,
   duoDefaultPreset,
@@ -19,9 +13,7 @@ import {
   membraneDefaultPreset,
   metalDefaultPreset,
   monoDefaultPreset,
-  pluckDefaultPreset,
 } from "#utils/synthdefaultPresets"
-
 import EffectBus from "#tone/class/EffectBus"
 
 interface TransportSettings {
@@ -66,12 +58,12 @@ class ToneManager {
   public totalSixteenthNotes = this.currentTimeSignature * 4 * this.currentLoopLength
 
   // add sequencers
-  private amSynthSequencer: StepSequencer | null = null
-  private monoSynthSequencer: StepSequencer | null = null
-  private duoSynthSequencer: StepSequencer | null = null
-  private metalSynthSequencer: StepSequencer | null = null
-  private membraneSynthSequencer: StepSequencer | null = null
-  private fmSynthSequencer: StepSequencer | null = null
+  private amSynthSequencer: Sequencer | null = null
+  private monoSynthSequencer: Sequencer | null = null
+  private duoSynthSequencer: Sequencer | null = null
+  private metalSynthSequencer: Sequencer | null = null
+  private membraneSynthSequencer: Sequencer | null = null
+  private fmSynthSequencer: Sequencer | null = null
 
   // Global EventEmitter
   public emitter = new EventEmitter()
@@ -100,8 +92,6 @@ class ToneManager {
           await EffectBus.init()
 
           consola.success("Tone.js initialized successfully (dynamic import).")
-          this.emitter.emit("initialized")
-
           resolve()
         } catch (error) {
           consola.error("Error initializing Tone.js (dynamic import):", error)
@@ -117,49 +107,43 @@ class ToneManager {
   }
 
   // problem with this is that we always init all synths, so it's under heavy load all the time
-  public initializeSequencer(measureCount?: number): void {
+  public initializeSequencer(): void {
     if (!this.isInitialized) {
       throw new Error("Tone.js is not yet initialized.")
     }
 
     if (!this.amSynthSequencer) {
-      consola.info("Initializing StepSequencer 1 with measureCount:", measureCount)
-      this.amSynthSequencer = new StepSequencer(sequencer1DefaultMeasures, [], false)
+      this.amSynthSequencer = new Sequencer()
       this.amSynthSequencer.initializeSynth(SynthManager.createAMSynth(amDefaultPreset))
       this.amSynthSequencer.registerTransportCallback()
     }
 
     if (!this.monoSynthSequencer) {
-      consola.info("Initializing StepSequencer 2 with measureCount:", measureCount)
-      this.monoSynthSequencer = new StepSequencer(sequencer2DefaultMeasures, [], false)
+      this.monoSynthSequencer = new Sequencer()
       this.monoSynthSequencer.initializeSynth(SynthManager.createMonoSynth(monoDefaultPreset))
       this.monoSynthSequencer.registerTransportCallback()
     }
 
     if (!this.duoSynthSequencer) {
-      consola.info("Initializing StepSequencer 3 with measureCount:", measureCount)
-      this.duoSynthSequencer = new StepSequencer(sequencer3DefaultMeasures, [], false)
+      this.duoSynthSequencer = new Sequencer()
       this.duoSynthSequencer.initializeSynth(SynthManager.createDuoSynth(duoDefaultPreset))
       this.duoSynthSequencer.registerTransportCallback()
     }
 
     if (!this.metalSynthSequencer) {
-      consola.info("Initializing StepSequencer 4 with measureCount:", measureCount)
-      this.metalSynthSequencer = new StepSequencer(sequencer4DefaultMeasures, [], false)
+      this.metalSynthSequencer = new Sequencer()
       this.metalSynthSequencer.initializeSynth(SynthManager.createMetalSynth(metalDefaultPreset))
       this.metalSynthSequencer.registerTransportCallback()
     }
 
     if (!this.membraneSynthSequencer) {
-      consola.info("Initializing StepSequencer 5 with measureCount:", measureCount)
-      this.membraneSynthSequencer = new StepSequencer(sequencer4DefaultMeasures, [], false)
+      this.membraneSynthSequencer = new Sequencer()
       this.membraneSynthSequencer.initializeSynth(SynthManager.createMembraneSynth(membraneDefaultPreset))
       this.membraneSynthSequencer.registerTransportCallback()
     }
 
     if (!this.fmSynthSequencer) {
-      consola.info("Initializing StepSequencer 6 with measureCount:", measureCount)
-      this.fmSynthSequencer = new StepSequencer(sequencer4DefaultMeasures, [], false)
+      this.fmSynthSequencer = new Sequencer()
       this.fmSynthSequencer.initializeSynth(SynthManager.createFMSynth(fmDefaultPreset))
       this.fmSynthSequencer.registerTransportCallback()
     }
@@ -232,7 +216,7 @@ class ToneManager {
       return
     }
 
-    this.initializeSequencer(this.currentLoopLength)
+    this.initializeSequencer()
     this.configureTransport()
 
     // Clear any previous schedules
@@ -296,7 +280,6 @@ class ToneManager {
     }
 
     consola.info("Transport stopped.")
-    this.emitter.emit("playbackStopped")
   }
 
   /**
@@ -309,7 +292,6 @@ class ToneManager {
     }
     if (value <= TRANSPORT_CONFIG.bpm.max && value >= TRANSPORT_CONFIG.bpm.min) {
       this.configureTransport({ bpm: value })
-      this.emitter.emit("bpmChanged", value)
     }
   }
 
