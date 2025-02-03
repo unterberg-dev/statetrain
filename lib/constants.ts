@@ -25,5 +25,20 @@ export const keyMap = Array.from({ length: 128 }, (_, i) => ({
 export const VOLUME_MIN = -60
 export const VOLUME_MAX = 0
 
+export const ATTACK_MIN = 0
+export const ATTACK_MAX = 2
+
+export const DECAY_MIN = 0
+export const DECAY_MAX = 2
+
+export const SUSTAIN_MIN = 0
+export const SUSTAIN_MAX = 1
+
+export const RELEASE_MIN = 0
+export const RELEASE_MAX = 3
+
+export const FILTER_ENVELOPE_BASE_FREQUENCY_MIN = 40
+export const FILTER_ENVELOPE_BASE_FREQUENCY_MAX = 20000
+
 export const DEFAULT_SYNTH_VOLUME_PERCENT = 80
 export const DEFAULT_METRONOME_VOLUME_PERCENT = 50
