@@ -2,23 +2,73 @@ import { memo, useCallback, useEffect, useMemo } from "react"
 
 import MissingStepButtonMap from "#components/sequencer/MissingStepsMap"
 import { SequencerButton, StepRow, StepsOuter } from "#components/sequencer/styled"
-import { chunkArray, getUniqueStepId } from "#components/sequencer/utils"
+import { getUniqueStepId } from "#components/sequencer/utils"
 import type { Sequencer } from "#tone/class/Sequencer"
 import useSequencer from "#tone/useSequencer"
 import useTone from "#tone/useTone"
 import type { Steps } from "#types/tone"
+import type { MeasureChunks } from "#types/ui"
 
 const MemoizedStepRow = memo(StepRow)
 const MemoizedSequencerButton = memo(SequencerButton)
 
+interface HollowGridOverlayProps {
+  measureChunks: MeasureChunks
+  activeStep: number | undefined
+  bpm: number
+}
+
+// This component expects the same chunking data as your button map.
+export const HollowGridOverlay = memo(({ measureChunks, activeStep, bpm }: HollowGridOverlayProps) => {
+  return (
+    <div className="absolute inset-0 pointer-events-none flex flex-col gap-1 z-3">
+      {measureChunks.map((measureSteps, measureIndex) => (
+        <MemoizedStepRow
+          key={`overlay-row-${getUniqueStepId(measureIndex, 0)}`}
+          // Use the same grid layout as your button row.
+          className="grid grid-cols-12" // Adjust columns to match measureSize
+        >
+          {measureSteps.map((stepObj) => {
+            const globalStepIdx = stepObj.originalIndex
+            const isActive = stepObj.originalIndex === activeStep
+            return (
+              <div className="relative flex-1" key={`${globalStepIdx}`}>
+                <div
+                  className="bg-primaryLight absolute inset-0 rounded"
+                  style={{
+                    transition: `opacity ${20 / bpm}s ease-out`,
+                    opacity: isActive ? 1 : 0,
+                  }}
+                />
+              </div>
+            )
+          })}
+        </MemoizedStepRow>
+      ))}
+    </div>
+  )
+})
+
 interface StepButtonMapProps {
-  activeStep?: number
+  measureChunks: MeasureChunks
   steps: Steps
   sequencer: Sequencer | null
   setSequencerSteps: (steps: Steps) => void
 }
 
-const StepButtonMap = ({ activeStep, steps, sequencer, setSequencerSteps }: StepButtonMapProps) => {
+const ActiveOverlay = memo(({ isActive, bpm }: { isActive: boolean; bpm: number }) => {
+  return (
+    <div
+      style={{
+        opacity: isActive ? 1 : 0,
+        transition: `opacity ${20 / bpm}s ease-out`,
+      }}
+      className="absolute top-0 left-0 w-full h-full bg-primaryLight bg-opacity-100 z-100 pointer-events-none"
+    />
+  )
+})
+
+const StepButtonMap = ({ measureChunks, steps, sequencer, setSequencerSteps }: StepButtonMapProps) => {
   const { timeSignature, loopLength, bpm } = useTone()
   const measureSize = useMemo(() => timeSignature * loopLength, [timeSignature, loopLength])
   const { editStepIndex, setEditStepIndex } = useSequencer()
@@ -38,23 +88,12 @@ const StepButtonMap = ({ activeStep, steps, sequencer, setSequencerSteps }: Step
     [setEditStepIndex, sequencer],
   )
 
-  const stepObjects = useMemo(
-    () => Array.from({ length: steps.length }, (_, i) => ({ originalIndex: i })),
-    [steps],
-  )
-
-  // 3) Chunk by measure-size for a row-per-measure layout
-  const measureChunks = useMemo(() => {
-    return chunkArray(stepObjects, measureSize)
-  }, [stepObjects, measureSize])
-
   return (
     <StepsOuter>
       {measureChunks.map((measureSteps, measureIndex) => (
         <MemoizedStepRow key={getUniqueStepId(measureIndex, 0)}>
           {measureSteps.map((stepObj, localIndex) => {
             const globalStepIdx = stepObj.originalIndex
-            const isCurrent = activeStep === globalStepIdx
             const isArmed = steps[globalStepIdx].notes.length > 0
             const uniqueKey = getUniqueStepId(measureIndex, localIndex)
 
@@ -100,13 +139,7 @@ const StepButtonMap = ({ activeStep, steps, sequencer, setSequencerSteps }: Step
                     ))}
                   </div>
                 </MemoizedSequencerButton>
-                <div
-                  style={{
-                    opacity: isCurrent ? 1 : 0,
-                    transition: `opacity ${20 / bpm}s ease-out`,
-                  }}
-                  className="absolute top-0 left-0 w-full h-full bg-primaryLight bg-opacity-100 z-100 pointer-events-none"
-                />
+                {/* <ActiveOverlay bpm={bpm} isActive={isCurrent} /> */}
               </div>
             )
           })}

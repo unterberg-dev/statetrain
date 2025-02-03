@@ -1,8 +1,8 @@
 import SequencerControls from "#components/sequencer/SequencerControls"
-import StepButtonMap from "#components/sequencer/StepButtonMap"
-import { parseTransportPosition } from "#components/sequencer/utils"
+import StepButtonMap, { HollowGridOverlay } from "#components/sequencer/StepButtonMap"
+import { chunkArray, parseTransportPosition } from "#components/sequencer/utils"
 import useTone from "#tone/useTone"
-import { useState, useMemo, useEffect, useCallback } from "react"
+import { useState, useMemo, useEffect, useCallback, createContext, useRef } from "react"
 import type { SequencerMeasuresValue } from "#tone/useSequencer"
 import PianoRoll from "#components/PianoRoll"
 import { getPercentSingleValue, ruleOfThree } from "#utils/index"
@@ -13,6 +13,9 @@ import useThrottledCallback from "#lib/hooks/useThrottledCallback"
 import EffectBus from "#tone/class/EffectBus"
 import useSequencer from "#tone/useSequencer"
 import LayoutComponent from "#components/common/LayoutComponent"
+import consola from "consola"
+import HighlightOverlayDOM from "#components/sequencer/HightlightOverlayDom"
+import { ActiveStepProvider } from "#tone/ActiveStepProvider"
 
 const StyledKnobOuter = rc.div`
   flex
@@ -29,7 +32,7 @@ const SequencerLayout = () => {
     registerSixteenthTick,
     unregisterSixteenthTick,
   } = useTone()
-  const [activeStep, setActiveStep] = useState<number | undefined>()
+  // const [activeStep, setActiveStep] = useState<number | undefined>()
 
   const {
     currentSequencer: {
@@ -86,23 +89,8 @@ const SequencerLayout = () => {
       const newSteps = sequencer.setMeasureCount(newCount)
 
       setSequencerSteps(newSteps)
-
-      // Adjust active step based on Tone.Transport position
-      const posString = ToneManager.toneTransport?.position as string
-      if (posString) {
-        const totalSixteenthCount = parseTransportPosition(posString, timeSignature)
-
-        // Calculate new total steps based on updated measures
-        const newTotalSteps = newCount * timeSignature * loopLength
-
-        // Determine the new active step
-        const currentStep = totalSixteenthCount % newTotalSteps
-        setActiveStep(Math.floor(currentStep))
-      } else {
-        setActiveStep(0) // Fallback if position is unavailable
-      }
     },
-    [setSequencerSteps, setSequencerMeasures, timeSignature, loopLength, sequencer],
+    [setSequencerSteps, setSequencerMeasures, sequencer],
   )
 
   // @todo: potential bad side effect
@@ -111,37 +99,6 @@ const SequencerLayout = () => {
     if (!sequencer || !timeSignature) return
     handleMeasureSelect(measures)
   }, [sequencer, timeSignature, measures, handleMeasureSelect])
-
-  // track the current step for UI highlight
-  useEffect(() => {
-    function handleTick() {
-      setActiveStep((prev) => (typeof prev === "number" ? (prev + 1) % totalSteps : 0))
-    }
-    // we are doing it wrong: https://github.com/Tonejs/Tone.js/wiki/Performance#syncing-visuals
-    registerSixteenthTick(handleTick)
-    return () => {
-      unregisterSixteenthTick(handleTick)
-    }
-  }, [totalSteps, registerSixteenthTick, unregisterSixteenthTick])
-
-  // reset highlight if user toggles global play
-  useEffect(() => {
-    if (isPlaying) {
-      setActiveStep(0)
-    }
-  }, [isPlaying])
-
-  useEffect(() => {
-    if (!transport) return
-
-    const posString = transport.position as string
-    const totalSixteenthCount = parseTransportPosition(posString, timeSignature)
-
-    // Each step sequencer UI is effectively one sixteenth note:
-    const currentStep = totalSixteenthCount % totalSteps
-
-    setActiveStep(Math.floor(currentStep))
-  }, [timeSignature, totalSteps, transport])
 
   const onChangeVolume = useCallback(
     (value: number) => {
@@ -159,6 +116,19 @@ const SequencerLayout = () => {
       sequencer.setVolume(interpolatedValue)
     }
   }, 300)
+
+  // const currentActiveStep = useMemo(() => {
+  //   return activeStep ? steps[activeStep] : undefined
+  // }, [activeStep, steps])
+
+  const stepObjects = useMemo(
+    () => Array.from({ length: steps.length }, (_, i) => ({ originalIndex: i })),
+    [steps],
+  )
+
+  const measureChunks = useMemo(() => {
+    return chunkArray(stepObjects, measureSize)
+  }, [stepObjects, measureSize])
 
   return (
     <LayoutComponent className="p-4 rounded-sm bg-black">
@@ -181,13 +151,24 @@ const SequencerLayout = () => {
           <Knob label="Delay" onChange={onChangeDelayMix} value={delay ? delay : 0} />
         </StyledKnobOuter>
       </div>
-      <StepButtonMap
-        sequencer={sequencer}
-        setSequencerSteps={setSequencerSteps}
-        activeStep={activeStep}
-        steps={steps}
-      />
-      <PianoRoll steps={steps} activeStep={activeStep} sequencer={sequencer} />
+      <ActiveStepProvider>
+        <div className="relative">
+          <StepButtonMap
+            sequencer={sequencer}
+            setSequencerSteps={setSequencerSteps}
+            steps={steps}
+            measureChunks={measureChunks}
+          />
+          {/* <HollowGridOverlay measureChunks={measureChunks} bpm={bpm} activeStep={activeStep}  /> */}
+          <HighlightOverlayDOM
+            measureChunks={measureChunks}
+            registerSixteenthTick={registerSixteenthTick}
+            unregisterSixteenthTick={unregisterSixteenthTick}
+            measureCount={measures}
+          />
+        </div>
+        <PianoRoll sequencer={sequencer} />
+      </ActiveStepProvider>
     </LayoutComponent>
   )
 }
