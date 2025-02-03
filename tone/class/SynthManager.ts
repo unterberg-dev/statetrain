@@ -64,7 +64,7 @@ class SynthManager {
 
   public createFMSynth(options?: RecursivePartial<FMSynthOptions>): PolySynth<FMSynth> {
     const Tone = ToneManager.getTone()
-    const synth = new Tone.PolySynth(Tone.FMSynth, options)
+    const synth = new Tone.PolySynth(Tone.FMSynth, options).toDestination()
     EffectBus.routeSynth(synth)
     return synth
   }

@@ -1,7 +1,6 @@
 import { useState, useRef, useEffect, useMemo, useCallback, memo } from "react"
 import rc from "react-classmate"
 import type { Sequencer } from "#tone/class/Sequencer"
-import type { Step } from "#types/tone"
 import { APP_CONFIG } from "#lib/config"
 import useTone from "#tone/useTone"
 import useSequencer from "#tone/useSequencer"

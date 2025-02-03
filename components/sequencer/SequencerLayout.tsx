@@ -1,19 +1,17 @@
 import SequencerControls from "#components/sequencer/SequencerControls"
-import StepButtonMap, { HollowGridOverlay } from "#components/sequencer/StepButtonMap"
-import { chunkArray, parseTransportPosition } from "#components/sequencer/utils"
+import StepButtonMap from "#components/sequencer/StepButtonMap"
+import { chunkArray } from "#components/sequencer/utils"
 import useTone from "#tone/useTone"
-import { useState, useMemo, useEffect, useCallback, createContext, useRef } from "react"
+import { useMemo, useEffect, useCallback } from "react"
 import type { SequencerMeasuresValue } from "#tone/useSequencer"
 import PianoRoll from "#components/PianoRoll"
 import { getPercentSingleValue, ruleOfThree } from "#utils/index"
-import ToneManager from "#tone/class/ToneManager"
 import Knob from "#components/Knob"
 import rc from "react-classmate"
 import useThrottledCallback from "#lib/hooks/useThrottledCallback"
 import EffectBus from "#tone/class/EffectBus"
 import useSequencer from "#tone/useSequencer"
 import LayoutComponent from "#components/common/LayoutComponent"
-import consola from "consola"
 import HighlightOverlayDOM from "#components/sequencer/HightlightOverlayDom"
 import { ActiveStepProvider } from "#tone/ActiveStepProvider"
 
@@ -51,8 +49,6 @@ const SequencerLayout = () => {
   } = useSequencer()
 
   const measureSize = useMemo(() => timeSignature * loopLength, [timeSignature, loopLength])
-  const totalSteps = useMemo(() => measureSize * measures, [measureSize, measures])
-
   const synth = sequencer?.getSynth() // Get the sequencer's synth instance
 
   useEffect(() => {
@@ -116,10 +112,6 @@ const SequencerLayout = () => {
       sequencer.setVolume(interpolatedValue)
     }
   }, 300)
-
-  // const currentActiveStep = useMemo(() => {
-  //   return activeStep ? steps[activeStep] : undefined
-  // }, [activeStep, steps])
 
   const stepObjects = useMemo(
     () => Array.from({ length: steps.length }, (_, i) => ({ originalIndex: i })),
