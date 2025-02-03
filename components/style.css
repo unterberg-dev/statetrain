@@ -94,3 +94,30 @@
 .knob #Oval-5 {
   display: none;
 }
+
+* {
+  -webkit-user-select: none; /* Safari */
+  -ms-user-select: none; /* IE 10 and IE 11 */
+  user-select: none; /* Standard syntax */
+}
+
+/* transport visualizer performance ref rendering */
+.tick .tick-dashed {
+  display: block;
+}
+.tick .tick-x,
+.tick .tick-smile {
+  display: none;
+}
+.tick.active-tick .tick-dashed {
+  display: none;
+}
+.tick.active-tick:not(.isMeasure) .tick-x {
+  display: block;
+}
+.tick.active-tick.isMeasure .tick-smile {
+  display: block;
+}
+.tick.active-tick.isMeasure .tick-x {
+  display: none;
+}

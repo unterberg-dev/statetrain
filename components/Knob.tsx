@@ -10,7 +10,7 @@ const RotaryKnob = import.meta.env.DEV
   : knob.Knob
 
 const defaultProps = {
-  unlockDistance: 60,
+  unlockDistance: 40,
 }
 
 interface ExtendedKnobProps extends KnobProps {
@@ -19,25 +19,20 @@ interface ExtendedKnobProps extends KnobProps {
   height?: number
 }
 
-const MAX_DISTANCE = 20 // Prevents sudden jumps beyond this value
+const MAX_DISTANCE = 40 // Prevents sudden jumps beyond this value
 
 const Knob = ({ width = 52, height = 52, value, onChange, label, ...props }: ExtendedKnobProps) => {
   const [realTimeValue, setRealTimeValue] = useState(value)
 
-  // Ensure the local state updates when the external value changes
   useEffect(() => {
     setRealTimeValue(value)
   }, [value])
 
   const handleChange = useCallback(
     (newValue: number) => {
-      // Ensure clamping happens BEFORE state update
       const clampedValue = Math.min(100, Math.max(0, newValue))
-
-      // Calculate the difference from the last value
       const distance = Math.abs(clampedValue - realTimeValue)
 
-      // Ignore changes exceeding the max allowed distance
       if (distance > MAX_DISTANCE) {
         return
       }

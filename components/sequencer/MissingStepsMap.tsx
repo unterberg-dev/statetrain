@@ -1,5 +1,5 @@
-import { SequencerButton, StepRow } from "#components/sequencer/styled"
-import { chunkArray, getUniqueStepId } from "#components/sequencer/utils"
+import { SequencerButton, StepRow } from "#components/Sequencer/styled"
+import { chunkArray, getUniqueStepId } from "#components/Sequencer/utils"
 import useTone from "#tone/useTone"
 import type { Steps } from "#types/tone"
 

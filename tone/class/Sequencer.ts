@@ -1,5 +1,8 @@
+import { VOLUME_MAX, VOLUME_MIN } from "#lib/constants"
 import ToneManager from "#tone/class/ToneManager"
+import { useAmSynthStore } from "#tone/useSequencer"
 import type { AvailableSynths, Steps } from "#types/tone"
+import { ruleOfThree } from "#utils/index"
 import consola from "consola"
 
 export class Sequencer {
@@ -57,8 +60,16 @@ export class Sequencer {
         const step = this.steps[stepIndex]
 
         if (step.active && this.synth) {
-          for (const note of step.notes) {
-            this.synth?.triggerAttackRelease(note.value, "16n", time, note.velocity)
+          if (!step.double) {
+            for (const note of step.notes) {
+              this.synth.triggerAttackRelease(note.value, "16n", time, note.velocity)
+            }
+          } else {
+            for (const note of step.notes) {
+              this.synth.triggerAttackRelease(note.value, "32n", time, note.velocity)
+              const secondHitTime = time + ToneManager.getTone().Time("32n").toSeconds()
+              this.synth.triggerAttackRelease(note.value, "32n", secondHitTime, note.velocity)
+            }
           }
         }
         this.currentStep++
@@ -75,6 +86,9 @@ export class Sequencer {
 
   public initializeSynth(synth: AvailableSynths) {
     this.synth = synth
+
+    const defaultVolume = useAmSynthStore.getState().volume
+    this.synth.volume.value = ruleOfThree(defaultVolume, VOLUME_MIN, VOLUME_MAX)
   }
 
   public increaseVolume() {
@@ -111,7 +125,14 @@ export class Sequencer {
   public toggleDouble(index: number) {
     const step = this.steps[index]
     if (!step) return
-    step.double = !step.double
+
+    const newSteps = [...this.steps]
+    newSteps[index] = {
+      ...step,
+      double: !step.double,
+    }
+
+    this.steps = newSteps
   }
 
   public triggerStep(index: number, time: number) {

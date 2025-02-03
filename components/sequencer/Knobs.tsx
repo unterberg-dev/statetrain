@@ -1,11 +1,13 @@
+import rc from "react-classmate"
+
 import useThrottledCallback from "#lib/hooks/useThrottledCallback"
 import EffectBus from "#tone/class/EffectBus"
 import useSequencer from "#tone/useSequencer"
-import { getPercentSingleValue, ruleOfThree } from "#utils/index"
+import { ruleOfThree } from "#utils/index"
 import { useCallback, useEffect } from "react"
-import rc from "react-classmate"
 import Knob from "#components/Knob"
 import useTone from "#tone/useTone"
+import { VOLUME_MIN, VOLUME_MAX } from "#lib/constants"
 
 const StyledKnobOuter = rc.div`
   flex
@@ -50,7 +52,7 @@ const SequencerKnobs = () => {
   const throttledOnChangeVolume = useThrottledCallback((value: number) => {
     if (sequencer) {
       setVolume(Math.floor(value))
-      const interpolatedValue = ruleOfThree(value, -50, 20)
+      const interpolatedValue = ruleOfThree(value, VOLUME_MIN, VOLUME_MAX)
       sequencer.setVolume(interpolatedValue)
     }
   }, 300)
@@ -72,18 +74,7 @@ const SequencerKnobs = () => {
 
   return (
     <StyledKnobOuter>
-      <Knob
-        label="Volume"
-        onChange={onChangeVolume}
-        value={
-          volume ||
-          getPercentSingleValue({
-            min: -50,
-            max: 20,
-            value: 0,
-          })
-        }
-      />
+      <Knob label="Volume" onChange={onChangeVolume} value={volume || 0} />
       <Knob label="Reverb" onChange={onChangeReverbMix} value={reverb ? reverb : 0} />
       <Knob label="Delay" onChange={onChangeDelayMix} value={delay ? delay : 0} />
     </StyledKnobOuter>

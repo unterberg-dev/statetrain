@@ -10,9 +10,10 @@ import { APP_CONFIG } from "#lib/config"
 import useMetronome from "#tone/useMetronome"
 import LayoutComponent from "#components/common/LayoutComponent"
 import Metronome from "#tone/class/Metronome"
-import { getPercentSingleValue, ruleOfThree } from "#utils/index"
+import { ruleOfThree } from "#utils/index"
 import useThrottledCallback from "#lib/hooks/useThrottledCallback"
 import Knob from "#components/Knob"
+import { VOLUME_MAX, VOLUME_MIN } from "#lib/constants"
 
 const TransportControls = () => {
   const { isPlaying, handlePlay, handleStop } = useTone()
@@ -26,7 +27,7 @@ const TransportControls = () => {
   const throttledOnChangeVolume = useThrottledCallback((value: number) => {
     if (Metronome) {
       setVolume(Math.floor(value))
-      const interpolatedValue = ruleOfThree(value, -50, 20)
+      const interpolatedValue = ruleOfThree(value, VOLUME_MIN, VOLUME_MAX)
       Metronome.setVolume(interpolatedValue)
     }
   }, 300)
@@ -54,20 +55,7 @@ const TransportControls = () => {
           }
           onClick={handleToggleMetronome}
         />
-        <Knob
-          width={32}
-          height={32}
-          label="Metronome"
-          onChange={throttledOnChangeVolume}
-          value={
-            volume ||
-            getPercentSingleValue({
-              min: -50,
-              max: 20,
-              value: 0,
-            })
-          }
-        />
+        <Knob width={32} height={32} label="Metronome" onChange={throttledOnChangeVolume} value={volume} />
       </ElementContainer>
     </LayoutComponent>
   )

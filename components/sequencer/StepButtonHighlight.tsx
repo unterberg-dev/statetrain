@@ -1,8 +1,8 @@
 // HighlightOverlayDOM.tsx
 import { useCallback, useEffect, useMemo, useRef } from "react"
 import type { MeasureChunks } from "#types/ui"
-import { getUniqueStepId, parseTransportPosition } from "#components/sequencer/utils"
-import { StepRow } from "#components/sequencer/styled"
+import { getUniqueStepId, parseTransportPosition } from "#components/Sequencer/utils"
+import { StepRow } from "#components/Sequencer/styled"
 import useTone from "#tone/useTone"
 import ToneManager from "#tone/class/ToneManager"
 import { useGlobalActiveStepRef } from "#tone/ActiveStepProvider"

@@ -1,3 +1,4 @@
+import { DEFAULT_METRONOME_VOLUME_PERCENT } from "#lib/constants"
 import Metronome from "#tone/class/Metronome"
 import useTone from "#tone/useTone"
 import { consola } from "consola/browser"
@@ -13,17 +14,17 @@ export interface MetronomeStoreValues {
   setVolume: (payload: number | undefined) => void
 }
 
-const useInternalMetronomeStore = create<MetronomeStoreValues>()((set) => ({
+export const useInternalMetronomeStore = create<MetronomeStoreValues>()((set) => ({
   isMetronomeStarted: false,
   setIsMetronomeStarted: (payload) => set(() => ({ isMetronomeStarted: payload })),
   isMetronomeInit: false,
   setIsMetronomeInit: (payload) => set(() => ({ isMetronomeInit: payload })),
-  volume: 0,
+  volume: DEFAULT_METRONOME_VOLUME_PERCENT, // 0..100
   setVolume: (payload) => set(() => ({ volume: payload })),
 }))
 
 const useMetronome = () => {
-  const { isInitialized, timeSignature } = useTone()
+  const { isInitialized } = useTone()
   const isMetronomeStarted = useInternalMetronomeStore((state) => state.isMetronomeStarted)
   const setIsMetronomeStarted = useInternalMetronomeStore((state) => state.setIsMetronomeStarted)
   const isMetronomeInit = useInternalMetronomeStore((state) => state.isMetronomeInit)

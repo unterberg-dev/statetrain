@@ -21,3 +21,9 @@ export const keyMap = Array.from({ length: 128 }, (_, i) => ({
   index: i,
   isWhite: whiteBlackKeySequence[i % whiteBlackKeySequence.length],
 }))
+
+export const VOLUME_MIN = -60
+export const VOLUME_MAX = 0
+
+export const DEFAULT_SYNTH_VOLUME_PERCENT = 80
+export const DEFAULT_METRONOME_VOLUME_PERCENT = 50

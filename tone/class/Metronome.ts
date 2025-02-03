@@ -4,6 +4,9 @@ import type { Player } from "tone"
 import ToneManager from "#tone/class/ToneManager"
 import PlayerManager from "#tone/class/PlayerManager"
 import { APP_CONFIG } from "#lib/config"
+import { useInternalMetronomeStore } from "#tone/useMetronome"
+import { ruleOfThree } from "#utils/index"
+import { VOLUME_MIN, VOLUME_MAX } from "#lib/constants"
 
 class Metronome {
   private static instance: Metronome
@@ -13,8 +16,8 @@ class Metronome {
   private measureScheduleId?: number
 
   /** Synths used for quarter-note click and measure-downbeat click */
-  private quarterSynth?: Player
-  private measureSynth?: Player
+  private quarterPlayer?: Player
+  private measurePlayer?: Player
 
   /** Tracks if the metronome has started scheduling events */
   private isPlaying = false
@@ -36,16 +39,21 @@ class Metronome {
       throw new Error("[Metronome] Tone.js not initialized. Call ToneManager.init() first.")
     }
 
-    // could be one sample too
-    this.quarterSynth = PlayerManager.createPlayer({
-      url: `${APP_CONFIG.viteUrl}/sounds/MPC2000/P_SN_RIM.wav`,
-    })
-    this.quarterSynth.playbackRate = 1.2
+    // get default volume from store
+    const defaultVolume = useInternalMetronomeStore.getState().volume
 
-    this.measureSynth = PlayerManager.createPlayer({
+    // could be one sample too
+    this.quarterPlayer = PlayerManager.createPlayer({
       url: `${APP_CONFIG.viteUrl}/sounds/MPC2000/P_SN_RIM.wav`,
     })
-    this.measureSynth.playbackRate = 0.8
+    this.quarterPlayer.playbackRate = 1.2
+    this.quarterPlayer.volume.value = ruleOfThree(defaultVolume, VOLUME_MIN, VOLUME_MAX)
+
+    this.measurePlayer = PlayerManager.createPlayer({
+      url: `${APP_CONFIG.viteUrl}/sounds/MPC2000/P_SN_RIM.wav`,
+    })
+    this.measurePlayer.playbackRate = 0.8
+    this.measurePlayer.volume.value = ruleOfThree(defaultVolume, VOLUME_MIN, VOLUME_MAX)
   }
 
   /** If the time signature changes, re-register schedules if currently playing. */
@@ -65,7 +73,7 @@ class Metronome {
       consola.warn("[Metronome] ToneManager is not initialized.")
       return
     }
-    if (!this.quarterSynth || !this.measureSynth) {
+    if (!this.quarterPlayer || !this.measurePlayer) {
       consola.warn("[Metronome] Synths not created. Call initialize() first.")
       return
     }
@@ -77,7 +85,7 @@ class Metronome {
     // Quarter-note click
     this.quarterNoteScheduleId = ToneManager.toneTransport?.scheduleRepeat(
       (time) => {
-        this.quarterSynth?.start(time)
+        this.quarterPlayer?.start(time)
       },
       "4n",
       "0",
@@ -86,7 +94,7 @@ class Metronome {
     // Measure downbeat click
     this.measureScheduleId = ToneManager.toneTransport?.scheduleRepeat(
       (time) => {
-        this.measureSynth?.start(time)
+        this.measurePlayer?.start(time)
       },
       "1m",
       "0",
@@ -102,11 +110,11 @@ class Metronome {
   }
 
   public setVolume(value: number) {
-    if (this.measureSynth?.volume) {
-      this.measureSynth.volume.value = value
+    if (this.measurePlayer?.volume) {
+      this.measurePlayer.volume.value = value
     }
-    if (this.quarterSynth?.volume) {
-      this.quarterSynth.volume.value = value
+    if (this.quarterPlayer?.volume) {
+      this.quarterPlayer.volume.value = value
     }
   }
 
@@ -145,10 +153,10 @@ class Metronome {
     this.stop()
 
     // Dispose synths
-    this.quarterSynth?.dispose()
-    this.measureSynth?.dispose()
-    this.quarterSynth = undefined
-    this.measureSynth = undefined
+    this.quarterPlayer?.dispose()
+    this.measurePlayer?.dispose()
+    this.quarterPlayer = undefined
+    this.measurePlayer = undefined
 
     consola.info("[Metronome] Disposed completely.")
   }

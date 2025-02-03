@@ -1,8 +1,8 @@
 import { memo, useCallback, useEffect, useMemo } from "react"
 
-import MissingStepButtonMap from "#components/sequencer/MissingStepsMap"
-import { SequencerButton, StepRow, StepsOuter } from "#components/sequencer/styled"
-import { getUniqueStepId } from "#components/sequencer/utils"
+import MissingStepButtonMap from "#components/Sequencer/MissingStepsMap"
+import { SequencerButton, StepRow, StepsOuter } from "#components/Sequencer/styled"
+import { getUniqueStepId } from "#components/Sequencer/utils"
 import useSequencer from "#tone/useSequencer"
 import useTone from "#tone/useTone"
 import type { MeasureChunks } from "#types/ui"

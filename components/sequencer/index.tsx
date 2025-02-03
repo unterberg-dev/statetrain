@@ -1,14 +1,14 @@
-import SequencerControls from "#components/sequencer/SequencerControls"
-import StepButtonMap from "#components/sequencer/StepButtonMap"
-import { chunkArray } from "#components/sequencer/utils"
+import SequencerControls from "#components/Sequencer/SequencerControls"
+import StepButtonMap from "#components/Sequencer/StepButtonMap"
+import { chunkArray } from "#components/Sequencer/utils"
 import useTone from "#tone/useTone"
 import { useMemo } from "react"
 import PianoRoll from "#components/PianoRoll"
 import useSequencer from "#tone/useSequencer"
 import LayoutComponent from "#components/common/LayoutComponent"
-import StepButtonHighlight from "#components/sequencer/StepButtonHighlight"
+import StepButtonHighlight from "#components/Sequencer/StepButtonHighlight"
 import { ActiveStepProvider } from "#tone/ActiveStepProvider"
-import SequencerKnobs from "#components/sequencer/Knobs"
+import SequencerKnobs from "#components/Sequencer/Knobs"
 
 const SequencerLayout = () => {
   const { timeSignature, loopLength } = useTone()

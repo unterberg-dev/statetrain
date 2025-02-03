@@ -22,9 +22,6 @@ class EffectBus {
     return EffectBus.instance
   }
 
-  /**
-   * Initializes the EffectBus **after** ToneManager is ready.
-   */
   public async init(): Promise<void> {
     if (this.isInitialized) {
       consola.warn("[EffectBus] Already initialized.")
@@ -40,7 +37,7 @@ class EffectBus {
 
     this.lowCutFilter = new Tone.Filter({
       type: "highpass",
-      frequency: 350,
+      frequency: 950,
       Q: 1,
     })
 
@@ -64,12 +61,6 @@ class EffectBus {
     ToneManager.toneTransport?.on("ticks", this.updateDelayTime.bind(this))
   }
 
-  /**
-   * Routes a synth through the effect bus with individual wet mix control for reverb & delay.
-   * @param synth - The synth instance to route.
-   * @param reverbMix - Initial reverb mix (0-1).
-   * @param delayMix - Initial delay mix (0-1).
-   */
   public routeSynth(synth: AvailableSynths, reverbMix = 0, delayMix = 0): void {
     if (!this.isInitialized || !this.reverb || !this.pingPongDelay || !this.feedbackDelay) {
       consola.warn("[EffectBus] Not initialized yet. Queueing synth routing.")
@@ -93,13 +84,6 @@ class EffectBus {
 
     synth.toDestination()
   }
-
-  /**
-   * Routes a player or sampler through the effect bus with individual wet mix control for reverb & delay.
-   * @param player - The player instance to route.
-   * @param reverbMix - Initial reverb mix (0-1).
-   * @param delayMix - Initial delay mix (0-1).
-   */
   public routePlayer(player: Player | Sampler, reverbMix = 0, delayMix = 0): void {
     if (!this.isInitialized || !this.reverb || !this.pingPongDelay || !this.feedbackDelay) {
       consola.warn("[EffectBus] Not initialized yet. Queueing player routing.")
@@ -125,11 +109,6 @@ class EffectBus {
     player.toDestination()
   }
 
-  /**
-   * Updates the **reverb wet mix** level for a specific synth.
-   * @param synth - The target synth.
-   * @param wetMix - The new reverb level (0 - 1).
-   */
   public updateSynthReverbMix(synth: AvailableSynths, wetMix: number): void {
     const wetGains = this.synthWetGains.get(synth)
     if (wetGains) {
@@ -140,11 +119,6 @@ class EffectBus {
     }
   }
 
-  /**
-   * Updates the **delay wet mix** level for a specific synth.
-   * @param synth - The target synth.
-   * @param wetMix - The new delay level (0 - 1).
-   */
   public updateSynthDelayMix(synth: AvailableSynths, wetMix: number): void {
     const wetGains = this.synthWetGains.get(synth)
     if (wetGains) {
