@@ -159,7 +159,6 @@ export default function PianoRoll() {
       return
     }
     const step = sequencer?.getSteps()[editStepIndex]
-    console.log(step)
     if (!step) {
       setLocalIsDouble(false)
       return

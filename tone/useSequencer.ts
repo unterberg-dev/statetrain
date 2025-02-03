@@ -56,22 +56,29 @@ export interface FilterEnvelope {
   exponent: number
 }
 
-interface MonoSynthEnvelope {
-  envelope?: Envelope
-  setEnvelope?: (payload: Envelope) => void
-}
-
-export const getMonoSynthEnvelope = (
+export const getMonoSynthOptions = (
   currentSequencer: any, // Ideally, this is be a union type of all synth stores.
   activeSequencer: SequencerKey | undefined,
-): MonoSynthEnvelope => {
-  if (activeSequencer === SequencerKey.Mono && "envelope" in currentSequencer) {
+): {
+  envelope?: Envelope
+  setEnvelope?: (payload: Envelope) => void
+  filterEnvelope?: FilterEnvelope
+  setFilterEnvelope?: (payload: FilterEnvelope) => void
+} => {
+  if (activeSequencer === SequencerKey.Mono) {
     return {
       envelope: currentSequencer.envelope,
       setEnvelope: currentSequencer.setEnvelope,
+      filterEnvelope: currentSequencer.filterEnvelope,
+      setFilterEnvelope: currentSequencer.setFilterEnvelope,
     }
   }
-  return { envelope: undefined, setEnvelope: undefined }
+  return {
+    envelope: undefined,
+    setEnvelope: undefined,
+    filterEnvelope: undefined,
+    setFilterEnvelope: undefined,
+  }
 }
 
 export interface MonoSynthStoreValues extends SequencerStoreValues {
@@ -206,6 +213,8 @@ const useSequencer = () => {
       setDelayMix: state.setDelayMix,
       envelope: state.envelope,
       setEnvelope: state.setEnvelope,
+      filterEnvelope: state.filterEnvelope,
+      setFilterEnvelope: state.setFilterEnvelope,
     })),
   )
 

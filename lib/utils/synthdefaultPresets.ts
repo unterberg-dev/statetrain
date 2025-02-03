@@ -111,7 +111,7 @@ export const monoDefaultPreset = {
   },
   filter: {
     Q: 2,
-    type: "bandpass",
+    type: "highpass",
     rolloff: -24,
   },
   envelope: {
