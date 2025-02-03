@@ -3,10 +3,8 @@ import { memo, useCallback, useEffect, useMemo } from "react"
 import MissingStepButtonMap from "#components/sequencer/MissingStepsMap"
 import { SequencerButton, StepRow, StepsOuter } from "#components/sequencer/styled"
 import { getUniqueStepId } from "#components/sequencer/utils"
-import type { Sequencer } from "#tone/class/Sequencer"
 import useSequencer from "#tone/useSequencer"
 import useTone from "#tone/useTone"
-import type { Steps } from "#types/tone"
 import type { MeasureChunks } from "#types/ui"
 
 const MemoizedStepRow = memo(StepRow)
@@ -14,20 +12,16 @@ const MemoizedSequencerButton = memo(SequencerButton)
 
 interface StepButtonMapProps {
   measureChunks: MeasureChunks
-  steps: Steps
-  sequencer: Sequencer | null
-  setSequencerSteps: (steps: Steps) => void
 }
 
-const StepButtonMap = ({ measureChunks, steps, sequencer, setSequencerSteps }: StepButtonMapProps) => {
-  const { timeSignature, loopLength, bpm } = useTone()
+const StepButtonMap = ({ measureChunks }: StepButtonMapProps) => {
+  const { timeSignature, loopLength } = useTone()
   const measureSize = useMemo(() => timeSignature * loopLength, [timeSignature, loopLength])
-  const { editStepIndex, setEditStepIndex } = useSequencer()
-
-  useEffect(() => {
-    if (!sequencer || !steps.length) return
-    setSequencerSteps(sequencer.getSteps())
-  }, [sequencer, steps.length, setSequencerSteps])
+  const {
+    editStepIndex,
+    setEditStepIndex,
+    currentSequencer: { steps, sequencer },
+  } = useSequencer()
 
   const handleToggleStepEvent = useCallback(
     async (e: React.MouseEvent<HTMLButtonElement>) => {

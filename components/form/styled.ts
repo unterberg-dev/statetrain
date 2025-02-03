@@ -17,6 +17,7 @@ export const inputStyle = `
   items-center
   justify-center
   font-bold
+  select-none
 `
 
 export const StyledToggleButton = rc.button<StyledToggleButtonProps>`
@@ -31,11 +32,14 @@ export const StyledToggleButton = rc.button<StyledToggleButtonProps>`
   font-bold
   justify-center
   h-full
+  select-none
   ${(p) => (p.$pos === "left" ? "rounded-s-lg" : "rounded-e-lg")}
 `
 
 export const StyledNumberInput = rc.input`
   ${inputStyle}
+  select-none
+  pointer-events-none
   border-x-0
   w-full
   h-full

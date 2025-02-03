@@ -63,7 +63,7 @@ const Knob = ({ width = 52, height = 52, value, onChange, label, ...props }: Ext
         {...props}
         {...defaultProps}
       />
-      <span className="text-xs text-grayLight">{label}</span>
+      <span className="text-xs text-grayLight pointer-events-none select-none">{label}</span>
     </div>
   )
 }

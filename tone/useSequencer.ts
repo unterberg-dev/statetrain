@@ -51,6 +51,8 @@ interface SequencerStoreConfig {
   setEditStepIndex: (setterFn: StoreReactStateSetter<number | undefined>) => void
   activeSequencer: SequencerKey | undefined
   setActiveSequencer: (payload: SequencerKey | undefined) => void
+  editStepNotesMap: Record<number, number[]>
+  setEditStepNotesMap: (setterFn: StoreReactStateSetter<Record<number, number[]>>) => void
 }
 
 export const useInternalSequencerStoreConfigStore = create<SequencerStoreConfig>()((set) => ({
@@ -61,6 +63,11 @@ export const useInternalSequencerStoreConfigStore = create<SequencerStoreConfig>
     })),
   activeSequencer: undefined,
   setActiveSequencer: (payload) => set({ activeSequencer: payload }),
+  editStepNotesMap: {},
+  setEditStepNotesMap: (setterFn) =>
+    set(({ editStepNotesMap }) => ({
+      editStepNotesMap: typeof setterFn === "function" ? setterFn(editStepNotesMap) : setterFn,
+    })),
 }))
 
 const useSequencer = () => {
@@ -140,6 +147,10 @@ const useSequencer = () => {
 
   const editStepIndex = useInternalSequencerStoreConfigStore((state) => state.editStepIndex)
   const setEditStepIndex = useInternalSequencerStoreConfigStore((state) => state.setEditStepIndex)
+
+  // @todo: check if we can accumulate this with editStepIndex
+  const editStepNotesMap = useInternalSequencerStoreConfigStore((state) => state.editStepNotesMap)
+  const setEditStepNotesMap = useInternalSequencerStoreConfigStore((state) => state.setEditStepNotesMap)
 
   const activeSequencer = useInternalSequencerStoreConfigStore((state) => state.activeSequencer)
   const setActiveSequencer = useInternalSequencerStoreConfigStore((state) => state.setActiveSequencer)
@@ -330,6 +341,9 @@ const useSequencer = () => {
     setActiveSequencer,
 
     currentSequencer,
+
+    editStepNotesMap,
+    setEditStepNotesMap,
   }
 }
 

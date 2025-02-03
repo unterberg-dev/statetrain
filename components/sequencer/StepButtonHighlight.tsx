@@ -1,43 +1,45 @@
 // HighlightOverlayDOM.tsx
-import React, { useEffect, useRef } from "react"
+import { useCallback, useEffect, useMemo, useRef } from "react"
 import type { MeasureChunks } from "#types/ui"
 import { getUniqueStepId, parseTransportPosition } from "#components/sequencer/utils"
 import { StepRow } from "#components/sequencer/styled"
 import useTone from "#tone/useTone"
 import ToneManager from "#tone/class/ToneManager"
-import type { SequencerMeasuresValue } from "#tone/useSequencer"
 import { useGlobalActiveStepRef } from "#tone/ActiveStepProvider"
+import useSequencer from "#tone/useSequencer"
+import { getCurrentSixteenthStep } from "#utils/getSteps"
+import useTransportTick from "#tone/useTransportTick"
 
-interface HighlightOverlayDOMProps {
+interface StepButtonHighlightProps {
   measureChunks: MeasureChunks
-  registerSixteenthTick: (fn: () => void) => void
-  unregisterSixteenthTick: (fn: () => void) => void
-  measureCount: SequencerMeasuresValue
 }
 
-function HighlightOverlayDOM({
-  measureChunks,
-  registerSixteenthTick,
-  unregisterSixteenthTick,
-  measureCount,
-}: HighlightOverlayDOMProps) {
+function StepButtonHighlight({ measureChunks }: StepButtonHighlightProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const currentStepRef = useGlobalActiveStepRef()
   const prevStepRef = useRef<number>(0)
-  const { isPlaying, timeSignature, loopLength, bpm } = useTone()
 
-  // Calculate total steps from measureChunks, if necessary:
-  // e.g. sum up all stepObj across each chunk, or if they’re uniform, just measureChunks[0].length * measureChunks.length
-  const totalSteps = measureChunks.reduce((acc, chunk) => acc + chunk.length, 0)
+  const { isPlaying, timeSignature, loopLength, bpm, registerSixteenthTick, unregisterSixteenthTick } =
+    useTone()
+  const {
+    currentSequencer: { measures },
+  } = useSequencer()
 
-  // 1) Tone.js subscription for updating the ref on each 16th note
-  useEffect(() => {
-    function handleTick() {
-      currentStepRef.current = (currentStepRef.current + 1) % totalSteps
-    }
-    registerSixteenthTick(handleTick)
-    return () => unregisterSixteenthTick(handleTick)
-  }, [currentStepRef, totalSteps, registerSixteenthTick, unregisterSixteenthTick])
+  const totalSteps = useMemo(
+    () => measureChunks.reduce((acc, chunk) => acc + chunk.length, 0),
+    [measureChunks],
+  )
+
+  const onSixteenthTick = useCallback(() => {
+    currentStepRef.current = getCurrentSixteenthStep(totalSteps)
+  }, [currentStepRef, totalSteps])
+
+  useTransportTick({
+    onTick: onSixteenthTick,
+    registerFn: registerSixteenthTick,
+    unregisterFn: unregisterSixteenthTick,
+    syncOnVisibility: true,
+  })
 
   // reset highlight if user toggles global play
   useEffect(() => {
@@ -47,23 +49,19 @@ function HighlightOverlayDOM({
   }, [currentStepRef, isPlaying])
 
   useEffect(() => {
-    if (measureCount) {
-      // Adjust active step based on Tone.Transport position
+    if (measures) {
       const posString = ToneManager.toneTransport?.position as string
       if (posString) {
         const totalSixteenthCount = parseTransportPosition(posString, timeSignature)
+        const newTotalSteps = measures * timeSignature * loopLength
 
-        // Calculate new total steps based on updated measures
-        const newTotalSteps = measureCount * timeSignature * loopLength
-
-        // Determine the new active step
         const currentStep = totalSixteenthCount % newTotalSteps
         currentStepRef.current = Math.floor(currentStep)
       } else {
         currentStepRef.current = 0
       }
     }
-  }, [currentStepRef, measureCount, loopLength, timeSignature])
+  }, [currentStepRef, measures, loopLength, timeSignature])
 
   // 2) requestAnimationFrame loop to do the highlighting
   useEffect(() => {
@@ -72,7 +70,6 @@ function HighlightOverlayDOM({
     function animate() {
       const container = containerRef.current
       if (container) {
-        // Remove highlight from prev cell
         const prevCell = container.querySelector(
           `[data-step-index="${prevStepRef.current}"]`,
         ) as HTMLDivElement | null
@@ -87,8 +84,6 @@ function HighlightOverlayDOM({
         if (currentCell) {
           currentCell.style.opacity = "1"
         }
-
-        // Update prev step
         prevStepRef.current = currentStepRef.current
       }
 
@@ -99,15 +94,11 @@ function HighlightOverlayDOM({
     return () => cancelAnimationFrame(frameId)
   }, [currentStepRef])
 
-  // 3) Render multi‐row layout.
-  // Each row = one element from measureChunks; each cell has data-step-index = stepObj.originalIndex
-  // Make sure it matches EXACTLY the layout you want.
-
   return (
     <div ref={containerRef} className="absolute inset-0 pointer-events-none flex flex-col gap-1 z-3">
       {measureChunks.map((rowSteps, rowIndex) => (
         // Use rowIndex as key or some unique measure ID
-        <StepRow key={getUniqueStepId(rowIndex, 0)} className="grid grid-cols-12 gap-1">
+        <StepRow key={getUniqueStepId(rowIndex, 0)}>
           {rowSteps.map((stepObj) => (
             <div
               key={stepObj.originalIndex}
@@ -127,4 +118,4 @@ function HighlightOverlayDOM({
   )
 }
 
-export default HighlightOverlayDOM
+export default StepButtonHighlight

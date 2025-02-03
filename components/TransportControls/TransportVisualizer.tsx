@@ -1,37 +1,48 @@
 import { CircleDashed, CircleX, Smile } from "lucide-react"
-import { memo, useEffect, useMemo, useState } from "react"
+import { memo, useCallback, useEffect, useMemo, useState } from "react"
 
 import useTone from "#tone/useTone"
-import ToneManager from "#tone/class/ToneManager"
+import useTransportTick from "#tone/useTransportTick"
 
 const TransportVisualizer = memo(() => {
   const [tickCount, setTickCount] = useState(0)
-  const { isPlaying, loopLength, timeSignature } = useTone()
 
-  const measures = useMemo(() => Array.from({ length: loopLength }, (_, i) => i), [loopLength])
-  const ticks = useMemo(() => Array.from({ length: timeSignature }, (_, i) => i), [timeSignature])
+  const { isPlaying, loopLength, transport, timeSignature, registerQuarterTick, unregisterQuarterTick } =
+    useTone()
 
-  // Which tick are we on?
-  const totalSteps = loopLength * timeSignature
-  const currentStep = isPlaying ? tickCount % totalSteps : undefined
+  // We'll often need total quarter steps in a loop
+  const totalQuarterSteps = loopLength * timeSignature
 
-  // subscribe to transport ticks
-  useEffect(() => {
-    function handleTick() {
-      setTickCount((prev) => prev + 1)
-    }
-    ToneManager.emitter.on("quarterTick", handleTick)
+  // 2) Our stable handleTick callback
+  const handleTick = useCallback(() => {
+    if (!transport) return
 
-    return () => {
-      ToneManager.emitter.off("quarterTick", handleTick)
-    }
-  }, [])
+    const quarterIndex = Math.floor(transport.ticks / transport.PPQ)
+    const step = quarterIndex % totalQuarterSteps
+
+    setTickCount(step)
+  }, [totalQuarterSteps, transport])
+
+  useTransportTick({
+    onTick: handleTick,
+    registerFn: registerQuarterTick,
+    unregisterFn: unregisterQuarterTick,
+    syncOnVisibility: true,
+  })
 
   useEffect(() => {
     if (!isPlaying) {
       setTickCount(0)
     }
   }, [isPlaying])
+
+  // 5) Which step do we highlight?
+  const currentStep = isPlaying ? tickCount : undefined
+
+  // Render your measures & ticks
+  const measures = useMemo(() => Array.from({ length: loopLength }, (_, i) => i), [loopLength])
+
+  const ticks = useMemo(() => Array.from({ length: timeSignature }, (_, i) => i), [timeSignature])
 
   return (
     <div className="flex flex-col items-stretch justify-between">

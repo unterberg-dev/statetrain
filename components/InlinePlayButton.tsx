@@ -1,6 +1,5 @@
 import { Play, Square } from "lucide-react"
-import type React from "react"
-import { ButtonHTMLAttributes, useCallback } from "react"
+import { useCallback } from "react"
 
 import Button, { type ButtonProps } from "#components/common/Button"
 import useTone from "#tone/useTone"
