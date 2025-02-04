@@ -50,7 +50,7 @@ const Knob = ({ width = 52, height = 52, value, onChange, label, ...props }: Ext
     <div className="flex flex-col items-center gap-2">
       <RotaryKnob
         rotateDegrees={-180}
-        fallback={<Skeleton style={{ width, height }} />}
+        fallback={<Skeleton style={{ width, height }} className="rounded-full" />}
         style={{ width, height }}
         className="knob cursor-move"
         value={realTimeValue} // Ensure it's synced

@@ -2,7 +2,7 @@ import { EventEmitter } from "eventemitter3"
 import { consola } from "consola/browser"
 
 import type { InternalToneType, InternalTransportType } from "#types/tone"
-import { TRANSPORT_CONFIG } from "#lib/config"
+import { APP_CONFIG, TRANSPORT_CONFIG } from "#lib/config"
 import { Sequencer } from "#tone/class/Sequencer"
 import type { SequencerMeasuresValue } from "#tone/useSequencer"
 import SynthManager from "#tone/class/SynthManager"
@@ -180,7 +180,13 @@ class ToneManager {
    */
   public getTone(): InternalToneType {
     if (!this.toneCore) {
-      throw new Error("Tone.js is not yet initialized.")
+      // prevent blank page on tone crash with hmr - reinit
+      if (import.meta.env.DEV) {
+        location.reload()
+      } else {
+        location.href = `${APP_CONFIG.viteUrl}/tone-crashed`
+      }
+      throw new Error("Tone.js is not initialized.")
     }
     return this.toneCore
   }

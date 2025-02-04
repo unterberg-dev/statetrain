@@ -1,9 +1,9 @@
-import { ToneContext } from "#tone/ToneContextProvider"
 import ToneManager from "#tone/class/ToneManager"
 import { useCallback, useContext, useMemo } from "react"
 import { TRANSPORT_CONFIG } from "#lib/config"
 import { create } from "zustand"
 import { internalLinks } from "#lib/links"
+import { ToneContext } from "#tone/ToneContext"
 
 interface TransportStoreGetter {
   bpm: number

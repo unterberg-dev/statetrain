@@ -10,6 +10,7 @@ import PianoRollControls from "#components/PianoRoll/Controls"
 import { StyledKey, StyledKeyNoteValue } from "#components/PianoRoll/styled"
 import { keyMap } from "#lib/constants"
 import { getPlayableNotes } from "#utils/index"
+import LayoutComponent from "#components/common/LayoutComponent"
 
 const MemoizedStyledKey = memo(StyledKey)
 const MemoizedStyledKeyNoteValue = memo(StyledKeyNoteValue)
@@ -31,9 +32,6 @@ export default function PianoRoll() {
   const [displayedOctaves, setDisplayedOctaves] = useState(2)
   const [notesPressed, setNotesPressed] = useState<number[] | null>(null)
   const [maxVoicesReached, setMaxVoicesReached] = useState(false)
-
-  // Force a re-render if the sequencer changes (since it's a class outside React)
-  const [, forceRender] = useState(0)
 
   // For highlighting active keys
   const pianoRef = useRef<HTMLDivElement>(null)
@@ -231,9 +229,8 @@ export default function PianoRoll() {
   )
 
   return (
-    <>
+    <div className="rounded-sm p-4 bg-black">
       <H3Headline className="text-white mt-5 mb-3">Piano Roll</H3Headline>
-
       <div className="flex justify-between items-center mb-5">
         <PianoRollControls
           currentOctave={currentOctave}
@@ -303,6 +300,6 @@ export default function PianoRoll() {
           </label>
         </div>
       )}
-    </>
+    </div>
   )
 }

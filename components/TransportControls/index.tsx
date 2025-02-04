@@ -33,31 +33,29 @@ const TransportControls = () => {
   }, 300)
 
   return (
-    <LayoutComponent className="flex justify-end z-20">
-      <ElementContainer className="inline-flex gap-3 items-stretch h-20">
-        <TransportVisualizer />
-        <TransportSettings />
-        <Button
-          className={`"flex-1 w-14" ${isPlaying ? "" : "animate-pulse"}`}
-          color={isPlaying ? "error" : "success"}
-          icon={isPlaying ? <Square className="w-10 h-10" /> : <Play className="w-10 h-10" />}
-          onClick={handlePlayButtonClick}
-        />
-        <Button
-          className="flex-1 w-14"
-          color={isMetronomeStarted ? "primary" : "success"}
-          icon={
-            <img
-              src={`${APP_CONFIG.viteUrl}/icons/metronome-svgrepo-com.svg`}
-              alt="Stop"
-              className="w-10 h-10"
-            />
-          }
-          onClick={handleToggleMetronome}
-        />
-        <Knob width={32} height={32} label="Metronome" onChange={throttledOnChangeVolume} value={volume} />
-      </ElementContainer>
-    </LayoutComponent>
+    <ElementContainer className="inline-flex gap-3 items-stretch h-20">
+      <TransportVisualizer />
+      <TransportSettings />
+      <Button
+        className={`"flex-1 w-14" ${isPlaying ? "" : "animate-pulse"}`}
+        color={isPlaying ? "error" : "success"}
+        icon={isPlaying ? <Square className="w-10 h-10" /> : <Play className="w-10 h-10" />}
+        onClick={handlePlayButtonClick}
+      />
+      <Button
+        className="flex-1 w-14"
+        color={isMetronomeStarted ? "primary" : "success"}
+        icon={
+          <img
+            src={`${APP_CONFIG.viteUrl}/icons/metronome-svgrepo-com.svg`}
+            alt="Stop"
+            className="w-10 h-10"
+          />
+        }
+        onClick={handleToggleMetronome}
+      />
+      <Knob width={32} height={32} label="Metronome" onChange={throttledOnChangeVolume} value={volume} />
+    </ElementContainer>
   )
 }
 export default TransportControls

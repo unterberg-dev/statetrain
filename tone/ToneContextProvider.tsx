@@ -1,13 +1,8 @@
 import ToneManager from "#tone/class/ToneManager"
+import { ToneContext } from "#tone/ToneContext"
 import { consola } from "consola/browser"
-import { type ReactNode, useState, useCallback, createContext } from "react"
-
-interface ToneContextType {
-  isInitialized: boolean
-  initTone: () => void
-}
-
-export const ToneContext = createContext<ToneContextType | undefined>(undefined)
+import { type ReactNode, useState, useCallback } from "react"
+import { navigate } from "vike/client/router"
 
 const ToneContextProvider = ({ children }: { children: ReactNode }) => {
   const [isInitialized, setIsInitialized] = useState(false)
@@ -29,7 +24,7 @@ const ToneContextProvider = ({ children }: { children: ReactNode }) => {
       await ToneManager.init()
       setIsInitialized(true)
     } catch (error) {
-      consola.error("Failed to initialize Tone.js:", error)
+      navigate("")
     } finally {
       setIsInitializing(false)
     }

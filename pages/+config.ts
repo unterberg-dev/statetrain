@@ -9,4 +9,5 @@ export default {
   extends: vikeReact,
   lang: "en",
   clientRouting: true,
+  passToClient: ["abortStatusCode", "is404"],
 } satisfies Config

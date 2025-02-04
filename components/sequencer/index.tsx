@@ -3,11 +3,9 @@ import StepButtonMap from "#components/Sequencer/StepButtonMap"
 import { chunkArray } from "#components/Sequencer/utils"
 import useTone from "#tone/useTone"
 import { useMemo } from "react"
-import PianoRoll from "#components/PianoRoll"
 import useSequencer from "#tone/useSequencer"
 import LayoutComponent from "#components/common/LayoutComponent"
 import StepButtonHighlight from "#components/Sequencer/StepButtonHighlight"
-import { ActiveStepProvider } from "#tone/ActiveStepProvider"
 import SequencerKnobs from "#components/Sequencer/Knobs"
 
 const SequencerLayout = () => {
@@ -26,19 +24,16 @@ const SequencerLayout = () => {
   }, [steps, measureSize])
 
   return (
-    <LayoutComponent className="p-4 rounded-sm bg-black">
+    <div className="rounded-sm p-4 bg-black">
       <div className="flex justify-between items-center mb-5">
         <SequencerControls />
         <SequencerKnobs />
       </div>
-      <ActiveStepProvider>
-        <div className="relative">
-          <StepButtonMap measureChunks={measureChunks} />
-          <StepButtonHighlight measureChunks={measureChunks} />
-        </div>
-        <PianoRoll />
-      </ActiveStepProvider>
-    </LayoutComponent>
+      <div className="relative">
+        <StepButtonMap measureChunks={measureChunks} />
+        <StepButtonHighlight measureChunks={measureChunks} />
+      </div>
+    </div>
   )
 }
 

@@ -8,6 +8,10 @@ export const internalLinks = {
     url: `${base}/`,
     title: "Mixer / Overview",
   },
+  toneBroken: {
+    url: `${base}/tone-crashed/`,
+    title: "Tone is broken",
+  },
   synths: {
     amSynth: {
       key: SequencerKey.AM,

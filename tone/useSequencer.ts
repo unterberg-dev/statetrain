@@ -14,7 +14,7 @@ import ToneManager from "#tone/class/ToneManager"
 import useTone from "#tone/useTone"
 import type { Steps, StoreReactStateSetter } from "#types/tone"
 import { create } from "zustand"
-import { useMemo } from "react"
+import { useCallback, useMemo } from "react"
 import { useShallow } from "zustand/react/shallow"
 import type { MonoSynthOptions } from "tone"
 
@@ -56,8 +56,11 @@ export interface FilterEnvelope {
   exponent: number
 }
 
+// here goes the store for the sequencers
+export type SequencerUnion = any // .., OtherSynthStoreValues, ...
+
 export const getMonoSynthOptions = (
-  currentSequencer: any, // Ideally, this is be a union type of all synth stores.
+  currentSequencer: SequencerUnion,
   activeSequencer: SequencerKey | undefined,
 ): {
   envelope?: Envelope
@@ -332,8 +335,31 @@ const useSequencer = () => {
     fmSynthState,
   ])
 
+  const getSquencerStore = useCallback(
+    (sequencerKey: SequencerKey) => {
+      switch (sequencerKey) {
+        case SequencerKey.AM:
+          return amSynthState
+        case SequencerKey.Mono:
+          return monoSynthState
+        case SequencerKey.Duo:
+          return duoSynthState
+        case SequencerKey.Metal:
+          return metalSynthState
+        case SequencerKey.Membrane:
+          return membraneSynthState
+        case SequencerKey.FM:
+          return fmSynthState
+        default:
+          return amSynthState
+      }
+    },
+    [amSynthState, monoSynthState, duoSynthState, metalSynthState, membraneSynthState, fmSynthState],
+  )
+
   return {
     ...configState,
+    getSquencerStore,
     currentSequencer,
   }
 }
