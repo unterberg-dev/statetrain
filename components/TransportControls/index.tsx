@@ -8,11 +8,10 @@ import TransportVisualizer from "#components/TransportControls/TransportVisualiz
 import useTone from "#tone/useTone"
 import { APP_CONFIG } from "#lib/config"
 import useMetronome from "#tone/useMetronome"
-import LayoutComponent from "#components/common/LayoutComponent"
 import Metronome from "#tone/class/Metronome"
 import { ruleOfThree } from "#utils/index"
 import useThrottledCallback from "#lib/hooks/useThrottledCallback"
-import Knob from "#components/Knob"
+import RotaryKnob from "#components/form/RotaryKnob"
 import { VOLUME_MAX, VOLUME_MIN } from "#lib/constants"
 
 const TransportControls = () => {
@@ -54,7 +53,13 @@ const TransportControls = () => {
         }
         onClick={handleToggleMetronome}
       />
-      <Knob width={32} height={32} label="Metronome" onChange={throttledOnChangeVolume} value={volume} />
+      <RotaryKnob
+        width={32}
+        height={32}
+        label="Metronome"
+        onChange={throttledOnChangeVolume}
+        value={volume}
+      />
     </ElementContainer>
   )
 }

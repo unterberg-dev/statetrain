@@ -12,51 +12,27 @@ import { usePageContext } from "vike-react/usePageContext"
 import useTone from "#tone/useTone"
 import useMetronome from "#tone/useMetronome"
 import useSequencer from "#tone/useSequencer"
-import { SequencerKey } from "#lib/constants"
-import { internalLinks } from "#lib/links"
 import ToneContextProvider from "#tone/ToneContextProvider"
 import PianoRoll from "#components/PianoRoll"
 import { ActiveStepProvider } from "#tone/ActiveStepProvider"
 import LayoutComponent from "#components/common/LayoutComponent"
+import KnobPanel from "#components/KnobPanel"
 
 const AppLayout = ({ children }: { children: ReactNode }) => {
-  const { urlParsed } = usePageContext()
-  const { setActiveSequencer, activeSequencer } = useSequencer()
-
-  useEffect(() => {
-    switch (urlParsed.pathnameOriginal) {
-      case internalLinks.synths.amSynth.url:
-        setActiveSequencer(SequencerKey.AM)
-        break
-      case internalLinks.synths.duoSynth.url:
-        setActiveSequencer(SequencerKey.Duo)
-        break
-      case internalLinks.synths.fmSynth.url:
-        setActiveSequencer(SequencerKey.FM)
-        break
-      case internalLinks.synths.membraneSynth.url:
-        setActiveSequencer(SequencerKey.Membrane)
-        break
-      case internalLinks.synths.metalSynth.url:
-        setActiveSequencer(SequencerKey.Metal)
-        break
-      case internalLinks.synths.monoSynth.url:
-        setActiveSequencer(SequencerKey.Mono)
-        break
-      default:
-        setActiveSequencer(undefined)
-        break
-    }
-  }, [urlParsed.pathnameOriginal, setActiveSequencer])
-
-  const isStartPage = urlParsed.href === "/"
+  const { isInitialized } = useTone()
+  const { activeSequencer } = useSequencer()
 
   return (
     <>
       <Header />
       <LayoutComponent className="mt-10 min-h-70dvh">
-        {!isStartPage && activeSequencer && <SequencerLayout />}
-        {!isStartPage && activeSequencer && <PianoRoll />}
+        {isInitialized && activeSequencer && (
+          <div className="flex-col gap-4 flex">
+            <KnobPanel />
+            <SequencerLayout />
+            <PianoRoll />
+          </div>
+        )}
         {children}
       </LayoutComponent>
       <Footer />
@@ -66,7 +42,7 @@ const AppLayout = ({ children }: { children: ReactNode }) => {
 
 const routesWithoutPortal = ["/tone-crashed/"]
 
-const App = ({ children }: { children: ReactNode }) => {
+const AppInContext = ({ children }: { children: ReactNode }) => {
   const { isInitialized, handlePlay } = useTone()
   const { handleMetronomeInit } = useMetronome()
   const context = usePageContext()
@@ -84,12 +60,12 @@ const App = ({ children }: { children: ReactNode }) => {
   return isInitialized || isWithoutPortal ? <AppLayout>{children}</AppLayout> : <TonePortalContent />
 }
 
-const AppContext = ({ children }: { children: ReactNode }) => (
+const App = ({ children }: { children: ReactNode }) => (
   <ToneContextProvider>
     <ActiveStepProvider>
-      <App>{children}</App>
+      <AppInContext>{children}</AppInContext>
     </ActiveStepProvider>
   </ToneContextProvider>
 )
 
-export default AppContext
+export default App

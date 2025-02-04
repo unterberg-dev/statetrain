@@ -11,6 +11,7 @@ import { StyledKey, StyledKeyNoteValue } from "#components/PianoRoll/styled"
 import { keyMap } from "#lib/constants"
 import { getPlayableNotes } from "#utils/index"
 import LayoutComponent from "#components/common/LayoutComponent"
+import ElementContainer from "#components/common/ElementContainer"
 
 const MemoizedStyledKey = memo(StyledKey)
 const MemoizedStyledKeyNoteValue = memo(StyledKeyNoteValue)
@@ -229,7 +230,7 @@ export default function PianoRoll() {
   )
 
   return (
-    <div className="rounded-sm p-4 bg-black">
+    <ElementContainer>
       <H3Headline className="text-white mt-5 mb-3">Piano Roll</H3Headline>
       <div className="flex justify-between items-center mb-5">
         <PianoRollControls
@@ -300,6 +301,6 @@ export default function PianoRoll() {
           </label>
         </div>
       )}
-    </div>
+    </ElementContainer>
   )
 }

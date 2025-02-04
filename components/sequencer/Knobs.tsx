@@ -4,7 +4,7 @@ import useThrottledCallback from "#lib/hooks/useThrottledCallback"
 import EffectBus from "#tone/class/EffectBus"
 import useSequencer from "#tone/useSequencer"
 import { ruleOfThree } from "#utils/index"
-import Knob from "#components/Knob"
+import RotaryKnob from "#components/form/RotaryKnob"
 import useTone from "#tone/useTone"
 import { VOLUME_MIN, VOLUME_MAX } from "#lib/constants"
 
@@ -34,37 +34,37 @@ const SequencerKnobs = () => {
 
   const synth = sequencer?.getSynth()
 
-  const onChangeReverbMix = useThrottledCallback((value: number) => {
-    setReverb(value)
-    if (sequencer && synth) {
-      const interpolatedValue = ruleOfThree(value, 0, 1)
-      EffectBus.updateSynthReverbMix(synth, interpolatedValue)
-    }
-  }, 300)
+  const onChangeReverbMix = useCallback(
+    (value: number) => {
+      setReverb(value)
+      if (sequencer && synth) {
+        const interpolatedValue = ruleOfThree(value, 0, 1)
+        EffectBus.updateSynthReverbMix(synth, interpolatedValue)
+      }
+    },
+    [sequencer, synth, setReverb],
+  )
 
-  const onChangeDelayMix = useThrottledCallback((value: number) => {
-    setDelay(value)
-    if (sequencer && synth) {
-      const interpolatedValue = ruleOfThree(value, 0, 1)
-      EffectBus.updateSynthDelayMix(synth, interpolatedValue)
-    }
-  }, 300)
-
-  const throttledOnChangeVolume = useThrottledCallback((value: number) => {
-    setVolume(Math.floor(value))
-    if (sequencer) {
-      const interpolatedValue = ruleOfThree(value, VOLUME_MIN, VOLUME_MAX)
-      sequencer.setVolume(interpolatedValue)
-    }
-  }, 300)
+  const onChangeDelayMix = useCallback(
+    (value: number) => {
+      setDelay(value)
+      if (sequencer && synth) {
+        const interpolatedValue = ruleOfThree(value, 0, 1)
+        EffectBus.updateSynthDelayMix(synth, interpolatedValue)
+      }
+    },
+    [sequencer, synth, setDelay],
+  )
 
   const onChangeVolume = useCallback(
     (value: number) => {
+      setVolume(Math.floor(value))
       if (sequencer) {
-        throttledOnChangeVolume(Math.floor(value))
+        const interpolatedValue = ruleOfThree(value, VOLUME_MIN, VOLUME_MAX)
+        sequencer.setVolume(interpolatedValue)
       }
     },
-    [sequencer, throttledOnChangeVolume],
+    [sequencer, setVolume],
   )
 
   useEffect(() => {
@@ -75,11 +75,10 @@ const SequencerKnobs = () => {
 
   return (
     <StyledKnobOuter>
-      {/* Render envelope knobs only if envelope settings exist */}
       <StyledKnobGroup>
-        <Knob label="Volume" onChange={onChangeVolume} value={volume || 0} />
-        <Knob label="Reverb" onChange={onChangeReverbMix} value={reverb ?? 0} />
-        <Knob label="Delay" onChange={onChangeDelayMix} value={delay ?? 0} />
+        <RotaryKnob label="Volume" onChange={onChangeVolume} value={volume || 0} />
+        <RotaryKnob label="Reverb" onChange={onChangeReverbMix} value={reverb ?? 0} />
+        <RotaryKnob label="Delay" onChange={onChangeDelayMix} value={delay ?? 0} />
       </StyledKnobGroup>
     </StyledKnobOuter>
   )

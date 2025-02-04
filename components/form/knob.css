@@ -1,0 +1,9 @@
+.knob g#container #Oval-5,
+.knob g#container g#Oval-2 {
+  display: none !important;
+}
+
+.knob g#container #knob path {
+  fill: var(--color-primary);
+}
+

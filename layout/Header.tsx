@@ -11,8 +11,9 @@ const Header = () => {
           <Smile size={50} />
           <TransportControls />
         </div>
-        <div className="mt-8"></div>
-        <InstrumentNav />
+        <div className="mt-8">
+          <InstrumentNav />
+        </div>
       </LayoutComponent>
     </>
   )

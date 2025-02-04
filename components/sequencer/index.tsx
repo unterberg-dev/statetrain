@@ -4,9 +4,9 @@ import { chunkArray } from "#components/Sequencer/utils"
 import useTone from "#tone/useTone"
 import { useMemo } from "react"
 import useSequencer from "#tone/useSequencer"
-import LayoutComponent from "#components/common/LayoutComponent"
 import StepButtonHighlight from "#components/Sequencer/StepButtonHighlight"
 import SequencerKnobs from "#components/Sequencer/Knobs"
+import ElementContainer from "#components/common/ElementContainer"
 
 const SequencerLayout = () => {
   const { timeSignature, loopLength } = useTone()
@@ -24,7 +24,7 @@ const SequencerLayout = () => {
   }, [steps, measureSize])
 
   return (
-    <div className="rounded-sm p-4 bg-black">
+    <ElementContainer>
       <div className="flex justify-between items-center mb-5">
         <SequencerControls />
         <SequencerKnobs />
@@ -33,7 +33,7 @@ const SequencerLayout = () => {
         <StepButtonMap measureChunks={measureChunks} />
         <StepButtonHighlight measureChunks={measureChunks} />
       </div>
-    </div>
+    </ElementContainer>
   )
 }
 

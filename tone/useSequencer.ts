@@ -65,6 +65,8 @@ export const getMonoSynthOptions = (
 ): {
   envelope?: Envelope
   setEnvelope?: (payload: Envelope) => void
+  filter?: Filter
+  setFilter?: (payload: Filter) => void
   filterEnvelope?: FilterEnvelope
   setFilterEnvelope?: (payload: FilterEnvelope) => void
 } => {
@@ -72,6 +74,8 @@ export const getMonoSynthOptions = (
     return {
       envelope: currentSequencer.envelope,
       setEnvelope: currentSequencer.setEnvelope,
+      filter: currentSequencer.filter,
+      setFilter: currentSequencer.setFilter,
       filterEnvelope: currentSequencer.filterEnvelope,
       setFilterEnvelope: currentSequencer.setFilterEnvelope,
     }
@@ -79,6 +83,8 @@ export const getMonoSynthOptions = (
   return {
     envelope: undefined,
     setEnvelope: undefined,
+    filter: undefined,
+    setFilter: undefined,
     filterEnvelope: undefined,
     setFilterEnvelope: undefined,
   }
